@@ -1,0 +1,144 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{title}}: {{app_settings.site_title}}{% endblock %}
+
+{% block javascript %}
+{{form.media}}
+{% endblock javascript %}
+
+{% block content %}
+
+<!-- Start::app-content -->
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="page-header d-flex d-block justify-content-between">
+            <div class="page-leftheader">
+                <div class="page-title">{{ title|title }}</div>
+            </div>
+            <div class="page-rightheader">
+                
+            </div>
+        </div>
+        <!-- Page Header Close -->
+
+        <!-- Start::row-1 -->
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card custom-card invoice-card" id="invoice-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="invoice-header text-start d-block">
+                                    <img src="{% static 'app/assets/images/brand-logos/desktop-logo.png' %}" alt="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="invoice-header text-end d-block mb-4">
+                                    <h2 class="invoice-title fw-medium text-uppercase mb-1">Receipt</h2>
+                                </div><!-- invoice-header -->
+                            </div>
+                            
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md">
+                                <p class="fw-medium mb-2">Receipt To</p>
+                                <div class="billed-to">
+                                    <h6>{{object.student.fullname}}</h6>
+                                    {% if object.student.communication_address %}
+                                    <p>{{object.student.communication_address}}<br>
+                                    {% endif %}
+                                    Phone : {{object.student.contact_number}}<br>
+                                    Email: {{object.student.personal_email}}</p>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="billed-from text-md-end">
+                                    <label class="fw-medium">Receipt From</label>
+                                    <h6>Oxdu Tech School.</h6>
+                                    <p>Near Calicut International Airport Ali Tower, Kondotty, Kerala 673638<br>
+                                    Phone : +91 088480 09860<br>
+                                    Email: Info@oxdu.in</p>
+                                </div><!-- billed-from -->
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table class="table table-bordered border text-nowrap mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="">Course</th>
+                                        <th class="text-center">Course Price</th>
+                                        <th class="text-end">Paid</th>
+                                        <th class="text-end">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-medium">{{object.student.course}}</td>
+                                        <td class="text-center fw-bold">₹{{object.student.course.fees}}</td>
+                                        <td class="text-end fw-bold text-success">₹{{object.amount}}</td>
+                                        <td class="text-end fw-bold text-danger">₹{{object.get_balance_amount}}</td>
+                                    </tr>
+                                   
+                                    <tr>
+                                        <td class="valign-middle" colspan="4" rowspan="4">
+                                        {% if object.note%}
+                                            <div class="invoice-notes">
+                                                <label class="main-content-label tx-13 fw-medium">Notes</label>
+                                                <p> {{object.note}}.</p>
+                                            </div><!-- invoice-notes -->
+                                        {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="float-end btn-list mt-4 invoice-btns">
+                            <a class="btn btn-secondary" href="{{object.get_list_url}}"><i class="ri-arrow-go-back-line align-middle"></i> Back </a>
+                            <button class="btn btn-secondary" onclick="downloadInvoice()">
+                                <i class="ri-download-2-line align-middle"></i> Download Invoice
+                            </button>
+                            <button  class="btn btn-info" onClick="javascript:window.print();"><i class="ri-printer-line align-middle"></i> Print Invoice</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+<!-- End::app-content -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    function downloadInvoice() {
+        const { jsPDF } = window.jspdf;
+        const invoiceCard = document.getElementById("invoice-card");
+        const buttons = document.querySelector(".invoice-btns"); 
+    
+        buttons.style.display = "none";
+    
+        html2canvas(invoiceCard, { scale: 3 }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+    
+            const imgWidth = 190; 
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+            pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+            pdf.save("invoice.pdf");
+    
+            buttons.style.display = "block";
+        }).catch(error => {
+            console.error("Error generating PDF:", error);
+            buttons.style.display = "block"; 
+        });
+    }
+</script>
+
+{% endblock content %}

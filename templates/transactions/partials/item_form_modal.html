@@ -1,0 +1,46 @@
+{% load static crispy_forms_tags %}
+
+<div class="modal fade" id="item-form-modal" tabindex="-1" aria-labelledby="item-form-modalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="item-form-modalLabel">Account Form</h5>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'transactions:item_create' %}" class="" id="item-form">
+                    {% csrf_token %}
+                    <div class="row">
+                      
+                      <div class="col-md-6">
+                        {{ item_form.is_active|as_crispy_field }}
+                        {{ item_form.name|as_crispy_field }}
+                        {{ item_form.price.label_tag }}
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="w-50">{{ item_form.price }}</td>
+                                    <td class="w-50"> {{ item_form.tax_included }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      </div>
+                      <div class="col-md-6">
+                        {{ item_form.hsn_or_sac|as_crispy_field }}
+                        {{item_form.tax|as_crispy_field }}
+                      </div>
+                      
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="button" class="btn btn-outline-grey" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

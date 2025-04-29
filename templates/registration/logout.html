@@ -1,0 +1,25 @@
+{% extends 'registration/registration_base.html' %}
+{% load static crispy_forms_tags %}
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+
+<div class="col-xl-12 bg-white log-image1">
+    <row class="row justify-content-center align-items-center h-100 mx-0">
+        <div class="col-xxl-12 col-xl-10 col-lg-7 col-md-8 col-sm-8 col-12">
+            <div class="container">
+                <div class="customlogin-content p-xl-5 py-2 mx-auto h-250">
+                   
+                    <div class="p-4 pt-6 text-center">
+                        <h1 class="mb-5 h3 font-weight-bold">Logged out.</h1>
+                        <a href="{% url 'auth_login' %}" class="btn btn-outline-info">Login Again</a>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </row>
+</div>
+
+
+{% endblock content %}

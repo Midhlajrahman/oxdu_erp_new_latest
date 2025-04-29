@@ -1,0 +1,562 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{title}}: {{app_settings.site_title}}{% endblock %}
+
+
+
+{% block content %}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="page-header d-flex d-block justify-content-between">
+            <div class="page-leftheader">
+                <div class="page-title">{{ title|title }}</div>
+            </div>
+            <div class="page-rightheader">
+                
+            </div>
+        </div>
+        <!-- Page Header Close -->
+
+        <!-- Start::row-1 -->
+        <div class="row">
+            <div class="col-md-12">
+                <form class="form-horizontal-expense" method="post" autocomplete="off" enctype="multipart/form-data" action="">
+                    <div class="card custom-card">
+                        <div class="card-header d-flex justify-content-between border-bottom-0">
+                            <div class="card-title d-flex">
+                                {{ sub_title|title }}
+                                <div class="form-check form-check-lg form-switch">
+                                    {{ form.is_gst|as_crispy_field }} 
+                                </div>
+                            </div>
+                            <div class="btn-list">
+                                {% if object %}
+                                    <a href="{{ object.get_delete_url }}" class="btn btn-light3" data-bs-placement="top"
+                                    data-bs-toggle="tooltip" title="Delete"> <i class="mdi mdi-delete"></i> </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    {% csrf_token %}
+                                    <div class="row justify-content-between">
+                                        <div class="col-md-5">
+                                            {{ form.is_active|as_crispy_field }}
+                                            {{ form.expense_category|as_crispy_field }}
+                                            <div class="gst-field">
+                                                {{ form.party|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                {{ form.expense_no.label_tag }}
+                                                                {% if form.expense_no.field.required %}
+                                                                <span style="color: red;">*</span>
+                                                                {% endif %}
+                                                            </strong>
+                                                        </td>
+                                                        <td>{{ form.expense_no }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                {{ form.bill_date.label_tag }}
+                                                                {% if form.bill_date.field.required %}
+                                                                <span style="color: red;">*</span>
+                                                                {% endif %}
+                                                            </strong>
+                                                        </td>
+                                                        <td>{{ form.bill_date }}</td>
+                                                    </tr>
+                    
+                                                </tbody>
+                                            </table>
+                    
+                                        </div>
+                                    </div>
+                                    <div class="col-12 p-0">
+                                        {{ expense_item_formset.management_form }}
+                        
+                                        <table class="table table-striped  my-3" id="expense-item">
+                                            <thead class="table-success">
+                                                <tr >
+                                                    <th style="width: 25%;" class="px-0 text-center">Item</th>
+                                                    <th style="width: 10%;" class="px-0 text-center">Quantity</th>
+                                                    <th style="width: 10%;" class="px-0 text-center">Price/Item (₹)</th>
+                                                    <th style="width: 10%;" class="px-0 text-center">Discount (%)</th>
+                                                    <th style="width: 10%;" class="px-0 text-center">Discount (₹)</th>
+                                                    <th style="width: 10%;" class="px-0 text-center gst-field">Tax (%)</th>
+                                                    <th style="width: 10%;" class="px-0 text-center gst-field">Tax (₹)</th>
+                                                    <th style="width: 10%;" class="px-0 text-center">Amount (₹)</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for form_ in expense_item_formset.forms %}
+                                                <tr class="formset_row {% if form_.errors %}table-danger{% endif %}">
+                                                    {% for hidden in form_.hidden_fields %}
+                                                    {{ hidden }}
+                                                    {% endfor %}
+                                                    <td class="p-0" style="width: 25%;">  <!-- Set width for the td -->
+                                                        {{ form_.item }}
+                                                        {{ form_.item.errors }}
+                                                    </td>
+                                                    <td class="p-0" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.quantity }}
+                                                        {{ form_.quantity.errors }}
+                                                    </td>
+                                                    <td class="p-0" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.unit_price }}
+                                                        {{ form_.unit_price.errors }}
+                                                    </td>
+                                                    <td class="p-0" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.discount_percentage }}
+                                                        {{ form_.discount_percentage.errors }}
+                                                    </td>
+                                                    <td class="p-0" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.discount_amount }}
+                                                        {{ form_.discount_amount.errors }}
+                                                    </td>
+                                                    <td class="p-0 gst-field" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.tax }}
+                                                        {{ form_.tax.errors }}
+                                                    </td>
+                                                    <td class="p-0 gst-field" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.tax_amount }}
+                                                        {{ form_.tax_amount.errors }}
+                                                    </td>
+                                                    <td class="p-0" style="width: 10%;">  <!-- Set width for the td -->
+                                                        {{ form_.line_total }}
+                                                        {{ form_.line_total.errors }}
+                                                    </td>
+                                                    <td style="vertical-align: middle;" class="p-0">
+                                                        {{ form_.DELETE }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            
+                                            <tfoot class="table-primary">
+                                                <tr class="subtotal">
+                                                    <td class="text-end font-weight-bold fs-6">Total</td>
+                                                    <td >{{ form.total_quantity }}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td >{{ form.items_discount_total }}</td>
+                                                    <td class="gst-field"></td>
+                                                    <td class="gst-field">{{ form.total_tax_amount }}</td>
+                                                    <td>{{ form.sub_total }}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                            
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="col-md-6 ms-auto">
+                                        <table class="table card-table table-vcenter text-nowrap mb-0 total-figure ">
+                                            <!-- Taxable Amount Row -->
+                                            <tr class="gst-field">
+                                                <td class="align-middle">
+                                                    {{ form.taxable_amount.label_tag }} <br>
+                                                    <small class="text-muted">{{ form.taxable_amount.help_text }}</small>
+                                                </td>
+                                                <td class="text-end align-middle">
+                                                    <div class="input-group">
+                                                        {{ form.taxable_amount }}
+                                                        <span class="input-group-text">₹</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    
+                                            <!-- Discount Row -->
+                                            <tr>
+                                                <td class="align-middle">
+                                                    Discount
+                                                </td>
+                                                <td class="align-middle">
+                                                    <div class="d-flex gap-2">
+                                                        <div class="flex-grow-1">
+                                                            <div class="input-group">
+                                                                {{ form.discount_percentage }}
+                                                                <span class="input-group-text">%</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <div class="input-group">
+                                                                {{ form.discount_amount }}
+                                                                <span class="input-group-text">₹</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    
+                                            <!-- Auto Round Off Row -->
+                                            <tr>
+                                                <td class="align-middle">
+                                                    {{ form.auto_round_off.label_tag }}
+                                                </td>
+                                                <td class="text-end align-middle">
+                                                    <div class="d-flex align-items-center justify-content-end gap-3">
+                                                        <div class="form-check form-switch">
+                                                            {{ form.auto_round_off }}
+                                                        </div>
+                                                        <div class="input-group w-50">
+                                                            {{ form.round_off_amount }}
+                                                            <span class="input-group-text">₹</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    
+                                            <!-- Grand Total Row -->
+                                            <tr>
+                                                <td class="align-middle">
+                                                    {{ form.grand_total.label_tag }}
+                                                </td>
+                                                <td class="text-end align-middle">
+                                                    <div class="input-group">
+                                                        {{ form.grand_total }}
+                                                        <span class="input-group-text">₹</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                    
+                                    <div class="mb-3 text-end">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary me-2">Save</button>
+                                            <button type="button" onclick="history.back()" class="border btn btn-outline-info">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                
+                            </div>
+                        
+                            
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+
+{% include 'transactions/partials/item_form_modal.html' %}
+{% include 'transactions/partials/expense_category_form_modal.html' %}
+{% include 'invoices/partials/supplier_form_modal.html' %}
+
+{% endblock content %}
+
+{% block js_plugins %}
+<script src="{% static 'app/assets/js/formset/formset.js' %}"></script>
+<script src="{% static 'app/assets/libs/choices.js/public/assets/scripts/choices.min.js' %}"></script>
+{% endblock js_plugins %}
+
+{% block javascript %}
+{{form.media}}
+
+<script>
+    initializeSelect2WithModal('#id_expense_category', '#expense_category-form-modal',"Search Expense Category");
+    initializeSelect2WithModal('#id_party', '#supplier-form-modal',"Search Party");
+    handleFormSubmit("#id_expense_category", "#expense_category-form-modal");
+    handleFormSubmit("#id_party", "#supplier-form-modal");
+    // 
+    $('.formset_row').formset({
+        addText: '<span>Add Row</span>',
+        deleteText: '<i class="fa-solid fa-xmark"></i>',
+        prefix: '{{ form_set.prefix }}',
+        formCssClass: 'formset_row',
+        added: function (row) {
+            initializeSelect2ForFormRow(row, '.item-select', "#item-form-modal","Select Item");
+            bindSelect2Focus('.select2');
+        },
+        removed: function (row) {
+            row.remove();
+            UpdateSubTotal();
+        }
+    });
+   
+
+    $('.formset_row').each(function () {
+        initializeSelect2ForFormRow($(this), '.item-select', "#item-form-modal","Search Item");
+    });
+
+    $(".item-select").on("select2:open", function () {
+            // Find the row containing the select box
+            const activeRow = $(this).closest(".expense_item_row");
+
+            // Store the row reference in the modal form's data attribute
+            $("#item-form").data("activeRow", activeRow);
+    });
+
+
+    $('#item-form').on("submit", function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const formData = new FormData(form[0]); // Collect form data
+        const url = form.attr("action"); // Get form action URL
+        const activeRow = form.data('activeRow');
+        const modal = $("#item-form-modal");
+        const expense_category = $('#id_expense_category').val();
+        if (!expense_category) {
+            form[0].reset();
+            modal.modal("hide");
+            dangerToastExample.find('.toast-body').text('Please select a Expense Category before submitting the Item form.');
+            const toast = new bootstrap.Toast(dangerToastExample[0]); // Access DOM element with [0]
+            toast.show();
+            return; // Prevent form submission
+        }
+        formData.append('expense_category', expense_category);
+        submitFormAjax(form, formData, url, activeRow, modal, '.item-select');
+    });
+
+
+    $("#id_is_gst").change(function () {
+            toggleGstFields();
+    })
+
+    $(document).on('change', '.item-select', function () {
+            var row = $(this).closest('.expense_item_row');
+            var requestData = {
+                itemId: row.find('.item-select').val(),
+            };
+            console.log(requestData)
+            fetchAndUpdateItemDetails(requestData, row);
+        });
+
+        $(document).on('keyup', '.quantity-input', function () {
+            var row = $(this).closest('.expense_item_row');
+            calculateTaxAmount(row);
+            calculateLineTotal(row);
+            calculateDiscountAmount(row);
+        });
+
+        $(document).on('keyup', '.unit-price-input', function () {
+            var row = $(this).closest('.expense_item_row');
+            calculateTaxAmount(row);
+            calculateLineTotal(row);
+            calculateDiscountAmount(row);
+        });
+
+
+        $(document).on('keyup', '.discount_percentage-input', function () {
+            var row = $(this).closest('.expense_item_row');
+            console.log(row)
+            calculateDiscountAmount(row);
+            calculateTaxAmount(row);
+            calculateLineTotal(row);
+        });
+
+        $(document).on('keyup', '.discount_amount-input', function () {
+            var row = $(this).closest('.expense_item_row');
+            calculateDiscountPercentage(row);
+            calculateTaxAmount(row);
+            calculateLineTotal(row);
+        });
+
+    $(document).on('keyup', '#id_discount_percentage', function () {
+            calculateTotalDiscountAmount();
+        });
+
+        $(document).on('keyup', '#id_discount_amount', function () {
+            calculateTotalDiscountPercentage();
+        });
+
+    function calculateTotalDiscountPercentage(){
+            const discountAmount = $("#id_discount_amount").val() || 0;
+            const totalAmount = $("#id_sub_total").val() || 0;
+            const discount_perc = (discountAmount *100 )/totalAmount;
+            $("#id_discount_percentage").val(discount_perc.toFixed(2));
+            UpdateSubTotal();
+        }
+
+        function calculateTotalDiscountAmount(){
+            const discountPercentage = $("#id_discount_percentage").val() || 0;
+            const totalAmount = $("#id_sub_total").val() || 0;
+            const discount_amount = (totalAmount *(discountPercentage/100));
+            $("#id_discount_amount").val(discount_amount.toFixed(2));
+            UpdateSubTotal();
+        }
+
+        function calculateDiscountPercentage(row) {
+            const discount_amount = parseFloat(row.find('.discount_amount-input').val()) || 0;
+            const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+            const unit_price = parseFloat(row.find('.unit-price-input').val()) || 0;
+            const total_amount = (quantity * unit_price);
+            const discount_percentage = (discount_amount * 100) / total_amount;
+            row.find('.discount_percentage-input').val(discount_percentage.toFixed(2));
+            UpdateSubTotal();
+        }
+
+        function calculateDiscountAmount(row) {
+            const discount_percentage = parseFloat(row.find('.discount_percentage-input').val()) || 0;
+            const unit_price = parseFloat(row.find('.unit-price-input').val()) || 0;
+            const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+            const total_amount = (quantity * unit_price);
+            const discount_amount = (total_amount * (discount_percentage / 100));
+            row.find('.discount_amount-input').val(discount_amount.toFixed(2));
+            UpdateSubTotal();
+        }
+
+    function fetchAndUpdateItemDetails(requestData, row) {
+            $.ajax({
+                url: '{% url "transactions:get_item_details" %}',
+                method: 'GET',
+                data: requestData,
+                success: function (response) {
+                    if (response.success) {
+                        const data = response.result;
+
+                        // Update unit price and quantity
+                        row.find('.unit-price-input').val(data.price || "0.00");
+                        row.find('.quantity-input').val(1);
+
+                        // Check if GST is checked
+                        const isGSTChecked = $("#id_is_gst").is(":checked");
+
+                        if (isGSTChecked) {
+                            // Update tax and tax amount only if GST is checked
+                            row.find('.tax-input').val(data.tax_id || "").trigger('change');
+
+                            // Calculate tax amount
+                            const price = parseFloat(data.price || 0);
+                            const taxPercentage = parseFloat(data.tax_percentage || 0); // Ensure tax_percentage is sent in response
+                            const taxAmount = (price * taxPercentage) / 100;
+
+                            row.find('.tax-amount-input').val(taxAmount.toFixed(2));
+                        } else {
+                            // Clear tax fields if GST is not checked
+                            row.find('.tax-input').val("").trigger('change');
+                            row.find('.tax-amount-input').val("");
+                        }
+                    } else {
+                        console.error("Failed to fetch item details:", response.message || "Unknown error.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+    }
+
+    function calculateLineTotal(row) {
+            // Retrieve input values with fallback to 0
+            const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+            const itemPrice = parseFloat(row.find('.unit-price-input').val()) || 0;
+            const taxAmount = parseFloat(row.find('.tax_amount-input').val()) || 0;
+            const discountAmount = parseFloat(row.find('.discount_amount-input').val()) || 0;
+
+            // Calculate subtotal and line total
+            const subtotal = quantity * itemPrice;
+            const lineTotal = subtotal + taxAmount - discountAmount;
+
+            // Set the calculated line total in the input field, formatted to two decimals
+            row.find('.line_total-input').val(lineTotal.toFixed(2));
+            UpdateSubTotal();
+    }
+
+    const $autoRoundOffCheckbox = $("#id_auto_round_off");
+    const $roundOffInput = $("#id_round_off");
+    const $grandTotalInput = $("#id_grand_total"); 
+
+    $autoRoundOffCheckbox.on("change", function () {
+            if (this.checked) {
+                const grandTotal = parseFloat($grandTotalInput.val() || 0);
+                const roundedValue = Math.floor(grandTotal) - grandTotal; // Calculate round-off
+                $roundOffInput.val(roundedValue.toFixed(2));
+                UpdateSubTotal();
+            } else {
+                $roundOffInput.val("0"); // Reset to default when unchecked
+                UpdateSubTotal();
+            }
+    });
+    toggleGstFields();
+    function toggleGstFields() {
+            const isGstEnabled = $("#id_is_gst").is(":checked"); // GST checkbox ID
+
+            if (isGstEnabled) {
+                // Show GST-related fields and reset column widths
+                $(".gst-field").show();
+                setColumnWidths(true);
+            } else {
+                // Hide GST-related fields and adjust column widths
+                $(".gst-field").hide();
+                setColumnWidths(false);
+            }
+        }
+
+        function setColumnWidths(isGstEnabled) {
+            const table = $("#expense-item");
+
+            if (isGstEnabled) {
+                // Set widths for GST enabled
+                table.find("th:nth-child(1)").css("width", "25%"); // Item column
+                table.find("th:nth-child(8)").css("width", "10%"); // Amount column
+            } else {
+                // Adjust widths for GST disabled
+                table.find("th:nth-child(1)").css("width", "35%"); // Item column
+                table.find("th:nth-child(8)").css("width", "20%"); // Amount column
+            }
+        }
+
+        function UpdateSubTotal() {
+            let discountTotal = 0, amountTotal = 0, taxTotal = 0, quantityTotal = 0;
+            let taxableAmountTotal = 0;
+
+            // Calculate totals from sale item rows
+            $('.expense_item_row').each(function () {
+                const row = $(this);
+                const discount = parseFloat(row.find('.discount_amount-input').val()) || 0;
+                const taxAmount = parseFloat(row.find('.tax_amount-input').val()) || 0;
+                const quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+                const unitPrice = parseFloat(row.find('.unit-price-input').val()) || 0;
+                const lineTotal = parseFloat(row.find('.line_total-input').val()) || 0;
+
+                discountTotal += discount;
+                quantityTotal += quantity;
+                taxTotal += taxAmount;
+                amountTotal += lineTotal;
+                taxableAmountTotal += (unitPrice * quantity) - discount;
+            });
+
+
+            // Fetch additional discount and compute grand total
+            const additionalDiscount = parseFloat($('#id_discount_amount').val()) || 0;
+            const roundOffAmount = parseFloat($('#id_round_off').val()) || 0;
+            const grandTotal = amountTotal - additionalDiscount + roundOffAmount;
+
+            const isGstEnabled = $("#id_is_gst").is(":checked");
+
+            const fieldsToUpdate = {
+                '#id_items_discount_total': discountTotal,
+                '#id_total_quantity': quantityTotal,
+                '#id_sub_total': amountTotal,
+                '#id_grand_total': grandTotal,
+            };
+
+            if (isGstEnabled) {
+                fieldsToUpdate['#id_total_tax_amount'] = taxTotal;
+                fieldsToUpdate['#id_taxable_amount'] = taxableAmountTotal;
+            }
+
+            // Update the DOM
+            updateFieldValues(fieldsToUpdate);
+        }
+</script>
+{% endblock javascript %}

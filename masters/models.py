@@ -1,0 +1,181 @@
+from django.utils import timezone
+
+from core.base import BaseModel
+
+from django.db import models
+from django.urls import reverse_lazy
+
+
+class Batch(BaseModel):
+    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, null=True)
+    batch_name = models.CharField(max_length=120)
+    description = models.TextField(blank=True, null=True)
+    academic_year = models.ForeignKey('core.AcademicYear', on_delete=models.CASCADE,blank=True,null=True)
+
+    def __str__(self):
+        return self.batch_name
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:batch_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:batch_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:batch_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:batch_delete", kwargs={"pk": self.pk})
+    
+    
+class Course(BaseModel):
+    name = models.CharField(max_length=120)
+    fees = models.PositiveIntegerField()
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:course_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:course_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:course_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:course_delete", kwargs={"pk": self.pk})
+    
+
+class PDFBookResource(BaseModel):
+    course = models.ForeignKey("masters.Course", on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.course) 
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:pdf_book_resource_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:pdf_book_resource_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:pdf_book_resource_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:pdf_book_resource_delete", kwargs={"pk": self.pk})
+    
+
+class PdfBook(BaseModel):
+    resource = models.ForeignKey("masters.PDFBookResource", on_delete=models.CASCADE)
+    name = models.CharField(max_length=180)
+    pdf = models.FileField(upload_to="pdf/")
+    
+    def __str__(self):
+        return self.name
+    
+    # @staticmethod
+    # def get_list_url():
+    #     return reverse_lazy("masters:pdf_book_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:pdf_book_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:pdf_book_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:pdf_book_delete", kwargs={"pk": self.pk})
+    
+
+class Syllabus(BaseModel):
+    course = models.ForeignKey("masters.Course", on_delete=models.CASCADE)
+    batch = models.ForeignKey("masters.Batch", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.course) 
+
+    def get_syllabus_item(self):
+        return SyllabusItem.objects.filter(syllabus=self)
+
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:syllabus_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:syllabus_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:syllabus_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:syllabus_delete", kwargs={"pk": self.pk})
+
+
+class SyllabusItem(BaseModel):
+    STATUS_CHOICES = [
+        ("complete", "Complete"),
+        ("pending", "Pending")
+    ]
+    syllabus = models.ForeignKey("masters.Syllabus", on_delete=models.CASCADE)
+    title = models.CharField(max_length=180)
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    
+    def __str__(self):
+        return str(self.title) 
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:syllabus_item_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:syllabus_item_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:syllabus_item_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:syllabus_item_delete", kwargs={"pk": self.pk})
+    
+
+class ComplaintRegistration(BaseModel):
+    COMPALINT_TYPE_CHOICES = [
+        ("general", "General"),
+        ("academic", "Academic"),
+        ("other", "Other")
+    ]
+    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, null=True)
+    complaint_type = models.CharField(max_length=15, choices=COMPALINT_TYPE_CHOICES, default="general")
+    complaint = models.TextField()
+    status = models.CharField(
+        max_length=30,
+        choices=[
+            ("Complaint Registered", "Complaint Registered"),
+            ("In Progress", "In Progress"),
+            ("Resolved", "Resolved"),
+            ("Closed", "Closed")
+        ],
+        default="Complaint Registered"
+    )
+    
+    def __str__(self):
+        return str(self.complaint_type) 
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:complaint_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:complaint_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:complaint_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:complaint_delete", kwargs={"pk": self.pk})

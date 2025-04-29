@@ -1,0 +1,157 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{title}}: {{app_settings.site_title}}{% endblock %}
+
+{% block javascript %}
+{{form.media}}
+{% endblock javascript %}
+
+{% block content %}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="page-header mb-0 d-flex d-block justify-content-between">
+            <div class="page-leftheader">
+                <div class="page-title">{{ title|title }}</div>
+            </div>
+            <div class="page-rightheader">
+               
+            </div>
+        </div>
+        <!-- Page Header Close -->
+
+        <!-- Start::row-1 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card custom-card">
+                    <div class="card-header d-flex justify-content-between border-bottom-0">
+                        <div class="card-title">{{ sub_title|title }}</div>
+                        <div class="btn-list">
+                            {% if object %}
+                                <a href="{{ object.get_delete_url }}" class="btn btn-light3" data-bs-placement="top"
+                                data-bs-toggle="tooltip" title="Delete"> <i class="mdi mdi-delete"></i> </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <form  method="post" autocomplete="off" enctype="multipart/form-data" action=""
+                                enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row align-items-start">
+                                    <div class="col-md-6">
+                                        <div class="bordered-container">
+                                            <h5 class="fw-bold">Main Details</h5>
+                                            <div class="row">
+                                               
+                                                <div class="col-6">
+                                                    {{ form.is_active|as_crispy_field }}
+                                                    {{ form.name|as_crispy_field }}
+                                                </div>
+                                                <div class="col-6">
+                                                    {{ form.alias_name|as_crispy_field }}
+                                                </div>
+                                                <div class="col-12">
+                                                    {{ form.under|as_crispy_field }}
+                                                </div>
+                                               
+                                            </div>
+                                        </div>
+                                        <div class="bordered-container mt-3 mb-5">
+                                            <h5 class="fw-bold">Balance Details</h5>
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>{{ form.opening_balance.label_tag }}</strong></td>
+                                                        <td>{{ form.opening_balance }}</td>
+                                                        <td> {{ form.opening_balance_type }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="bordered-container my-3">
+                                            <h5 class="fw-bold">Credit Limit</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    {{ form.limit|as_crispy_field }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    {{ form.credit_days|as_crispy_field }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="bordered-container">
+                                            <h5 class="fw-bold">Party Details</h5>
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>{{ form.city.label_tag }}</strong></td>
+                                                        <td>{{ form.city }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.pin_code.label_tag }}</strong></td>
+                                                        <td>{{ form.pin_code }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.mobile_no.label_tag }}</strong></td>
+                                                        <td>{{ form.mobile_no }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.email.label_tag }}</strong></td>
+                                                        <td>{{ form.email }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.state.label_tag }}</strong></td>
+                                                        <td>{{ form.state }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.country.label_tag }}</strong></td>
+                                                        <td>{{ form.country }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.address_line1.label_tag }}</strong></td>
+                                                        <td>{{ form.address_line1 }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ form.address_line2.label_tag }}</strong></td>
+                                                        <td>{{ form.address_line2 }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+            
+                                       
+            
+                                    </div>
+            
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-success"><i class="fe fe-save"></i> Save</button>
+                                            <button type="button" onclick="history.back()" class="btn btn-outline-info"> <i class="fa fa-cancel"></i> Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </form>
+                            </div>
+                        </div>
+                      
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+
+{% endblock content %}

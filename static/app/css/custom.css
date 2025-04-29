@@ -1,0 +1,185 @@
+.table>thead>tr>th,
+.table>thead>tr>th a {
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+
+#div_id_is_active {
+    display: none;
+}
+
+.asteriskField {
+    color: red;
+}
+
+.header-content-right {
+    gap: 2px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    /* Remove spinners for Firefox */
+}
+
+.custom .table tbody td{
+    padding: 10px;
+}
+
+.custom-input{
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+}
+
+
+.bordered-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    position: relative;
+    border-radius: 5px; /* Optional: Rounded corners */
+}
+
+.bordered-container h5 {
+    position: absolute;
+    top: -12px;
+    left: 10px;
+    background: white;
+    padding: 0 10px;
+    margin: 0;
+}
+input[readonly] {
+    background-color: #f0f0f0; /* Set your desired background color */
+    color: #333; /* Optional: Adjust text color for better contrast */
+    cursor: not-allowed; /* Optional: Indicate the field is not editable */
+}
+.app-sidebar{
+    background: linear-gradient(90deg, #EE4C24, #EB135E) !important;
+
+}
+
+.app-sidebar .side-menu__icon, .app-sidebar .side-menu__angle, .app-sidebar .side-menu__label{
+    color: white !important;
+    fill: white !important;
+}
+
+.badge {
+    padding: 10px;
+    font-weight: 600;
+    font-size: 11px;
+    border-radius: .25rem;
+}
+.invoice-header img{
+    height: 40px !important;
+}
+.customlogin-content .header-brand{
+    justify-content: center;
+    display: flex;
+}
+.customlogin-content .header-brand img{
+    height: 50px !important;
+}
+
+.customlogin-content{
+    width: 380px !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+    height: auto !important;
+    padding: 10px;
+    border-radius: 10px !important;
+}
+
+.custom-btn{
+    background: linear-gradient(90deg, #EE4C24, #EB135E) !important;
+    color: white;
+    /* border-radius: 30px !important; */
+}
+.custom-btn:hover{
+    border-color: #EE4C24;
+    color: rgb(0, 0, 0) !important;
+    background: white !important;
+}
+.card.custom-card .card-icon{
+    border-radius: 40px ;
+}
+.custom-btn-2{
+    border-color: #EE4C24;
+    color: rgb(0, 0, 0) !important;
+    background: white !important;
+}
+.custom-btn-2:hover{
+    border-color: #EE4C24;
+}
+@media (max-width: 991px) {
+    .app-sidebar .slide {
+        padding: 5px .75rem !important;
+    }
+    .app-sidebar .side-menu__item.active {
+        background-color: rgb(0 0 0) !important;
+        color: #fff !important;
+    }
+    .app-sidebar .side-menu__item.active:hover {
+        border-color: rgb(0 0 0) !important;
+        color: black !important;
+    }
+
+    .app-sidebar .side-menu__item{
+        color: white !important;
+    }
+    .app-sidebar .slide-menu.child1 .side-menu__item.active{
+        color: rgb(255, 255, 255) !important;
+    }
+    .app-sidebar .slide-menu.child1 .side-menu__item.active:hover{
+        color: rgb(255, 255, 255) !important;
+    }
+
+    .header-logo{
+        display: none;
+    }
+}
+.registration-form-section .registration-form-card .registration-form-content h1{
+    font-weight: 600 !important;
+}
+.registration-form-section .registration-form-card-sec{
+    padding: 20px !important;
+    border-bottom: 1px solid gray !important;
+    gap: 50px !important
+}
+
+.registration-form-section .registration-form-card-sec img{
+    height: 60px !important;
+}
+
+.registration-form-section .image-input{
+    cursor: pointer; 
+    position: relative; 
+    display: inline-block;
+}
+
+.registration-form-section #overlayText{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.registration-form-section .image-input img{
+    width: 100%;
+    height: 213px;
+}
+.terms-condition-section .registration-form-card-sec{
+    gap: 50px !important;
+    padding: 30px !important;
+}

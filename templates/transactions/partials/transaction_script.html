@@ -1,0 +1,126 @@
+<script>
+  $(document).ready(function () {
+    initializeSelect2WithModal('#id_opposite_account', '#customer-form-modal', "Search Customer");
+    initializeSelect2WithModal('#id_main_account', '#bank-form-modal', "search Bank");
+    handleFormSubmit("#id_opposite_account", "#customer-form-modal");
+    handleFormSubmit("#id_main_account", "#bank-form-modal");
+    toggleDenominationForm();
+
+    const formset = $("#formset");
+    const amount_input = $('#id_amount');
+
+    if ($('.formset_row').length > 0) {
+        formset.removeClass('d-none'); // Ensure formset is visible in update view if items exist
+        calculateAmount(); // Initialize total amount calculation
+    } else {
+        formset.addClass('d-none'); // Hide if no preloaded data
+    }
+
+    $(document).on('change', '#id_opposite_account, #id_reference', function () {
+        const customer = $("#id_opposite_account").val();
+        const reference = $("#id_reference").val();
+        const transaction_type = $('#id_transaction_type').val();
+
+        if (customer && reference === 'against') {
+            $.ajax({
+                url: "{% url 'transactions:get_references' %}",
+                method: "GET",
+                data: { customer_id: customer, transaction_type: transaction_type },
+                success: function (response) {
+                    let tbody = $('#formset tbody');
+                    tbody.empty();  // Clear existing rows (for create view)
+                    
+                    response.references.forEach((ref, index) => {
+                        let newRow = `
+                        <tr class="formset_row">
+                            <input type="hidden" name="transactionitem_set-${index}-id" id="id_transactionitem_set-${index}-id">
+                            <input type="hidden" name="transactionitem_set-${index}-transaction" id="id_transactionitem_set-${index}-transaction">
+                            <input type="hidden" name="transactionitem_set-${index}-reference" value="${ref.id}" class="form-control">
+                            <td class="p-0"><input type="text" name="transactionitem_set-${index}-reference_str" value="${ref.str}" class="form-control" readonly></td>
+                            <td class="p-0"><input type="text" name="transactionitem_set-${index}-date" value="${ref.date}" class="form-control" readonly></td>
+                            <td class="p-0"><input type="text" name="transactionitem_set-${index}-pending" value="${ref.pending}" class="form-control" readonly></td>
+                            <td class="p-0"><input type="text" name="transactionitem_set-${index}-tds" value="${ref.tds ? ref.tds : ''}" class="form-control" readonly></td>
+                            <td class="p-0"><input type="text" name="transactionitem_set-${index}-discount" value="${ref.discount}" class="form-control" readonly></td>
+                            <td class="p-0"><input type="number" name="transactionitem_set-${index}-amount" class="form-control received-input" ></td>
+                        </tr>
+                    `;
+                        tbody.append(newRow);
+                    });
+
+                    if (response.references.length > 0) {
+                        amount_input.attr('readonly', true);
+                        formset.removeClass('d-none');
+                    } else {
+                        const message = $("<p id='message'>").text("No Reference Found").addClass("text-danger");
+                        $("#id_reference").after(message);
+                    }
+                    
+                    $('#id_transactionitem_set-TOTAL_FORMS').val(response.references.length);
+                }
+            });
+        } else {
+            amount_input.attr('readonly', false);
+            formset.addClass('d-none');
+            $("#id_reference").next("p.text-danger").remove();
+        }
+    });
+
+    // Handle the change event for amount input
+    $(document).on('keyup', '.received-input', function () {
+        calculateAmount();
+    });
+
+    // Remove a row when the delete button is clicked
+    $(document).on('click', '.remove-row', function () {
+        $(this).closest('tr').remove();
+        calculateAmount();
+        updateManagementForm();
+    });
+
+    // Function to calculate the total amount
+    function calculateAmount() {
+        let amount_total = 0;
+
+        $('.formset_row').each(function () {
+            const amount = parseFloat($(this).find('.received-input').val()) || 0;
+            amount_total += amount;
+        });
+
+        $('#id_amount').val(amount_total.toFixed(2));
+    }
+
+    // Update formset management when modifying rows
+    function updateManagementForm() {
+        $('.formset_row').each(function (index) {
+            $(this).find('input, select').each(function () {
+                let name = $(this).attr('name');
+                if (name) {
+                    let newName = name.replace(/-\d+-/, `-${index}-`);
+                    $(this).attr('name', newName);
+                    $(this).attr('id', `id_${newName}`);
+                }
+            });
+        });
+
+        $('#id_transactionitem_set-TOTAL_FORMS').val($('.formset_row').length);
+    }
+
+    // Toggle denomination form
+    $("#id_is_denomination").change(toggleDenominationForm);
+    function toggleDenominationForm() {
+        const isDenominationChecked = $("#id_is_denomination").is(":checked");
+        $("#denomination-table").toggle(isDenominationChecked);
+    }
+
+    // Handle denomination calculation
+    $('input[id^="id_denomination_"][id$="_unit"]').on('input', function() {
+        let unitValue = parseFloat($(this).closest('tr').find('td:first').text()) || 0;
+        let quantity = parseFloat($(this).val()) || 0;
+        let total = unitValue * quantity;
+        
+        $(this).closest('tr').find('input[id^="id_denomination_"][id$="_unit_total"]').val(total.toFixed(2));
+    });
+});
+
+
+</script>

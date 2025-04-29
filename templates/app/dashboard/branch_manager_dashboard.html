@@ -1,0 +1,75 @@
+{% load static %}
+
+ <!-- Start::row-1 -->
+ <div class="row">
+    <div class="col-xxl-9 col-md-12 col-lg-12">
+        <div class="row">
+          
+            <div class="col-xl-3 col-lg-43 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Totel Employees</span>
+                                    <h3 class="mb-0 mt-1 mb-2">{{employee_count}}</h3>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="icon1 bg-success my-auto float-end card-icon"> <i class="fe fe-users"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Totel Students</span>
+                                    <h3 class="mb-0 mt-1 mb-2">{{student_count}}</h3>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="icon1 bg-primary my-auto  float-end card-icon"> <i class="fas fa-graduation-cap"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Total Credited</span>
+                                <h3 class="mb-0 mt-1 text-success mb-2">₹{{total_credited}}</h3> </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="icon1 bg-secondary my-auto  float-end card-icon"> <i class="fe fe-dollar-sign"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Total Balances</span>
+                                <h3 class="mb-0 mt-1 text-danger mb-2">₹{{total_balance}}</h3> </div>
+                            </div>
+                            <div class="col-4">
+                            <div class="icon1 bg-danger my-auto  float-end card-icon"> <i class="fe fe-credit-card"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+<!--End::row-1 -->

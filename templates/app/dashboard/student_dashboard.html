@@ -1,0 +1,116 @@
+{% load static %}
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!--Start::row-1 -->
+        <div class="row">
+            <div class="col-xl-12 col-md-12 col-lg-12">
+                <div class="card custom-card">
+                    <div class="card-body border-top">
+                        <div class="d-flex my-4 align-items-start justify-content-between">
+                            <div class="me-3">
+                                <span class="badge bg-light me-2">
+                                    <span id="current-date"></span>
+                                </span>
+                                <span class="badge bg-light me-2">
+                                    <span id="current-time"></span>
+                                </span>
+                            </div>
+                            <h4 class="mb-0 text-center flex-grow-1">Attendance Table</h4>
+                            <div class="d-flex flex-wrap gap-2 ">
+                                <span class="badge bg-success-transparent me-2"><i class="fe fe-check-circle text-success fs-12 align-middle"></i> ---> Present</span>
+                                <span class="badge bg-danger-transparent me-2"><i class="fe fe-x-circle text-danger fs-12 align-middle"></i> ---> Absent</span>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive hr-attlist">
+                            <table class="table mb-0 text-nowrap text-md-nowrap table-bordered border custom-table" id="hr-attendance">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        {% for day in days_in_month %}
+                                            <th>{{ day }}</th>
+                                        {% endfor %}
+                                        <th>Present</th>
+                                        <th>Absent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for month, data in attendance_by_month.items %}
+                                        <tr>
+                                            <td><strong>{{ month }}</strong></td>
+                            
+                                            {% for day in days_in_month %}
+                                                <td {% for attendance in data.records %}
+                                                {% if attendance.register.date.day == day %}
+                                                    class="{% if attendance.status == 'Present' %}bg-success-transparent{% elif attendance.status == 'Absent' %}bg-danger-transparent{% endif %}"
+                                                {% endif %}
+                                            {% endfor %}>
+                                                    {% for attendance in data.records %}
+                                                        {% if attendance.register.date.day == day %}
+                                                            {% if attendance.status == "Present" %}
+                                                                <span class="fe fe-check-circle text-success"></span>
+                                                            {% elif attendance.status == "Absent" %}
+                                                                <span class="fe fe-x-circle text-danger"></span>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                            {% endfor %}
+                            
+                                            <td class="text-success fw-bold">{{ data.total_present }}</td>
+                                            <td class="text-danger fw-bold">{{ data.total_absent }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td><strong>Total</strong></td>
+                                        {% for day in days_in_month %}<td></td>{% endfor %}
+                                        <td class="text-success fw-bold">{{ total_present }}</td>
+                                        <td class="text-danger fw-bold">{{ total_absent }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+<!-- End::app-content -->
+
+<script>
+    let row = document.getElementById("days-row");
+    for (let day = 1; day <= 31; day++) {
+        let th = document.createElement("th");
+        th.className = "border-bottom-0 w-5";
+        th.textContent = day;
+        row.appendChild(th);
+    }
+</script>
+
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        
+        // Format date as DD/MM/YYYY
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        // Format time as HH:MM AM/PM
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+        document.getElementById('current-date').textContent = dateStr;
+        document.getElementById('current-time').textContent = timeStr;
+    }
+
+    // Update every second
+    setInterval(updateDateTime, 1000);
+    
+    // Call function immediately on page load
+    updateDateTime();
+</script>

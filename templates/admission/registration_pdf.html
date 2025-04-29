@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>OXDU Registration Form</title>
+
+    <style>
+        body{
+            padding: 0px !important;
+            margin: 0px !important;
+            {% comment %} background-image: url("{% static 'app/assets/images/oxdu_registration.jpg'%}"); {% endcomment %}
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+        
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .registration-from-card{
+            padding: 0px !important;
+            margin: 0px !important;
+            background-image: url("{% static 'app/assets/images/oxdu_registration.jpg'%}");
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+        .terms-condition-card{
+            padding-top: 290px !important;
+            margin-top: 290px !important;
+            background-image: url("{% static 'app/assets/images/oxdu_registration.jpg'%}");
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+        .terms-condition-card-body{
+            width: 1200px;
+			height: 1200px;
+            max-width: 100%;
+            min-height: 100%;
+            position: relative;
+        }
+        .card {
+            width: 1200px;
+			height: 1400px;
+            max-width: 100%;
+            min-height: 100%;
+            position: relative;
+            
+        }
+       
+        .{
+            padmission_noosition: absolute;
+            top: 20.8%;
+            left: 72%;
+        }
+        .position{
+            position: absolute;
+            width: 370px;
+            left: 23%;
+            font-size: 15px;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+        .checked_by{
+            position: absolute;
+            top: 93%;
+            left: 38%;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .signature{
+            position: absolute;
+            top: 92%;
+            left: 70%;
+
+        }
+        .fullname{
+            position: absolute;
+            top: 20%;
+            left: 28%;
+        }
+        .registration-img {
+            height: 220px;
+            width: 180px;
+            position: absolute;
+            left: 70.5%;
+            top: 21.5%;
+            border-radius: 2px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="registration-from-card">
+        <div class="card">
+            {% if instance.photo %}
+            <div class="registration-img" style="background-image: url('{{ instance.photo.url }}');"></div>
+            {% endif %}
+            <p class="fullname" style="top: 21%; left: 29.5%;">{{instance.fullname}}</p>
+            <p class=" position" style="top: 24.8%; left: 24.5%; width: 50%;">{{instance.home_address|slice:":63"}}</p>
+            <p class=" position" style="top: 28.5%; left: 13.5%; width: 70%;">{{instance.home_address|slice:"63:"}}</p>
+            <p class=" position" style="top: 33%; left: 25.5%;">{{instance.contact_number}}</p>
+            <p class=" position" style="top: 33%; left: 53.5%;">{{instance.whatsapp_number}}</p>
+            <p class=" position" style="top: 37%; left: 47%;">{{instance.branch}}</p>
+            <p class=" position" style="top: 37%; left: 24.5%;">{{instance.joining_date}}</p>
+            <p class=" position" style="top: 41.3%; left: 17.5%;">{{instance.city}}</p>
+            <p class=" position" style="top: 41.3%; left: 35%;">{{instance.district}}</p>
+            <p class=" position" style="top: 41.3%; left: 51.5%;">{{instance.state}}</p>
+            <p class=" position" style="top: 41.3%; left: 72.8%;">{{instance.pin_code}}</p>
+            <p class=" position" style="top: 45.4%; left: 23%;">{{instance.date_of_birth}}</p>
+            <p class=" position" style="top: 45.4%; left: 47.5%;">{{instance.age}}</p>
+            <p class=" position" style="top: 45.4%; left: 63.5%;">{{instance.gender}}</p>
+            <p class=" position" style="top: 48.9%; left: 20.5%;">{{instance.religion}}</p>
+            <p class=" position" style="top: 48.9%; left: 56.5%;">{{instance.get_blood_group_display}}</p>
+            <p class=" position" style="top: 53%; left: 23.8%;">{{instance.personal_email}}</p>
+            <p class=" position" style="top: 57%; left: 30.3%;">{{instance.parentfullname}}</p>
+            <p class=" position" style="top: 61%; left: 36.7%;">{{instance.parent_contact_number}}</p>
+            <p class=" position" style="top: 61%; left: 68.3%;">{{instance.parent_whatsapp_number}}</p>
+            <p class=" position" style="top: 66.8%; left: 30.8%;">{{instance.qualifications}}</p>
+            <p class=" position" style="top: 69.3%; left: 30.8%;">{{instance.course}}</p>
+            <p class=" position" style="top: 71.9%; left: 30.8%;">{{instance.academic_year}}</p>
+            <p class=" position" style="top: 89.78%; left: 18.8%;">{{instance.created}}</p>
+            <p class=" position" style="top: 91.3%; left: 18.8%;">{{instance.branch}}</p>
+            <div class="signature">
+                {% if instance.signature %}
+                <img src="{{instance.signature.url}}" alt="" width="160px" height="60px">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% comment %} <div class="terms-condition-card">
+        <div class="terms-condition-card-body">
+
+        <div>
+    <div> {% endcomment %}
+
+</body>
+
+</html>

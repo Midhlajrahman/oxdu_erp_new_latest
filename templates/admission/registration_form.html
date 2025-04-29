@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{title}}: {{app_settings.site_title}}{% endblock %}
+
+{% block body %}
+
+<style>
+    .errorlist li {
+        color: red;
+    }
+</style>
+
+<!-- Start::app-content -->
+<div class="registration-form-section">
+    <div>
+
+
+        <!-- Start::row-1 -->
+        <div class="row page-header">
+           
+            <div class="col-xxl-9 col-md-12 col-lg-9 mx-auto">
+                
+                <div class="panel-body tabs-menu-body hremp-tabs1 p-0 card custom-card registration-form-card">
+
+                    <div class="registration-form-card-sec d-flex justify-content-center">
+                        <img src="{% static 'app/assets/images/brand-logos/desktop-logo.png' %}" alt="" >
+                        {% comment %} <div class="registration-form-content">
+                            <h4 class="text-center">Registration Form</h4>
+                        </div> {% endcomment %}
+                    </div>
+
+                    <form action="#" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="tab-content">
+                            <div class="tab-pane border-0 active">
+                                <div class="row">
+                                    <h4 class="mb-4 fw-bold text-center">Basic Informations</h4>
+                                    <div class="col-lg-9">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label mb-2 mt-2">Applicant First Name</label>
+                                                            {{ form.first_name }}
+                                                            {{ form.first_name.errors }}
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label mb-2 mt-2">Applicant Last Name</label>
+                                                            {{ form.last_name }}
+                                                            {{ form.last_name.errors }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="form-group mb-3">
+                                            <label class="form-label mb-2 mt-2">Home Address</label>
+                                            {{ form.home_address }}
+                                            {{ form.home_address.errors }}
+                                        </div>
+                    
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-sm-12 col-xs-12">
+                                                    <label class="form-label mb-2 mt-2">Contact Number</label>
+                                                    {{ form.contact_number }}
+                                                    {{ form.contact_number.errors }}
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12 col-xs-12">
+                                                    <label class="form-label mb-2 mt-2">Whatsapp Number</label>
+                                                    {{ form.whatsapp_number }}
+                                                    {{ form.whatsapp_number.errors }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="col-lg-3">
+                                        <div class="form-group mb-3 text-center">
+                                            <label class="form-label mb-2 mt-2 d-block">Applicant Image</label>
+                                            <input type="file" id="photoInput" name="photo" accept="image/*" style="display: none;">
+                                            <img src="https://t4.ftcdn.net/jpg/02/15/84/43/360_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg"
+                                                 class="img-fluid rounded mb-2"
+                                                 alt="Upload Image"
+                                                 id="previewImage"
+                                                 style="cursor: pointer; width: 150px; height: 150px; object-fit: cover; border: 1px solid #ccc;">
+                                            {{ form.photo.errors }}
+                    
+                                            <div class="form-group mb-3">
+                                                <label class="form-label mb-0 mt-2">Select Branch</label>
+                                                {{ form.branch }}
+                                                {{ form.branch.errors }}
+                                            </div>
+                    
+                                            {{ form.password }}
+                                            {{ form.password.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Joining</label>
+                                        <div class="col-md-9">
+                                            {{ form.joining_date }}
+                                            {{ form.joining_date.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Birth</label>
+                                        <div class="col-md-9">
+                                            {{ form.date_of_birth }}
+                                            {{ form.date_of_birth.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Gender</label>
+                                        <div class="col-md-9">
+                                            {{ form.gender }}
+                                            {{ form.gender.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Religion</label>
+                                        <div class="col-md-9">
+                                            {{ form.religion }}
+                                            {{ form.religion.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Blood Group</label>
+                                        <div class="col-md-9">
+                                            {{ form.blood_group }}
+                                            {{ form.blood_group.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Email Address</label>
+                                        <div class="col-md-9">
+                                            {{ form.personal_email }}
+                                            {{ form.personal_email.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-5 row">
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-2 mt-2">City</label>
+                                            {{ form.city }}
+                                            {{ form.city.errors }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-2 mt-2">District</label>
+                                            {{ form.district }}
+                                            {{ form.district.errors }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-2 mt-2">State</label>
+                                            {{ form.state }}
+                                            {{ form.state.errors }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-2 mt-2">Pin Code</label>
+                                            {{ form.pin_code }}
+                                            {{ form.pin_code.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <h4 class="mb-4 fw-bold text-center">Parent/Guardian Informations</h4>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Name</label>
+                                        <div class="col-md-9">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+                                                    {{ form.parent_first_name }}
+                                                    {{ form.parent_first_name.errors }}
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+                                                    {{ form.parent_last_name }}
+                                                    {{ form.parent_last_name.errors }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Contact Number</label>
+                                        <div class="col-md-9">
+                                            {{ form.parent_contact_number }}
+                                            {{ form.parent_contact_number.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Whatsapp Number</label>
+                                        <div class="col-md-9">
+                                            {{ form.parent_whatsapp_number }}
+                                            {{ form.parent_whatsapp_number.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Email Address</label>
+                                        <div class="col-md-9">
+                                            {{ form.parent_mail_id }}
+                                            {{ form.parent_mail_id.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <h4 class="mb-4 fw-bold text-center">Additional Informations</h4>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">ID Card to be submit</label>
+                                        <div class="col-md-9">
+                                            {{ form.document }}
+                                            {{ form.document.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Education Qualification</label>
+                                        <div class="col-md-9">
+                                            {{ form.qualifications }}
+                                            {{ form.qualifications.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Course</label>
+                                        <div class="col-md-9">
+                                            {{ form.course }}
+                                            {{ form.course.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Academic Year</label>
+                                        <div class="col-md-9">
+                                            {{ form.academic_year }}
+                                            {{ form.academic_year.errors }}
+                                        </div>
+                                    </div>
+                    
+                                    <div class="d-flex justify-content-end mt-4">
+                                        <div class="form-group">
+                                            <label for="signatureUpload" class="form-label fw-bold">Upload Your Signature:</label>
+                                            <input type="file" class="form-control" id="signatureUpload" name="signature" accept="image/*" required>
+                                            {% if form.signature.errors %}
+                                                <div class="text-danger">{{ form.signature.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="card-footer text-end">
+                                <button type="reset" class="btn btn-danger">Cancel</button>
+                                <button type="submit" name="save_and_next" class="btn btn-primary">Save & Next</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+<!-- End::app-content -->
+<script>
+    const photoInput = document.getElementById('photoInput');
+    const previewImage = document.getElementById('previewImage');
+
+    // Click image to open file input
+    previewImage.addEventListener('click', function () {
+        photoInput.click();
+    });
+
+    // Update preview when a file is selected
+    photoInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock body %}

@@ -1,0 +1,186 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{object}}: {{app_settings.site_title}}{% endblock %}
+
+{% block content %}
+
+
+<div class="main-content app-content">
+<div class="container-fluid">
+
+  <!-- Page Header -->
+  <div class="page-header d-flex d-block justify-content-between">
+    <div class="page-leftheader">
+      <div class="page-title">{{ title|title }}</div>
+    </div>
+    <div class="page-rightheader">
+      <div class="btn-list">
+        <a class="btn btn-light3" href="javascript:void(0);" onclick="window.print();" data-bs-placement="top"
+          data-bs-toggle="tooltip" title="Print"> <i class="fe fe-printer"></i> </a>
+
+          <a class="btn btn-light3" href="{{ object.get_update_url }}"  data-bs-placement="top"
+          data-bs-toggle="tooltip" title="Edit"> <i class="fe fe-edit"></i> </a>
+
+          <a class="btn btn-light3" href="{{ object.get_delete_url }}"  data-bs-placement="top"
+          data-bs-toggle="tooltip" title="Delete"> <i class="mdi mdi-delete"></i> </a>
+      </div>
+    </div>
+  </div>
+  <!-- Page Header Close -->
+
+  <!-- Start::row-1 -->
+<div class="row">
+
+  <div class="col-lg-4 col-md-4 col-12">
+    {% if object %}
+    <div class="card content_card">
+      <div class="card-header">
+        <div class="card-title d-flex align-items-center w-100">
+          <h5 class="mb-0">{{object}}</h5>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover info_table mb-0" style="width:100%;">
+            <tbody>
+              {% for name, value in object.get_fields|slice:"5:" %}
+              {% if value %}
+              <tr>
+                <td> {{name}} </td>
+                <td> {{ value }} </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+              <tr>
+                <td>Branch</td>
+                <td> {{ object.batch.branch }}</td>
+              </tr>
+              
+              <tr>
+                <td>Academic Year</td>
+                <td> {{ object.batch.academic_year }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    {% else %}
+    <div class="card content_card">
+      <div class="card-body">
+        <p class="text-center">There is nothing here</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between w-100">
+        <h5 class="mb-0">Syllabus Details</h5>
+      </div>
+      <div class="card-body p-5">
+        <div class="table-responsive">
+          <table  class="datatable-custom table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th style="width: 40%;">Title</th>
+                <th style="width: 40%;">Description</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in object.get_syllabus_item %}
+              <tr class="{% if i.status|lower == "complete" %} table-success {% else %} table-danger {% endif %}">
+                <td>{{forloop.counter}}</td>
+                <td><a href="{{i.student.get_absolute_url}}">{{i.title}}</a> </td>
+                <td>{{i.description}}</td>
+                <td>
+                    {% if i.status|lower == "complete" %}
+                        <span class="btn btn-success btn-sm">
+                            <i class="fas fa-circle-check me-1"></i> Completed
+                        </span>
+                    {% else %}
+                    <span id="incomplete-{{ i.id }}" data-id="{{ i.id }}" class="btn btn-danger btn-sm incomplete-btn">
+                        <i class="fas fa-circle-xmark me-1"></i> Incomplete
+                    </span>
+                    {% endif %}
+                </td>
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+  <!--End::row-1 -->
+
+</div>
+</div>
+{% endblock content %}
+
+
+{% block javascript %}
+
+<script>
+    $(document).ready(function() {
+        $('.incomplete-btn').click(function() {
+            const recordId = $(this).data('id'); 
+    
+            if (!recordId) {
+                Swal.fire('Error!', 'Record ID is missing.', 'error');
+                return;
+            }
+    
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to mark this as complete?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/masters/update_status/' + recordId + '/',  // Append the record ID to the URL
+                        type: 'POST',
+                        data: JSON.stringify({ status: 'complete' }),  // Send status as complete
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        headers: {
+                            'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // CSRF token for protection
+                        },
+                        success: function(data) {
+                            if (data.status === 'success') {
+                                Swal.fire('Updated!', 'The status has been updated.', 'success')
+                                    .then(() => location.reload());  // Reload the page to reflect changes
+                            } else {
+                                Swal.fire('Error!', 'Failed to update status.', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error!', 'Network error occurred.', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<!-- SweetAlert JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.6/dist/sweetalert2.min.js"></script>
+
+{% endblock %}
+
+
+{% block extra_css %}
+    <!-- SweetAlert CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.6/dist/sweetalert2.min.css" rel="stylesheet">
+{% endblock %}

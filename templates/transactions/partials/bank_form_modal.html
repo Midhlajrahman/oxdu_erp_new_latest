@@ -1,0 +1,114 @@
+{% load static crispy_forms_tags %}
+
+<div class="modal fade" id="bank-form-modal" tabindex="-1" aria-labelledby="bank-form-modalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bank-form-modalLabel">Account Form</h5>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'accounting:account_create' %}" class="" id="bank-form">
+                    {% csrf_token %}
+                    <div class="row align-items-start">
+                        <div class="col-md-6">
+                            <div class="bordered-container">
+                                <h5 class="fw-bold">Main Details</h5>
+                                <div class="row">
+                                   
+                                    <div class="col-6">
+                                        {{ bank_form.is_active|as_crispy_field }}
+                                        {{ bank_form.name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ bank_form.alias_name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ bank_form.under|as_crispy_field }}
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            <div class="bordered-container mt-3 mb-5">
+                                <h5 class="fw-bold">Balance Details</h5>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>{{ bank_form.opening_balance.label_tag }}</strong></td>
+                                            <td>{{ bank_form.opening_balance }}</td>
+                                            <td> {{ bank_form.opening_balance_type }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bordered-container my-3">
+                                <h5 class="fw-bold">Credit Limit</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ bank_form.limit|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ bank_form.credit_days|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bordered-container">
+                                <h5 class="fw-bold">Party Details</h5>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>{{ bank_form.city.label_tag }}</strong></td>
+                                            <td>{{ bank_form.city }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.pin_code.label_tag }}</strong></td>
+                                            <td>{{ bank_form.pin_code }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.mobile_no.label_tag }}</strong></td>
+                                            <td>{{ bank_form.mobile_no }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.email.label_tag }}</strong></td>
+                                            <td>{{ bank_form.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.state.label_tag }}</strong></td>
+                                            <td>{{ bank_form.state }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.country.label_tag }}</strong></td>
+                                            <td>{{ bank_form.country }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.address_line1.label_tag }}</strong></td>
+                                            <td>{{ bank_form.address_line1 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ bank_form.address_line2.label_tag }}</strong></td>
+                                            <td>{{ bank_form.address_line2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                           
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="button" class="btn btn-outline-grey" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

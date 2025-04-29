@@ -1,0 +1,159 @@
+{% load static %}
+
+ <!-- Start::row-1 -->
+ <div class="row">
+    <div class="col-xxl-9 col-md-12 col-lg-12">
+        <div class="row">
+            <div class="col-xl-4 col-lg-4 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Totel Students</span>
+                                    <h3 class="mb-0 mt-1 mb-2">{{student_count}}</h3>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="icon1 bg-success my-auto float-end card-icon" > <i class="fa fa-graduation-cap"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+   
+</div>
+<!--End::row-1 -->
+
+<!--Start::row-1 -->
+<div class="row">
+    <div class="col-xl-12 col-md-12 col-lg-12">
+        <div class="card custom-card">
+            {% comment %} <div class="card-body border-top">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-xl-5">
+                        <div class="row">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Academic Year:</label>
+                                <select name="attendance"  class="form-control custom-select" data-trigger data-placeholder="Select Year">
+                                    <option value="">Select Academic Year</option>
+                                    {% for academic_year in academicyears %}
+                                    <option value="{{academic_year.id}}">{{academic_year}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-3">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Month:</label>
+                            <select name="attendance"  class="form-control custom-select" data-trigger data-placeholder="Select Month">
+                                <option value="">Select Month</option>
+                                {% for month in months %}
+                                <option value="{{month.id}}">{{month}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-2">
+                        <div class="form-group">
+                            <label class="form-label">Batch:</label>
+                            <select name="attendance"  class="form-control custom-select" data-trigger data-placeholder="Select Year">
+                                <option value="">Select Batch</option>
+                                {% for batch in batches %}
+                                <option value="{{batch.id}}">{{batch}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-xl-2">
+                        <div class="form-group mt-2">
+                            <label class="form-label"></label>
+                            <a href="javascript:void(0);" class="btn custom-btn d-grid">Search</a>
+                        </div>
+                    </div>
+                </div>
+            </div>  {% endcomment %}
+                <div class="d-flex my-4 align-items-start justify-content-between ">
+                    <div class="ms-2">
+                        <span class="badge bg-light me-2">
+                            <span id="current-date"></span>
+                        </span>
+                        <span class="badge bg-light me-2">
+                            <span id="current-time"></span>
+                        </span>
+                    </div>
+                    <h4 class="mb-0 text-center flex-grow-1">Attendance Table</h4>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-success-transparent me-2">
+                            <i class="fe fe-check-circle text-success fs-12 align-middle"></i> ---> Present
+                        </span>
+                        <span class="badge bg-danger-transparent me-2">
+                            <i class="fe fe-x-circle text-danger fs-12 align-middle"></i> ---> Absent
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="table-responsive hr-attlist">
+                    <table class="table mb-0 text-nowrap text-md-nowrap table-bordered border custom-table" id="hr-attendance">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">#</th>
+                                <th>Student Name</th>
+                                {% for day in days_in_month %}
+                                    <th>{{ day }}</th>
+                                {% endfor %}
+                                <th>Presents</th>
+                                <th>Absents</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student, data in attendance_by_student.items %}
+                                <tr>
+                                    <td style="width:10%">{{ forloop.counter }}</td>
+                                    <td class="fw-semibold">{{ student }}</td>
+                                    {% for day in days_in_month %}
+                                        {% with attendance_record=data.records|dictsort:"register.date.day"|first %}
+                                            <td>
+                                                {% for record in data.records %}
+                                                    {% if record.register.date.day == day %}
+                                                        <span 
+                                                            class="{% if record.status == 'Present' %}fe fe-check-circle text-success{% elif record.status == 'Absent' %}fe fe-x-circle text-danger{% endif %}">
+                                                        </span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                        {% endwith %}
+                                    {% endfor %}
+                                    <td class="text-success fw-bold">{{ data.total_present }}</td>
+                                    <td class="text-danger fw-bold">{{ data.total_absent }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End::row-1 -->
+
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+        document.getElementById('current-date').textContent = dateStr;
+        document.getElementById('current-time').textContent = timeStr;
+    }
+
+    setInterval(updateDateTime, 1000);
+    
+    updateDateTime();
+</script>

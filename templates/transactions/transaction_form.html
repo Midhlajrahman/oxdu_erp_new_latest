@@ -1,0 +1,254 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags %}
+{% block title %}{{title}}: {{app_settings.site_title}}{% endblock %}
+
+
+
+{% block content %}
+
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="page-header d-flex d-block justify-content-between">
+            <div class="page-leftheader">
+                <div class="page-title">{{ title|title }}</div>
+            </div>
+            <div class="page-rightheader">
+                
+            </div>
+        </div>
+        <!-- Page Header Close -->
+
+        <!-- Start::row-1 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card custom-card">
+                    <div class="card-header d-flex justify-content-between border-bottom-0">
+                        <div class="card-title">{{ sub_title|title }}</div>
+                        <div class="btn-list">
+                            {% if object %}
+                                <a href="{{ object.get_delete_url }}" class="btn btn-light3" data-bs-placement="top"
+                                data-bs-toggle="tooltip" title="Delete"> <i class="mdi mdi-delete"></i> </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <form class="form-horizontal-transaction" method="post" autocomplete="off" enctype="multipart/form-data" action=""
+                                enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row justify-content-between">
+                                    <div class="col-md-4">
+                                        {% if payment_method == "BANK" %}
+                                            {{ form.main_account|as_crispy_field }}
+                                        {% endif %}
+                                        {% if transaction_type == "JV" %}
+                                            {{ form.main_account|as_crispy_field }}
+                                        {% endif %}
+                                        {{ form.opposite_account|as_crispy_field }}
+                                        {% if payment_method == "CASH" %}
+                                            <div class="row g-0">
+                                                <div class="col-6">{{ form.document_no|as_crispy_field }}</div>
+                                                <div class="col-6">{{ form.document_date|as_crispy_field }}</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        {{ form.date|as_crispy_field }}
+                                        {{ form.voucher_no|as_crispy_field }}
+
+                                    </div>
+                                </div>
+                                {% if payment_method == "BANK" %}
+                                <div class="row justify-content-between">
+                                    <div class="col-md-2">{{ form.cheque_no|as_crispy_field }}</div>
+                                    <div class="col-md-2">{{ form.cheque_date|as_crispy_field }}</div>
+                                    <div class="col-md-2">{{ form.cheque_name|as_crispy_field }}</div>
+                                    <div class="col-md-2">{{ form.transfer_method|as_crispy_field }}</div>
+                                </div>
+                               
+                                {% endif %}
+                                <div class="row justify-content-between">
+                                    <div class="col-md-3">
+                                        {{ form.reference|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {{ form.amount|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="row mb-3 d-" id="formset">
+                                    <div class="col-12">
+                                        {{ form_set.management_form }}
+                                        <table class="table table-bordered">
+                                            <thead class="table-success">
+                                                <tr>
+                                                    <th style="width: 20%;" class="text-center px-0">Ref.NO</th>
+                                                    <th style="width: 15%;" class="text-center px-0">Date</th>
+                                                    <th style="width: 15%;" class="text-center px-0">Pending</th>
+                                                    <th style="width: 15%;" class="text-center px-0">Tds</th>
+                                                    <th style="width: 15%;" class="text-center px-0">Discount</th>
+                                                    <th style="width: 15%;" class="text-center px-0">Received</th>
+                                                    {% if object %}
+                                                    <th></th>
+                                                    {% endif %}
+                                                    
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for form in form_set.forms %}
+                                                <tr class="formset_row mb-5">
+                                                    {% for hidden in form.hidden_fields %}
+                                                    {{ hidden }}
+                                                    {% endfor %}
+                                                    <td class="p-0">
+                                                        {{ form.reference }}
+                                                    </td>
+                                                   
+                                                    <td class="p-0">
+                                                        {{ form.date }}
+                                                    </td>
+                                                   
+                                                    <td class="p-0">
+                                                        {{ form.pending }}
+                                                    </td>
+                                                    <td class="p-0">
+                                                        {{ form.tds }}
+                                                    </td>
+                                                    <td class="p-0">
+                                                        {{ form.discount }}
+                                                    </td>
+                                                    <td class="p-0">
+                                                        {{ form.amount }}
+                                                    </td>
+                                                    
+                                                    <td style="vertical-align: middle;" class="p-0 text-center">{{ form.DELETE }}</td>
+                                                    
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-between align-items-center">
+                                    {% if payment_method == "CASH" %}
+                                    <div class="col-md-6">
+                                        <div class="mt-3">
+                                            <label class="form-check-label" for="id_is_denomination">
+                                                Denomination
+                                            </label>
+                                            <div class="form-check  form-check-md form-switch">
+                                                {{ form.is_denomination }}
+                                                <label for="id_is_denomination" class="form-check-label"></label>
+                                            </div>
+                                            <table class="table table-sm text-center " id="denomination-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Denomination</th>
+                                                        <th>Unit</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="p-0">2000</td>
+                                                        <td class="p-0">{{ form.denomination_2000_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_2000_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">500</td>
+                                                        <td class="p-0">{{ form.denomination_500_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_500_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">200</td>
+                                                        <td class="p-0">{{ form.denomination_200_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_200_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">100</td>
+                                                        <td class="p-0">{{ form.denomination_100_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_100_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">50</td>
+                                                        <td class="p-0">{{ form.denomination_50_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_50_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">20</td>
+                                                        <td class="p-0">{{ form.denomination_20_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_20_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">10</td>
+                                                        <td class="p-0">{{ form.denomination_10_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_10_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">5</td>
+                                                        <td class="p-0">{{ form.denomination_5_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_5_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">2</td>
+                                                        <td class="p-0">{{ form.denomination_2_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_2_unit_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="p-0">1</td>
+                                                        <td class="p-0">{{ form.denomination_1_unit }}</td>
+                                                        <td class="p-0">{{ form.denomination_1_unit_total }}</td>
+                                                    </tr>
+                                                </tbody>
+                                                
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-md-3">{{ form.remark|as_crispy_field }}</div>
+                                    <div class="col-md-3">{{ form.narration|as_crispy_field }}</div>
+                                </div>
+                                <input type="hidden" id="id_transaction_type" value="{{ transaction_type }}">
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-success"><i class="fe fe-save"></i> Save</button>
+                                            <button type="button" onclick="history.back()" class="btn btn-outline-info"> <i class="fa fa-cancel"></i> Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </form>
+                            </div>
+                        </div>
+                      
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+
+{% include 'invoices/partials/customer_form_modal.html' %}
+{% include 'transactions/partials/bank_form_modal.html' %}
+
+{% endblock content %}
+
+
+{% block js_plugins %}
+<script src="{% static 'app/assets/js/formset/formset.js' %}"></script>
+{% endblock js_plugins %}
+
+
+{% block javascript %}
+{{form.media}}
+{% include 'transactions/partials/transaction_script.html' %}
+{% endblock javascript %}

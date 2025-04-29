@@ -1,0 +1,114 @@
+{% load static crispy_forms_tags %}
+
+<div class="modal fade" id="expense_category-form-modal" tabindex="-1" aria-labelledby="expense_category-form-modalLabel"
+    aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="expense_category-form-modalLabel">Account Form</h5>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'accounting:account_create' %}" class="" id="expense_category-form">
+                    {% csrf_token %}
+                    <div class="row align-items-start">
+                        <div class="col-md-6">
+                            <div class="bordered-container">
+                                <h5 class="fw-bold">Main Details</h5>
+                                <div class="row">
+                                   
+                                    <div class="col-6">
+                                        {{ expense_category_form.is_active|as_crispy_field }}
+                                        {{ expense_category_form.name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ expense_category_form.alias_name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-12">
+                                        {{ expense_category_form.under|as_crispy_field }}
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            <div class="bordered-container mt-3 mb-5">
+                                <h5 class="fw-bold">Balance Details</h5>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.opening_balance.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.opening_balance }}</td>
+                                            <td> {{ expense_category_form.opening_balance_type }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bordered-container my-3">
+                                <h5 class="fw-bold">Credit Limit</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ expense_category_form.limit|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ expense_category_form.credit_days|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bordered-container">
+                                <h5 class="fw-bold">Party Details</h5>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.city.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.city }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.pin_code.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.pin_code }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.mobile_no.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.mobile_no }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.email.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.state.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.state }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.country.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.country }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.address_line1.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.address_line1 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>{{ expense_category_form.address_line2.label_tag }}</strong></td>
+                                            <td>{{ expense_category_form.address_line2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                           
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="button" class="btn btn-outline-grey" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
