@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 
 class Batch(BaseModel):
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, null=True)
+    course =models.ForeignKey("masters.Course", on_delete=models.CASCADE, null=True)
     batch_name = models.CharField(max_length=120)
     description = models.TextField(blank=True, null=True)
     academic_year = models.ForeignKey('core.AcademicYear', on_delete=models.CASCADE,blank=True,null=True)
@@ -21,6 +22,9 @@ class Batch(BaseModel):
     
     def get_absolute_url(self):
         return reverse_lazy("masters:batch_detail", kwargs={"pk": self.pk})
+
+    def get_syllabus_detail_url(self):
+        return reverse_lazy("masters:syllabus_detail", kwargs={"pk": self.course.pk})
     
     def get_update_url(self):
         return reverse_lazy("masters:batch_update", kwargs={"pk": self.pk})
@@ -36,6 +40,9 @@ class Course(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def get_syllabus(self):
+        return Syllabus.objects.filter(course=self)
     
     @staticmethod
     def get_list_url():
@@ -95,13 +102,17 @@ class PdfBook(BaseModel):
 
 class Syllabus(BaseModel):
     course = models.ForeignKey("masters.Course", on_delete=models.CASCADE)
-    batch = models.ForeignKey("masters.Batch", on_delete=models.CASCADE)
+    week = models.CharField(max_length=120)
+    title = models.CharField(max_length=120)
+    description = models.TextField(blank=True, null=True)
+    is_completed = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.course) 
-
-    def get_syllabus_item(self):
-        return SyllabusItem.objects.filter(syllabus=self)
+    
+    class Meta:
+        verbose_name = 'Syllabus'
+        verbose_name_plural = 'Syllabuses'
 
     @staticmethod
     def get_list_url():
@@ -117,31 +128,32 @@ class Syllabus(BaseModel):
         return reverse_lazy("masters:syllabus_delete", kwargs={"pk": self.pk})
 
 
-class SyllabusItem(BaseModel):
+class BatchSyllabusStatus(BaseModel):
     STATUS_CHOICES = [
-        ("complete", "Complete"),
-        ("pending", "Pending")
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
     ]
+
+    batch = models.ForeignKey("masters.Batch", on_delete=models.CASCADE)
     syllabus = models.ForeignKey("masters.Syllabus", on_delete=models.CASCADE)
-    title = models.CharField(max_length=180)
-    description = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
-    
+    user = models.ForeignKey("accounts.User", limit_choices_to={'is_active': True}, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+
     def __str__(self):
-        return str(self.title) 
+        return str(self.batch.batch_name )
     
     @staticmethod
     def get_list_url():
-        return reverse_lazy("masters:syllabus_item_list")
+        return reverse_lazy("masters:batch_syllabus_list")
     
     def get_absolute_url(self):
-        return reverse_lazy("masters:syllabus_item_detail", kwargs={"pk": self.pk})
+        return reverse_lazy("masters:batch_syllabus_detail", kwargs={"pk": self.pk})
     
     def get_update_url(self):
-        return reverse_lazy("masters:syllabus_item_update", kwargs={"pk": self.pk})
+        return reverse_lazy("masters:batch_syllabus_update", kwargs={"pk": self.pk})
 
     def get_delete_url(self):
-        return reverse_lazy("masters:syllabus_item_delete", kwargs={"pk": self.pk})
+        return reverse_lazy("masters:batch_syllabus_delete", kwargs={"pk": self.pk})
     
 
 class ComplaintRegistration(BaseModel):

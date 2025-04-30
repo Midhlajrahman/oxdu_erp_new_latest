@@ -70,6 +70,7 @@ class DashboardView(mixins.HybridTemplateView):
 
         if user.usertype == "student":
             try:
+                admission = get_object_or_404(Admission, user=self.request.user)
                 student_admission = Admission.objects.get(user=user)
                 attendance_records = Attendance.objects.filter(student=student_admission, is_active=True)
 
@@ -93,12 +94,14 @@ class DashboardView(mixins.HybridTemplateView):
                 context["days_in_month"] = list(range(1, 32))
                 context["total_present"] = total_present
                 context["total_absent"] = total_absent
+                context["admission"] = admission
 
             except Admission.DoesNotExist:
                 context["attendance_by_month"] = {}
                 context["days_in_month"] = list(range(1, 32))
                 context["total_present"] = 0
                 context["total_absent"] = 0
+                context["admission"] = admission
                 
                 
         elif user.usertype == "teacher":

@@ -1,6 +1,6 @@
 from core.base import BaseAdmin
 
-from .models import Batch, Course, PdfBook
+from .models import Batch, Course, PdfBook, Syllabus, BatchSyllabusStatus
 from django.contrib import admin
 
 
@@ -16,4 +16,16 @@ class CourseAdmin(BaseAdmin):
 
 @admin.register(PdfBook)
 class PdfBookAdmin(BaseAdmin):
+    pass
+
+
+@admin.register(Syllabus)
+class SyllabusAdmin(BaseAdmin):
+    list_display = ("course", "created")
+    search_fields = ("course__name",)
+    list_filter = ("course",)
+
+
+@admin.register(BatchSyllabusStatus)
+class BatchSyllabusStatusAdmin(BaseAdmin):
     pass

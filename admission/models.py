@@ -136,6 +136,9 @@ class Admission(BaseModel):
 
     def get_delete_url(self):
         return reverse_lazy("admission:admission_delete", kwargs={"pk": self.pk})
+
+    def get_syllabus_detail_url(self):
+        return reverse_lazy("masters:syllabus_detail", kwargs={"pk": self.course.pk})
     
     @staticmethod
     def get_fee_overview_list_url():

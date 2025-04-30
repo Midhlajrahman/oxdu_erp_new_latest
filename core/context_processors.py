@@ -1,5 +1,6 @@
 from core.models import AcademicYear
 from branches.models import Branch
+from admission.models import Admission
 
 from django.conf import settings
 
@@ -15,6 +16,8 @@ def main_context(request):
 
     loged_academic_year = AcademicYear.objects.filter(id=academic_year_id).first() if academic_year_id else None
     loged_branch = Branch.objects.filter(id=branch_id).first() if branch_id else None
+    if request.user.is_authenticated and request.user.usertype == 'student':
+        admission = Admission.objects.filter(user=request.user).select_related('course').first()
 
     return {
         "current_employee": user,
@@ -22,4 +25,5 @@ def main_context(request):
         "app_settings": settings.APP_SETTINGS,
         "loged_academic_year": loged_academic_year,
         "loged_branch": loged_branch,
+        'admission': admission
     }

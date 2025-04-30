@@ -36,9 +36,10 @@ urlpatterns = [
     #Syllabus
     path("syllabus/list/", views.SyllabusListView.as_view(), name="syllabus_list"),
     path("syllabus/<str:pk>/detail/", views.SyllabusDetailView.as_view(), name="syllabus_detail"),
-    path("new/syllabus/<int:pk>/", views.SyllabusCreateView.as_view(), name="syllabus_create"),
+    path('courses/<int:course_id>/syllabus/create/', views.SyllabusCreateView.as_view(), name='syllabus_create'),
     path("new/syllabus/", views.SyllabusCreateView.as_view(), name="syllabus_create"),
     path("syllabus/<str:pk>/update/", views.SyllabusUpdateView.as_view(), name="syllabus_update"),
+    path('courses/<int:course_id>/syllabus/update/', views.SyllabusUpdateView.as_view(), name='syllabus_create'),
     path("syllabus/<str:pk>/delete/", views.SyllabusDeleteView.as_view(), name="syllabus_delete"),
 
     #Complaint

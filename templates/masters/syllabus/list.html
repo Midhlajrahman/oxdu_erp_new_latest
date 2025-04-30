@@ -142,10 +142,10 @@
             <div class="modal-body">
                 <div class="row">
                 <div class="col-sm-12">
-                    <select name="batch" id="is_batch" class="form-control" required>
-                        <option value="">Choose Batch </option>
-                        {% for batch in batches %}
-                            <option value="{{ batch.pk }}">{{ batch.batch_name }}</option>
+                    <select name="course" id="is_course" class="form-control" required>
+                        <option value="">Choose course </option>
+                        {% for course in courses %}
+                            <option value="{{ course.pk }}">{{ course.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -174,8 +174,8 @@
 <script>
     $('.submit_btn').click(function(){
        var form = $('#addnewform');
-       var val = form.find('#is_batch').val();
-       window.location.href = "/masters/new/syllabus/" + val + "/";
+       var val = form.find('#is_course').val();
+       window.location.href = "/masters/courses/" + val + "/syllabus/create/";
     })
 </script>
 {% endblock javascript %}

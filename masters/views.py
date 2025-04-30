@@ -1,6 +1,8 @@
 import datetime
 import json
+from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.contrib import messages
@@ -17,35 +19,78 @@ from employees.models import Employee
 
 from . import forms
 from . import tables
-from masters .forms import PdfBookFormSet, SyllabusItemFormSet, SyllabusForm
-from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, SyllabusItem
+from .forms import PdfBookFormSet, SyllabusForm,SyllabusFormSet
+from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, BatchSyllabusStatus
+
 
 @csrf_exempt
 def status_update(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
     try:
-        data = json.loads(request.body) 
+        print("DEBUG: Is user authenticated?", request.user.is_authenticated)
+        print("DEBUG: User:", request.user)
+        print("DEBUG: Usertype attribute exists?", hasattr(request.user, 'usertype'))
+        if hasattr(request.user, 'usertype'):
+            print("DEBUG: Usertype:", request.user.usertype)
+
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": "error", "message": "User not authenticated"}, status=403)
+
+        data = json.loads(request.body)
+        status_value = data.get("status", "pending")
 
         syllabus = get_object_or_404(Syllabus, pk=pk)
 
-        if data.get('status') in dict(SyllabusItem.STATUS_CHOICES):
-            syllabus_item.status = data['status']  
-            syllabus_item.save()  
-
-            return JsonResponse({"status": "success"}, status=200)
+        if hasattr(request.user, 'usertype') and request.user.usertype == 'student':
+            admission = Admission.objects.filter(user=request.user).first()
+            if not admission or not admission.batch:
+                return JsonResponse({"status": "error", "message": "Valid batch not found for the student"}, status=404)
+            batch = admission.batch
+        elif hasattr(request.user, 'usertype') and request.user.usertype == 'teacher':
+            teacher = Employee.objects.filter(user=request.user).first()
+            if teacher and teacher.course:
+                batch = Batch.objects.filter(course=teacher.course).first()
+                if not batch:
+                    return JsonResponse({"status": "error", "message": "Batch not found for the teacher's course"}, status=404)
+            else:
+                return JsonResponse({"status": "error", "message": "Teacher's course not found"}, status=404)
         else:
-            error_message = "Invalid status"
-            print(error_message)  
-            return JsonResponse({"status": "error", "message": error_message}, status=400)
+            return JsonResponse({"status": "error", "message": "Unauthorized user type"}, status=403)
 
-    except json.JSONDecodeError as e:
-        error_message = f"Invalid JSON format: {str(e)}"
-        print(error_message)  
-        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+        bss, created = BatchSyllabusStatus.objects.get_or_create(
+            syllabus=syllabus,
+            user=request.user,
+            batch=batch,
+            defaults={'status': status_value}
+        )
+
+        if not created:
+            bss.status = status_value
+            bss.save()
+
+        if status_value == 'completed':
+            syllabus.is_completed = True
+            syllabus.save()
+
+        return JsonResponse({"status": "success", "created": created}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
 
     except Exception as e:
-        error_message = f"Error occurred: {str(e)}"
-        print(error_message)
+        print("EXCEPTION:", e)
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+def student_syllabus_redirect(request):
+    if request.user.is_authenticated and request.user.usertype == "student":
+        admission = Admission.objects.filter(user=request.user).first()
+        if admission and admission.course:
+            return redirect("masters:syllabus_detail", course_id=admission.course.id)
+    return redirect("core:home")
+
 
 
 class BatchListView(mixins.HybridListView):
@@ -182,8 +227,6 @@ class PDFBookResourceDetailView(mixins.HybridDetailView):
 
         pdfbook_entries = PdfBook.objects.filter(resource=resource, is_active=True)
 
-        context["is_transportation"] = True
-        context["is_rout"] = True
         context["customer_table"] = tables.PDFBookResourceTable(pdfbook_entries)
         context["pdfbook_entries"] = pdfbook_entries 
         return context
@@ -215,7 +258,7 @@ class PDFBookResourceCreateView(mixins.HybridCreateView):
             context["pdfbook_formset"] = PdfBookFormSet(self.request.POST, self.request.FILES)
         else:
             context["pdfbook_formset"] = PdfBookFormSet()
-        context["title"] = "Create Rout"
+        context["title"] = "Create PDF Book"
         return context
 
     def form_valid(self, form):
@@ -327,90 +370,147 @@ class PDFBookListView(mixins.HybridListView):
 
 
 class SyllabusListView(mixins.HybridListView):
-    model = Syllabus
-    table_class = tables.SyllabusTable 
-    filterset_fields = {'batch': ['exact'], 'course': ['exact']}  
-    permissions = ("")
+    model = Batch
+    table_class = tables.SyllabusBatchTable
+    filterset_fields = {'batch_name': ['exact']}
+    permissions = ("teacher", "admin_staff", "branch_staff", "student")
     template_name = 'masters/syllabus/list.html'
     branch_filter = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["batches"] = Batch.objects.filter(is_active=True)
-        context["title"] = "Syllabus"
+        user = self.request.user
+        context["courses"] = Course.objects.filter(is_active=True)
+        context["title"] = "Batches"
         context['is_masters'] = True
-        context["is_syllabus"] = True  
+        context["is_syllabus"] = True
+        context["can_add"] = user.usertype  != "student"
+        context["new_link"] = reverse_lazy("masters:pdfbook_resource_create")
         return context
     
 
-class SyllabusDetailView(mixins.HybridDetailView):
-    model = Syllabus
-    permissions = ()
+class SyllabusDetailView(TemplateView):
     template_name = "masters/syllabus/object_view.html"
+    permissions = ()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Syllabus"
+        course_pk = self.kwargs.get("pk")
+        course = get_object_or_404(Course, pk=course_pk)
+        user = self.request.user
+        syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
+        completed_statuses = BatchSyllabusStatus.objects.filter(
+            syllabus_id__in=syllabus_ids,
+            user=user
+        )
+        print("status==",completed_statuses)
+        completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
+        
+        pending_statuses = Syllabus.objects.filter(is_active=True).exclude(id__in=completed_statuses_ids)
+
+        context["title"] = f"Syllabus - {course.name}"
+        context["course"] = course
+        context["pending_items"] = pending_statuses
+        context["completed_items"] = completed_statuses
         return context
 
 
 class SyllabusCreateView(mixins.HybridCreateView):
     model = Syllabus
-    permissions = ("")
-    exclude = ("is_active",)
     template_name = "masters/syllabus/object_form.html"
+    permissions = ("teacher", "admin_staff", "branch_staff", "student")
+    exclude = ("is_active",)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.course = get_object_or_404(Course, pk=self.kwargs.get("course_id"))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = kwargs
         context["title"] = "Syllabus"
         context["is_masters"] = True
         context["is_syllabus"] = True
-
-        if self.request.POST:
-            context['formset'] = SyllabusItemFormSet(self.request.POST)
-        else:
-            context['formset'] = SyllabusItemFormSet(queryset=SyllabusItem.objects.none())
-
-        context['form'] = SyllabusForm()
-
+        context["course"] = self.course
         return context
 
-    def form_valid(self, form):
-        context = self.get_context_data()
-        formset = context['formset']
+    def get(self, request, *args, **kwargs):
+        formset = SyllabusFormSet(queryset=Syllabus.objects.none())
+        return self.render_to_response(self.get_context_data(formset=formset))
+
+    def post(self, request, *args, **kwargs):
+        formset = SyllabusFormSet(request.POST)
+
+        for form in formset:
+            form.data = form.data.copy()
+            form.data[form.add_prefix('course')] = str(self.course.id)
 
         if formset.is_valid():
-            syllabus = form.save(commit=False)
-            syllabus.save()
-
-            for syllabus_item_form in formset:
-                syllabus_item = syllabus_item_form.save(commit=False)
-                syllabus_item.syllabus = syllabus
-                syllabus_item.save()
-
-            formset.save() 
-
-            return super().form_valid(form)
+            for syllabus_form in formset:
+                if syllabus_form.cleaned_data and not syllabus_form.cleaned_data.get("DELETE", False):
+                    syllabus_item = syllabus_form.save(commit=False)
+                    syllabus_item.course = self.course
+                    syllabus_item.save()
+            formset.save()
+            return redirect("masters:syllabus_list")
         else:
-            print("Form errors:", form.errors)
             print("Formset errors:", formset.errors)
+            return self.form_invalid(formset)
 
-            for form_in_set in formset:
-                print("Formset form errors:", form_in_set.errors)
-
-            return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        context = self.get_context_data()
-        print("Form errors (invalid):", form.errors)
+    def form_invalid(self, formset):
+        context = self.get_context_data(formset=formset)
+        context['formset_errors'] = formset.errors
         return self.render_to_response(context)
 
 
-class SyllabusUpdateView(mixins.HybridUpdateView):
-    model = Syllabus
-    permissions = ("")
-    exclude = ("is_active",)
+
+class SyllabusUpdateView(View):
     template_name = "masters/syllabus/object_form.html"
+    permissions = ("teacher", "admin_staff", "branch_staff", "student")
+    
+    def dispatch(self, request, *args, **kwargs):
+        self.course = get_object_or_404(Course, pk=self.kwargs.get("course_id"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = kwargs
+        context["title"] = "Syllabus"
+        context["is_masters"] = True
+        context["is_syllabus"] = True
+        context["course"] = self.course
+        context["syllabi"] = self.course.get_syllabus()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        syllabus_list = self.course.get_syllabus()
+        formset = SyllabusFormSet(queryset=syllabus_list)
+        return render(request, self.template_name, self.get_context_data(formset=formset))
+
+    def post(self, request, *args, **kwargs):
+        formset = SyllabusFormSet(request.POST)
+
+        for form in formset:
+            form.data = form.data.copy() 
+            form.data[form.add_prefix('course')] = str(self.course.id) 
+
+        print("Formset Data:", request.POST)
+        for form in formset:
+            print("Form data for form:", form.data) 
+
+        if formset.is_valid():
+            for syllabus_form in formset:
+                if syllabus_form.cleaned_data and not syllabus_form.cleaned_data.get("DELETE", False):
+                    syllabus_item = syllabus_form.save(commit=False)
+                    syllabus_item.course = self.course  
+                    syllabus_item.save()
+            return redirect("masters:syllabus_list")
+        else:
+            print("Formset errors:", formset.errors)
+            return self.form_invalid(formset)
+
+    def form_invalid(self, formset):
+        context = self.get_context_data(formset=formset)
+        context['formset_errors'] = formset.errors  
+        return render(self.request, self.template_name, context)
 
 
 class SyllabusDeleteView(mixins.HybridDeleteView):
