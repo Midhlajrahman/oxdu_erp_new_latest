@@ -16,6 +16,8 @@ def main_context(request):
 
     loged_academic_year = AcademicYear.objects.filter(id=academic_year_id).first() if academic_year_id else None
     loged_branch = Branch.objects.filter(id=branch_id).first() if branch_id else None
+    
+    admission = None
     if request.user.is_authenticated and request.user.usertype == 'student':
         admission = Admission.objects.filter(user=request.user).select_related('course').first()
 

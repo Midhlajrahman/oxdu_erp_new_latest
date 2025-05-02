@@ -235,7 +235,7 @@ class AccountSettings(mixins.HybridView):
 
 class AcademicYearListView(mixins.HybridListView):
     model = AcademicYear
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
     branch_filter = False  
     
     def get_queryset(self):

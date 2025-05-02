@@ -145,7 +145,7 @@ EMPLOYEE_STATUS_CHOICES = (("Appointed", "Appointed"), ("Resigned", "Resigned"),
 
 PAYMENT_METHOD_CHOICES = [('cash', 'Cash'), ('bank', 'Bank Transfer')]
 
-USERTYPE_CHOICES = (('admin_staff', 'Admin Staff'), ('branch_staff', 'Branch Staff'), ('teacher', 'Teacher'), ('student', 'Student'))
+USERTYPE_CHOICES = (('admin_staff', 'Admin Staff'), ('branch_staff', 'Branch Staff'), ('teacher', 'Teacher'), ('mentor', 'Mentor'), ('student', 'Student'))
 
 ACCOUNTING_MASTER_CHOICES = (("Assets", "Assets"), ("Liabilities", "Liabilities"), ("Equity", "Equity"), ("Income", "Income"), ("Expense", "Expense"))
 
@@ -177,8 +177,6 @@ TAX_APPLICABLE_CHOICES = (
     ('shipping', 'Shipping Charge'),
     ('pakaging', 'Pakaging Charge'),
 )
-
-
 
 
 

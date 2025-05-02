@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus
+from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, ChatSession
 
 
 class PdfBookForm(forms.ModelForm):
@@ -58,3 +58,9 @@ class ComplaintForm(forms.ModelForm):
     class Meta:
         model = ComplaintRegistration
         fields = ['complaint_type', "complaint", "status", ]
+
+
+class ChatMessageForm(forms.ModelForm):
+    class Meta:
+        model = ChatSession
+        fields = ['message']

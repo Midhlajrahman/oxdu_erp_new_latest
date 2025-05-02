@@ -64,7 +64,7 @@ class AdmissionListView(mixins.HybridListView):
     model = Admission
     table_class = tables.AdmissionTable
     filterset_fields = {'course': ['exact'], "branch": ['exact'], "batch": ['exact'], "admission_number": ['exact'], "admission_date": ['exact']}
-    permissions = ("branch_manager", "teacher", "admin_staff" "is_superuser",)
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser",)
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -95,7 +95,7 @@ class InactiveAdmissionListView(mixins.HybridListView):
         'admission_number': ['exact'],
         'admission_date': ['exact'],
     }
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
 
     def get_queryset(self):
         queryset = Admission.objects.filter(is_active=False)
@@ -120,13 +120,13 @@ class InactiveAdmissionListView(mixins.HybridListView):
 class AdmissionDetailView(mixins.HybridDetailView):
     queryset = Admission.objects.filter(is_active=True)
     template_name = "admission/profile.html"
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
 
 
 class AdmissionCreateView(mixins.HybridCreateView):
     model = Admission
     form_class = forms.AdmissionPersonalDataForm
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
     template_name = "admission/admission_form.html"
     exclude = None
 
@@ -435,7 +435,7 @@ class FeeReceiptListView(mixins.HybridListView):
     model = FeeReceipt
     table_class = tables.FeeReceiptTable
     filterset_fields = {'student': ['exact'], }
-    permissions = ("branch_manager", "teacher", "admin_staff" "is_superuser", "student")
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser", "student")
     branch_filter = False
     
     def get_queryset(self):
@@ -523,7 +523,7 @@ class StudentFeeOverviewListView(mixins.HybridListView):
     model = Admission
     table_class = tables.StudentFeeOverviewTable
     filterset_fields = {'branch': ['exact'], 'course': ['exact'], 'batch': ['exact'], }
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser", "student")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "student")
     branch_filter = False
     
     def get_queryset(self):
@@ -564,7 +564,7 @@ class StudentFeeOverviewDetailView(mixins.HybridDetailView):
 class FeeOverviewListView(mixins.HybridListView):
     model = Admission
     filterset_fields = {'branch': ['exact'], 'course': ['exact'], 'batch': ['exact']}
-    permissions = ("branch_manager", "teacher", "admin_staff", "is_superuser", "student")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "student")
     template_name = "admission/fee_receipt/fee_overview.html"
     branch_filter = False
     

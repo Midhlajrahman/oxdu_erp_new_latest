@@ -50,4 +50,17 @@ urlpatterns = [
     path("complaint/<str:pk>/update/", views.ComplaintUpdateView.as_view(), name="complaint_update"),
     path("complaint/<str:pk>/delete/", views.ComplaintDeleteView.as_view(), name="complaint_delete"),
 
+    #Chat
+    path("chat/list/", views.ChatListView.as_view(), name="chat_list"),
+    path("chat/employee/list/", views.EmployeeChatListView.as_view(), name="employee_chat_list"),
+    path('chat/student/<int:user_id>/', views.StudentChatView.as_view(), name='student_chat'),
+    path('chat/<int:user_id>/clear/', views.clear_chat, name='clear_chat')
+
+
+    # path("chat/<str:pk>/detail/", views.ChatDetailView.as_view(), name="chat_detail"),
+    # path("new/chat/<str:pk>/", views.ChatCreateView.as_view(), name="chat_create"),
+    # path("new/chat/", views.ChatCreateView.as_view(), name="chat_create"),
+    # path("chat/<str:pk>/update/", views.ChatUpdateView.as_view(), name="chat_update"),
+    # path("chat/<str:pk>/delete/", views.ChatDeleteView.as_view(), name="chat_delete"),
+
 ]

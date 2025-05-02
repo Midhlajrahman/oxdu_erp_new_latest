@@ -60,11 +60,19 @@
                                 <td>{{ item.week }}</td>
                                 <td>{{ item.title }}</td>
                                 <td>{{ item.description }}</td>
+                                {% if request.user.usertype == "teacher" or request.user.usertype == "student" %}
                                 <td>
                                     <span id="incomplete-{{ item.id }}" data-id="{{ item.id }}" class="btn btn-danger btn-sm incomplete-btn">
                                         <i class="fas fa-circle-xmark me-1"></i> Incomplete
                                     </span>
                                 </td>
+                                {% else %}
+                                <td>
+                                    <span class="btn btn-danger btn-sm">
+                                        <i class="fas fa-circle-xmark me-1"></i> Pending
+                                    </span>
+                                </td>
+                                {% endif %}
                             </tr>
                             {% empty %}
                             <tr><td colspan="4" class="text-center">No pending syllabus items.</td></tr>

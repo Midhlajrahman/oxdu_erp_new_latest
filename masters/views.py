@@ -1,5 +1,8 @@
 import datetime
 import json
+from django.db import models
+from django.db.models import Q
+from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -19,8 +22,22 @@ from employees.models import Employee
 
 from . import forms
 from . import tables
-from .forms import PdfBookFormSet, SyllabusForm,SyllabusFormSet
-from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, BatchSyllabusStatus
+from .forms import PdfBookFormSet, SyllabusForm,SyllabusFormSet, ChatMessageForm
+from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, BatchSyllabusStatus, ChatSession
+
+User = get_user_model()
+
+@csrf_exempt 
+def clear_chat(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
+    current_user = request.user
+
+    ChatSession.objects.filter(
+        Q(sender=current_user, recipient=other_user) |
+        Q(sender=other_user, recipient=current_user)
+    ).delete()
+
+    return JsonResponse({'status': 'success'})
 
 
 @csrf_exempt
@@ -97,7 +114,7 @@ class BatchListView(mixins.HybridListView):
     model = Batch
     table_class = tables.BatchTable
     filterset_fields = {'academic_year': ['exact'], }
-    permissions = ("branch_manager", "teacher", "admin_staff" "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser")
     
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
@@ -107,7 +124,6 @@ class BatchListView(mixins.HybridListView):
         context["is_master"] = True
         context["is_batch"] = True
         return context
-    
 
     
 class BatchDetailView(mixins.HybridDetailView):
@@ -143,7 +159,7 @@ class CourseListView(mixins.HybridListView):
     model = Course
     table_class = tables.CourseTable
     filterset_fields = {'name': ['exact'], }
-    permissions = ("branch_manager", "teacher", "admin_staff" "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser")
     branch_filter = False
     
     def get_queryset(self):
@@ -190,7 +206,7 @@ class PDFBookResourceListView(mixins.HybridListView):
     model = PDFBookResource
     table_class = tables.PDFBookResourceTable
     filterset_fields = ('course',)
-    permissions = ("superadmin",'manager','teacher', "student")
+    permissions = ("superadmin",'branch_staff', "admin_staff", 'teacher', "student")
     branch_filter = False
     
     def get_queryset(self):
@@ -219,7 +235,7 @@ class PDFBookResourceListView(mixins.HybridListView):
 class PDFBookResourceDetailView(mixins.HybridDetailView):
     model = PDFBookResource
     template_name = "masters/pdfbook/object_view.html"
-    permissions = ("superadmin", "manager", "teacher", "student")
+    permissions = ("superadmin", "branch_staff", "admin_staff",  "teacher", "student")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -234,7 +250,7 @@ class PDFBookResourceDetailView(mixins.HybridDetailView):
 
 class PDFBookResourceCreateView(mixins.HybridCreateView):
     model = PDFBookResource
-    permissions = ("superadmin", "manager", "teacher")
+    permissions = ("superadmin", "branch_staff", "admin_staff",  "teacher")
     exclude = ("is_active",)
     template_name = "masters/pdfbook/object_form.html"
 
@@ -288,7 +304,7 @@ class PDFBookResourceCreateView(mixins.HybridCreateView):
 
 class PDFBookResourceUpdateView(mixins.HybridUpdateView):
     model = PDFBookResource
-    permissions = ("superadmin", "manager", "teacher")
+    permissions = ("superadmin", "branch_staff", "admin_staff",  "teacher")
     template_name = "masters/pdfbook/object_form.html"
 
     def get_context_data(self, **kwargs):
@@ -338,14 +354,14 @@ class PDFBookResourceUpdateView(mixins.HybridUpdateView):
 
 class PDFBookResourceDeleteView(mixins.HybridDeleteView):
     model = PDFBookResource
-    permissions = ("superadmin",'manager','driver')
+    permissions = ("superadmin",'branch_staff', "admin_staff", 'driver')
     
 
 class PDFBookListView(mixins.HybridListView):
     model = PdfBook
     table_class = tables.PdfBookTable
     filterset_fields = ('name',)
-    permissions = ("superadmin",'manager','teacher', "student")
+    permissions = ("superadmin",'branch_staff', "admin_staff", 'teacher', "student")
     branch_filter = False
     
     def get_queryset(self):
@@ -375,7 +391,6 @@ class SyllabusListView(mixins.HybridListView):
     filterset_fields = {'batch_name': ['exact']}
     permissions = ("teacher", "admin_staff", "branch_staff", "student")
     template_name = 'masters/syllabus/list.html'
-    branch_filter = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -398,15 +413,23 @@ class SyllabusDetailView(TemplateView):
         course_pk = self.kwargs.get("pk")
         course = get_object_or_404(Course, pk=course_pk)
         user = self.request.user
-        syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
-        completed_statuses = BatchSyllabusStatus.objects.filter(
-            syllabus_id__in=syllabus_ids,
-            user=user
-        )
-        print("status==",completed_statuses)
-        completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
-        
-        pending_statuses = Syllabus.objects.filter(is_active=True).exclude(id__in=completed_statuses_ids)
+        if user.usertype not in ["student", "teacher"]:
+            syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
+            completed_statuses = BatchSyllabusStatus.objects.filter(
+                syllabus_id__in=syllabus_ids
+            )
+            completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
+            pending_statuses = Syllabus.objects.filter(course=course, is_active=True).exclude(id__in=completed_statuses_ids)
+        else:
+            syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
+            completed_statuses = BatchSyllabusStatus.objects.filter(
+                syllabus_id__in=syllabus_ids,
+                user=user
+            )
+            print("status==",completed_statuses)
+            completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
+            
+            pending_statuses = Syllabus.objects.filter(is_active=True).exclude(id__in=completed_statuses_ids)
 
         context["title"] = f"Syllabus - {course.name}"
         context["course"] = course
@@ -584,3 +607,82 @@ class ComplaintUpdateView(mixins.HybridUpdateView):
 class ComplaintDeleteView(mixins.HybridDeleteView):
     model = ComplaintRegistration
     permissions = ("admin_staff", "branch_staff", "teacher",)
+
+
+class ChatListView(mixins.HybridListView):
+    model = Admission
+    table_class = tables.ChatSessionTable
+    filterset_fields = {'batch': ['exact'], "branch": ['exact'], 'course': ['exact']}  
+    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor",)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Chat with Students"
+        context["is_chat_session"] = True
+        context["can_add"] =  False
+        return context
+
+    
+class EmployeeChatListView(mixins.HybridListView):
+    model = Employee
+    table_class = tables.EmployeeChatSessionTable
+    filterset_fields = {"branch": ['exact'], 'course': ['exact']}  
+    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor",)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.filter(
+            user__branch=self.request.user.branch,
+            user__usertype__in=["teacher", "mentor"]
+        )
+
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Chat With Teachers & Mentors"
+        context["is_mentor_chat_session"] = True
+        context["can_add"] =  False
+        return context
+    
+    
+class StudentChatView(TemplateView):
+    template_name = "masters/chat/object_view.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        other_user = get_object_or_404(User, id=self.kwargs["user_id"])
+        current_user = self.request.user
+
+        messages = ChatSession.objects.filter(
+            Q(sender=current_user, recipient=other_user) |
+            Q(sender=other_user, recipient=current_user)
+        ).order_by("created")
+
+        context["default_user_avatar"] = f"https://ui-avatars.com/api/?name={current_user.get_full_name()}&background=fdc010&color=fff&size=128"
+        
+        context["other_user_avatar"] = f"https://ui-avatars.com/api/?name={other_user.get_full_name()}&background=fdc010&color=fff&size=128"
+
+        context["messages"] = messages
+        context["other_user"] = other_user
+        return context
+
+    def post(self, request, *args, **kwargs):
+        other_user = get_object_or_404(User, id=self.kwargs["user_id"])
+        message = request.POST.get("message", "")
+        attachment = request.FILES.get("attachment")
+
+        if attachment and attachment.size > 1024 * 1024:
+            messages.error(request, "File size should not exceed 1 MB.")
+            return redirect("masters:student_chat", user_id=other_user.id)
+
+        if message or attachment:
+            ChatSession.objects.create(
+                sender=request.user,
+                recipient=other_user,
+                message=message,
+                attachment=attachment
+            )
+
+        return redirect("masters:student_chat", user_id=other_user.id)

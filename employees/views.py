@@ -18,7 +18,7 @@ class DepartmentListView(mixins.HybridListView):
     model = Department
     table_class = tables.DepartmentTable
     filterset_fields = {"name": ["icontains"]}
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     branch_filter = False
     
 
@@ -31,30 +31,30 @@ class DepartmentListView(mixins.HybridListView):
 
 class DepartmentDetailView(mixins.HybridDetailView):
     model = Department
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     branch_filter = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["can_delete"] = mixins.check_access(self.request, ("manager"))
+        context["can_delete"] = mixins.check_access(self.request, ("branch_staff"))
         return context
 
 
 class DepartmentCreateView(mixins.HybridCreateView):
     model = Department
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     branch_filter = False
 
 
 class DepartmentUpdateView(mixins.HybridUpdateView):
     model = Department
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     branch_filter = False
 
 
 class DepartmentDeleteView(mixins.HybridDeleteView):
     model = Department
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     branch_filter = False
 
 
@@ -105,7 +105,7 @@ class ProfileView(mixins.HybridView):
 class EmployeeListView(mixins.HybridListView):
     model = Employee
     table_class = tables.EmployeeTable
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     filterset_fields = {'branch': ['exact'] ,'department': ['exact'], 'designation': ['exact'], 'gender': ['exact'],}
     search_fields = ("user__email", "employee_id", "first_name", "middle_name", "last_name", "marital_status", "mobile", "whatsapp")
     
@@ -132,7 +132,7 @@ class EmployeeListView(mixins.HybridListView):
 class EmployeeDetailView(mixins.HybridDetailView):
     queryset = Employee.objects.filter(is_active=True)
     template_name = "employees/profile.html"
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -152,7 +152,7 @@ class EmployeeDetailView(mixins.HybridDetailView):
 class EmployeeCreateView(mixins.HybridCreateView):
     model = Employee
     form_class = forms.EmployeePersonalDataForm
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     template_name = "employees/employee_form.html"
     exclude = None
 
@@ -199,6 +199,7 @@ class EmployeeCreateView(mixins.HybridCreateView):
 
             employee.user = user
             employee.branch = user.branch
+            employee.usertype = user.usertype
             employee.save()
         else:
             user.save()
@@ -211,7 +212,7 @@ class EmployeeCreateView(mixins.HybridCreateView):
 
 class EmployeeUpdateView(mixins.HybridUpdateView):
     model = Employee
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")
     template_name = "employees/employee_form.html"
 
     def get_initial(self):
@@ -285,4 +286,4 @@ class EmployeeUpdateView(mixins.HybridUpdateView):
 
 class EmployeeDeleteView(mixins.HybridDeleteView):
     model = Employee
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff")

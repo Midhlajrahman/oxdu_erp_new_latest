@@ -1,0 +1,493 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags django_tables2 %}
+{% block title %}{{title|title}} : {{app_settings.site_title}}{% endblock %}
+
+{% block content %}
+
+<!-- Start::app-content -->
+<div class="main-content app-content">
+    <div class="container-fluid">
+
+        <!-- Page Header -->
+        <div class="page-header d-lg-flex d-block">
+            <div class="page-leftheader">
+                <div class="page-title">Employees</div>
+            </div>
+            <div class="page-rightheader">
+                <div class="btn-list">
+                    <a  href="hr-addemployee.html" class="btn btn-primary">Add New Employee</a>
+                    <button  class="btn btn-light3" data-bs-toggle="tooltip" data-bs-placement="top" title="E-mail"> <i class="fe fe-mail"></i> </button>
+                    <button  class="btn btn-light3" data-bs-placement="top" data-bs-toggle="tooltip" title="Contact"> <i class="fe fe-phone-call"></i> </button>
+                    <button  class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" title="Info"> <i class="fe fe-info"></i> </button>
+                </div>
+            </div>
+        </div>
+        <!-- Page Header Close -->
+
+        <!-- Start::row-1 -->
+        <div class="row">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="mt-0 text-start"> <span class="fw-medium">Total Employees</span>
+                                    <h3 class="mb-0 mt-1 text-success">5,678</h3>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="icon1 bg-success-transparent my-auto float-end"> <i class="las la-users"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="mt-0 text-start"> <span class="fw-medium">Total Male Employees</span>
+                                    <h3 class="mb-0 mt-1 text-primary">3,876</h3>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="icon1 bg-primary-transparent my-auto float-end"> <i class="las la-male"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="mt-0 text-start"> <span class="fw-medium">Total Female Employees</span>
+                                <h3 class="mb-0 mt-1 text-secondary">1,396</h3> </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="icon1 bg-secondary-transparent my-auto float-end"> <i class="las la-female"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-7">
+                                <div class="mt-0 text-start"> <span class="fw-medium">Total New Employees</span>
+                                <h3 class="mb-0 mt-1 text-danger">398</h3> </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="icon1 bg-danger-transparent my-auto float-end"> <i class="las la-user-friends"></i> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Start::row-1 -->
+
+        <!-- Start::row-2 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Employees List</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2 gap-2 gap-lg-0">
+                            <div class="col-lg-6">
+                                <div class="d-flex align-items-center">
+                                    <span>Show</span>
+                                    <div class="d-flex ms-2 mx-2">
+                                        <div class="form-group mb-0">
+                                            <select name="quantity" id="select-countries17" class="form-control  wd-150" data-trigger>
+                                                <option value="1" selected="">10</option>
+                                                <option value="2">25</option>
+                                                <option value="3">50</option>
+                                                <option value="4">100</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <span>entries</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="float-end">
+                                    <input type="text" class="form-control" placeholder="search">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table mb-0 text-nowrap text-md-nowrap table-bordered border">
+                                <thead>
+                                    <tr class="border-bottom">
+                                        <th>No</th>
+                                        <th>Emp Name</th>
+                                        <th>#Emp ID</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Phone Number</th>
+                                        <th>Join Date</th>
+                                        <th>At Work</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <th scope="row">01</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/10.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Faith Harris</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">faith@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#2987</td>
+                                        <td>Designing Department</td>
+                                        <td>Web Designer</td>
+                                        <td>+9685321475</td>
+                                        <td>05-05-2017</td>
+                                        <td>3 yrs 1 mons 13 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">02</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/2.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Austin Bell</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">austin@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#4987</td>
+                                        <td>Development Department</td>
+                                        <td>Angular Developer</td>
+                                        <td>+8653217950</td>
+                                        <td>02-01-2018</td>
+                                        <td>3 yrs 0 mons 25 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">03</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/4.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Maria Bower</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">maria@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#6729</td>
+                                        <td>Marketing Department</td>
+                                        <td>Marketing analyst</td>
+                                        <td>+9563258417</td>
+                                        <td>02-08-2019</td>
+                                        <td>2 yrs 3 mons 23 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">04</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/5.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Peter Hill</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">mpeter@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#2098</td>
+                                        <td>IT Department</td>
+                                        <td>Testor</td>
+                                        <td>+8563249751</td>
+                                        <td>01-01-2020</td>
+                                        <td>1 yrs 0 mons 25 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">05</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/7.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Victoria Lyman</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">victoria@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#1025</td>
+                                        <td>Managers Department</td>
+                                        <td>General Manager</td>
+                                        <td>+9635826432</td>
+                                        <td>05-05-2021</td>
+                                        <td>0 yrs 0 mons 20 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">06</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/9.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Adam Quinn</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">adam@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#3262</td>
+                                        <td>Accounts Department</td>
+                                        <td>Accountant</td>
+                                        <td>+9685231572</td>
+                                        <td>05-05-2020</td>
+                                        <td>0 yrs 8 mons 20 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">07</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/13.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Melanie Coleman</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">melanie@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#3489</td>
+                                        <td>Application Department</td>
+                                        <td>App Designer</td>
+                                        <td>+8635291470</td>
+                                        <td>15-02-2019</td>
+                                        <td>1 yrs 11 mons 10 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">08</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/10.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Max Wilson</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">max@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#3698</td>
+                                        <td>Development Department</td>
+                                        <td>PHP Developer</td>
+                                        <td>+9986357240</td>
+                                        <td>05-05-2020</td>
+                                        <td>0 yrs 9 mons 20 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">09</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/11.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Amelia Russell</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">amelia@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#5612</td>
+                                        <td>Designing Department</td>
+                                        <td>UX Designer</td>
+                                        <td>+9356982472</td>
+                                        <td>01-05-2018</td>
+                                        <td>2 yrs 9 mons 25 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <th scope="row">10</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2 avatar-rounded">
+                                                    <img src="../assets/images/users/12.jpg" alt="img">
+                                                </div>
+                                                <div>
+                                                    <div class="lh-1">
+                                                        <h6 class="mb-1">Justin Metcalfe</h6>
+                                                    </div>
+                                                    <div class="lh-1">
+                                                        <span
+                                                            class="fs-12 text-muted">justin@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>#0245</td>
+                                        <td>Designing Department</td>
+                                        <td>Web Designer</td>
+                                        <td>+9685321475</td>
+                                        <td>05-05-2017</td>
+                                        <td>3 yrs 1 mons 13 days</td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>
+                                            <a class="btn btn-primary btn-icon"  href="hr-empview.html">
+                                                <i class="fe fe-edit" data-bs-toggle="tooltip" data-original-title="View/Edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" data-bs-toggle="tooltip" data-original-title="Delete"><i class="fe fe-trash-2"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Start::pagination -->
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-end mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="javascript:void(0);">Prev</a></li>
+                                <li class="page-item active"><a class="page-link" href="javascript:void(0);">1</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0);">2</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0);">3</a></li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0);">Next</a></li>
+                            </ul>
+                        </nav>
+                        <!-- End::pagination -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End::row-2 -->
+
+    </div>
+</div>
+<!-- End::app-content -->
+
+{% for new_html in includes %}
+  {% include new_html %}
+{% endfor %}
+
+{% include 'app/partials/filter.html' %}
+{% include 'app/partials/help.html' %}
+
+{% endblock content %}

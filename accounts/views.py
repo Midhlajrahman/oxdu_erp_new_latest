@@ -73,8 +73,7 @@ class UserCreateView(mixins.HybridCreateView):
             user.last_name = employee.last_name or ""
 
             user.save()  # Save the user after setting password
-            employee.user = user  # Link the employee to the user
-            employee.user.usertype = 'teacher'
+            employee.user = user 
             employee.save()
 
         return super().form_valid(form)

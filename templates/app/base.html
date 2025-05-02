@@ -64,6 +64,8 @@
                 {% include 'app/sidebar/teacher.html' %}
             {% elif request.user.usertype == 'branch_staff' %}
                 {% include 'app/sidebar/branch_staff.html' %}
+            {% elif request.user.usertype == 'mentor' %}
+                {% include 'app/sidebar/mentor.html' %}
             {% elif request.user.usertype == 'student' %}
                 {% include 'app/sidebar/student.html' %}
             {% endif %}

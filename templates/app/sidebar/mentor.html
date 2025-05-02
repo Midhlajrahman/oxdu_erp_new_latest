@@ -44,58 +44,13 @@
                         <span class="side-menu__label">Dashboard</span>
                     </a>
                 </li>
-                
 
                 <li class="slide ">
-                    <a href="{% url 'masters:pdf_book_list' %}" class="side-menu__item {% if is_pdf_book %}active{% endif %}">
-                        <i class="la la-file-pdf side-menu__icon"></i>
-                        <span class="side-menu__label">PDF Book</span>
-                    </a>
-                </li>
-
-                <li class="slide ">
-                    <a href="{% url 'admission:fee_receipt_list' %}" class="side-menu__item {% if fee_reciept %}active{% endif %}">
-                        <i class="la la-file-invoice-dollar side-menu__icon"></i>
-                        <span class="side-menu__label">Fee Receipt</span>
-                    </a>
-                </li>
-
-                <li class="slide ">
-                    <a href="{% url 'admission:fee_overview_list' %}" class="side-menu__item {% if fee_overview %}active{% endif %}">
-                        <i class="la la-file-invoice side-menu__icon"></i>
-                        <span class="side-menu__label">Fee Overview</span>
-                    </a>
-                </li>
-
-                <li class="slide ">
-                    <a href="{% url 'admission:attendance_register_list' %}" class="side-menu__item {% if is_attendance %}active{% endif %}">
-                        <i class="la la-user-check side-menu__icon"></i>
-                        <span class="side-menu__label">Attandance</span>
-                    </a>
-                </li>
-
-                <li class="slide">
-                    <a href="{{admission.get_syllabus_detail_url}}" 
-                       class="side-menu__item {% if is_syllabus %} active {% endif %}">
-                        <i class="la la-book side-menu__icon"></i>
-                        <span class="side-menu__label">Syllabus</span>
-                    </a>
-                </li>
-                
-                <li class="slide ">
-                    <a href="{% url 'masters:complaint_create' %}" class="side-menu__item {% if is_complaint_register %}active{% endif %}">
-                        <i class="la la-exclamation-circle side-menu__icon"></i>
-                        <span class="side-menu__label">Complaint Register</span>
-                    </a>
-                </li>
-
-                <li class="slide ">
-                    <a href="{% url 'masters:employee_chat_list' %}" class="side-menu__item {% if is_mentor_chat_session %}active{% endif %}">
+                    <a href="{% url 'masters:chat_list' %}" class="side-menu__item {% if is_chat_session %} active {% endif %}">
                         <i class="la la-comments side-menu__icon"></i>
                         <span class="side-menu__label">Chat Session</span>
                     </a>
                 </li>
-
 
             </ul>
             <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24"> <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"></path> </svg></div>

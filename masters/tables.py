@@ -1,6 +1,8 @@
 from core.base import BaseTable
 from django_tables2 import columns
-from .models import Batch, Course, PDFBookResource, PdfBook, ComplaintRegistration, Syllabus
+from admission .models import Admission
+from employees .models import Employee
+from .models import Batch, Course, PDFBookResource, PdfBook, ComplaintRegistration, ChatSession
 
 
 class BatchTable(BaseTable):
@@ -75,4 +77,55 @@ class ComplaintTable(BaseTable):
     class Meta(BaseTable.Meta):
         model = ComplaintRegistration
         fields = ("created", "branch", "complaint_type", "status",)
+        attrs = {"class": "table table-striped table-bordered"}
+
+    
+class ChatSessionTable(BaseTable):
+    action = columns.TemplateColumn(
+        template_code="""
+        {% if record.user and record.user.id %}
+            <a href="{% url 'masters:student_chat' record.user.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-comment-dots me-1"></i> Chat
+            </a>
+        {% else %}
+            <span class="text-muted">No user assigned</span>
+        {% endif %}
+        """,
+        orderable=False,
+        verbose_name="Chat"
+    )
+
+    class Meta(BaseTable.Meta):
+        model = Admission
+        fields = ("admission_number", "fullname", "user", "course", 'batch')
+        attrs = {"class": "table table-striped table-bordered"}
+
+    
+class EmployeeChatSessionTable(BaseTable):
+    action = columns.TemplateColumn(
+        template_code="""
+        {% if record.user and record.user.id %}
+            <a href="{% url 'masters:student_chat' record.user.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-comment-dots me-1"></i> Chat
+            </a>
+        {% else %}
+            <span class="text-muted">No user assigned</span>
+        {% endif %}
+        """,
+        orderable=False,
+        verbose_name="Chat"
+    )
+    user__usertype = columns.Column(
+        accessor="user.usertype",
+        verbose_name="User Type",
+    )
+    fullname = columns.Column(
+        accessor="fullname",
+        verbose_name="Full Name",
+    )
+    created = None
+
+    class Meta(BaseTable.Meta):
+        model = Employee
+        fields = ("employee_id", "fullname", "personal_email", "user__usertype")
         attrs = {"class": "table table-striped table-bordered"}

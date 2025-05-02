@@ -1,4 +1,4 @@
-from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 
 from core.base import BaseModel
 
@@ -11,6 +11,8 @@ class Batch(BaseModel):
     course =models.ForeignKey("masters.Course", on_delete=models.CASCADE, null=True)
     batch_name = models.CharField(max_length=120)
     description = models.TextField(blank=True, null=True)
+    starting_time = models.TimeField(blank=True, null=True)
+    ending_time = models.TimeField(blank=True, null=True)
     academic_year = models.ForeignKey('core.AcademicYear', on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self):
@@ -191,3 +193,31 @@ class ComplaintRegistration(BaseModel):
 
     def get_delete_url(self):
         return reverse_lazy("masters:complaint_delete", kwargs={"pk": self.pk})
+
+    
+class ChatSession(BaseModel):
+    sender = models.ForeignKey("accounts.User", related_name="sent_messages", on_delete=models.CASCADE, null=True)
+    recipient = models.ForeignKey("accounts.User", related_name="received_messages", on_delete=models.CASCADE, null=True)
+    attachment = models.FileField(
+        upload_to='chat_attachments/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'])]
+    )
+    message = models.TextField()
+
+    def __str__(self):
+        return f"{self.sender} to {self.recipient}"
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:chat_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:chat_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:chat_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:chat_delete", kwargs={"pk": self.pk})

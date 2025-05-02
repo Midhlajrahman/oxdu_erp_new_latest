@@ -1,0 +1,247 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags django_tables2 %}
+{% block title %}{{title|title}} : {{app_settings.site_title}}{% endblock %}
+
+{% block content %}
+
+<!-- Start::app-content -->
+<div class="main-content app-content mt-5">
+    <div class="container-fluid">
+
+        <!-- Start::row-1 -->
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card overflow-hidden">
+                            <div class="tile tile-alt mb-0 border-0" id="messages-main">
+                                <div class="ms-body">
+                                    <div class="action-header clearfix border-bottom bg-transparent d-flex flex-wrap">
+                                        <div class="float-start hidden-xs d-flex chat-user mb-2 mb-sm-0">
+                                            {% if other_user.photo %}
+                                                <img src="{{ other_user.photo.url }}" alt="" class="avatar avatar-lg avatar-rounded me-2">
+                                            {% else %}
+                                                <img src="https://ui-avatars.com/api/?name={{ other_user.get_full_name }}&background=fdc010&color=fff&size=128" alt="" class="avatar avatar-md avatar-rounded">
+                                            {% endif %}
+                                            <div class="align-items-center ms-2">
+                                                <div class="fw-semibold">{{ other_user.get_full_name }}</div>
+                                                <span class="w-2 h-2 bg-success d-inline-block me-1 rounded"></span> <small>active</small>
+                                            </div>
+                                        </div>
+
+                                        <ul class="ah-actions actions align-items-center d-flex gap-1 flex-wrap ms-auto">
+                                            <li>
+                                                <a  href="tel:{{other_user.contact_number}}" class="option-dots border" data-bs-toggle="tooltip"  title="Call">
+                                                    <span class="fe fe-phone-call"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a  href="mailto:{{other_user.personal_email}}" class="option-dots border" data-bs-toggle="tooltip"  title="Gmail">
+                                                    <span class="fe fe-mail"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="option-dots border delete-chat-btn" data-user-id="{{ other_user.id }}" data-bs-toggle="tooltip" title="Trash">
+                                                    <span class="fe fe-trash-2"></span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a  href="{{other_user.get_absolute_url}}" class="option-dots border" data-bs-toggle="tooltip" title="View Info">
+                                                    <span class="fe fe-info"></span>
+                                                 </a>
+                                            </li>
+                                            <li>
+                                                <a href="#" id="refresh-page-btn" class="option-dots border" data-bs-toggle="tooltip" title="Refresh">
+                                                    <span class="fe fe-rotate-cw"></span>
+                                                </a>
+                                            </li>
+                                    </div>
+                                
+                                    <div class="chat-body-style ps" id="ChatBody">
+                                        {% for message in messages %}
+                                            {% if message.sender == request.user %}
+                                                <div class="message-feed right">
+                                                    <div class="float-end ps-2">
+                                                        <img src="{{ default_user_avatar }}" alt="You" class="avatar avatar-md avatar-rounded">
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <div class="mf-content bg-primary text-white p-2 rounded">
+                                                            {{ message.message|linebreaksbr }}
+                                                            {% if message.attachment %}
+                                                                <div class="mt-2">
+                                                                    <a href="{{ message.attachment.url }}" target="_blank" class="text-light">
+                                                                        📎 View Attachment
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <small class="mf-date d-block mt-1"><i class="fe fe-clock"></i> {{ message.created|date:"d/m/Y H:i" }}</small>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="message-feed d-flex">
+                                                    <div class="float-start pe-2">
+                                                        <img src="{{ other_user_avatar }}" alt="{{ other_user.get_full_name }}" class="avatar avatar-md avatar-rounded">
+                                                    </div>
+                                                    <div>
+                                                        <div class="mf-content bg-light p-2 rounded">
+                                                            {{ message.message|linebreaksbr }}
+                                                            {% if message.attachment %}
+                                                                <div class="mt-2">
+                                                                    <a href="{{ message.attachment.url }}" target="_blank" class="text-light">
+                                                                        📎 View Attachment
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <small class="mf-date d-block mt-1"><i class="fe fe-clock"></i> {{ message.created|date:"d/m/Y H:i" }}</small>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% empty %}
+                                            <p class="text-muted text-center mt-4">No messages yet.</p>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <form method="post" enctype="multipart/form-data" class="mt-3">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <label for="attachmentInput" class="btn btn-light border me-2 d-flex align-items-center" style="cursor: pointer;">
+                                                <i class="fe fe-paperclip"></i>
+                                            </label>
+                                    
+                                            <input type="file" name="attachment" id="attachmentInput" class="d-none"
+                                                   accept=".jpg,.jpeg,.png,.pdf,.docx,.doc">
+                                    
+                                            <input type="text" name="message" class="form-control" placeholder="Type your message..." required>
+                                    
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fe fe-send"></i> 
+                                            </button>
+                                        </div>
+                                    </form>
+                                
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!--End::row-1 -->
+
+    </div>
+</div>
+<!-- End::app-content -->
+
+
+
+{% for new_html in includes %}
+  {% include new_html %}
+{% endfor %}
+
+{% include 'app/partials/filter.html' %}
+{% include 'app/partials/help.html' %}
+
+{% block javascript %} 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function scrollToBottom() {
+            const chatBody = document.getElementById('ChatBody');
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+        window.onload = function() {
+            const chatBody = document.getElementById('ChatBody');
+            if (chatBody.scrollHeight - chatBody.scrollTop === chatBody.clientHeight) {
+                scrollToBottom();
+            }
+        };
+
+        scrollToBottom();
+    </script>
+
+    <script>
+        document.getElementById("refresh-page-btn").addEventListener("click", function(e) {
+            e.preventDefault();
+            location.reload();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.delete-chat-btn').on('click', function (e) {
+                e.preventDefault();
+                var userId = $(this).data('user-id');
+    
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This will delete all messages in the chat!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/masters/chat/${userId}/clear/`,
+                            type: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            success: function () {
+                                Swal.fire('Deleted!', 'Messages have been deleted.', 'success').then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function () {
+                                Swal.fire('Error!', 'Something went wrong.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+    
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+{% endblock javascript %}
+
+{% block extra_css %}
+    <style>
+        @media (min-width: 992px) {
+            #messages-main .ms-body {
+                padding-inline-start: 0px;
+            }
+        }
+
+        .msb-reply {
+            height: 70px !important;
+        }
+
+        .msb-reply button {
+            width: 45px !important;
+        }
+        .avatar.avatar-md{
+            height: 32px !important;
+            width: 32px !important;
+        }
+
+        .ms-body .chat-body-style {
+            height: calc(100vh - 200px);
+            overflow-y: auto !important;
+        }
+    </style>
+{% endblock %}
+
+{% endblock content %}
