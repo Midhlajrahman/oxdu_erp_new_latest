@@ -1,0 +1,116 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags django_tables2 %}
+{% block title %}{{title|title}} : {{app_settings.site_title}}{% endblock %}
+
+{% block content %}
+
+<div class="main-content app-content">
+
+  <div class="container-fluid">
+
+
+    <!-- Page Header -->
+    <div class="page-header d-flex d-block justify-content-between">
+      <div class="page-leftheader">
+        <div class="page-title">{{title|title}}</div>
+      </div>
+      <div class="page-rightheader">
+        <div class="btn-list">
+          {% if can_add and new_link %}
+          <a href="{{ new_link }}" class="btn btn-light3" data-bs-placement="top" data-bs-toggle="tooltip" title="Add New"> <i
+              class="fe fe-plus"></i>New </a>
+          {% endif %}
+          {% if table.paginated_rows %}
+          <a href="{% export_url 'xlsx' %}" class="btn btn-light3" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Export"> <i class="fe fe-download"></i> </a>
+          {% endif %}
+          <a class="btn btn-light3" href="javascript:void(0);" onclick="window.print();" data-bs-placement="top"
+            data-bs-toggle="tooltip" title="Print"> <i class="fe fe-printer"></i> </a>
+
+          <a class="btn btn-light3" data-bs-toggle="offcanvas" href="#offcanvasFilter" role="button"
+            aria-controls="offcanvasFilter" title="Filter Data"> <i class="fe fe-filter"></i> </a>
+
+        </div>
+      </div>
+    </div>
+    <!-- Page Header Close -->
+
+    <!-- Start::row -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="row g-4">
+                {% for object in updates %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="card custom-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                        <a href="{{object.get_absolute_url}}" class="text-decoration-none text-dark">
+                            <div class="card-img-container overflow-hidden" style="height: 200px;">
+                                <img src="{{object.image.url}}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{object.title}}">
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-column h-100">
+                                    <h6 class="card-title fw-semibold text-dark">{{object.title}}</h6>
+                                    <p class="card-text text-muted mb-4 flex-grow-1">{{ object.description|truncatechars:150|safe }}</p>
+                                    <div class="d-flex align-items-center justify-content-between mt-auto">
+                                        <small class="text-muted"><i class="far fa-calendar me-2"></i>{{object.created|date:"M d, Y"}}</small>
+                                        <a href="{{object.get_absolute_url}}">
+                                         <span class="badge bg-light text-dark"><i class="far fa-eye me-1"></i> Read More</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+{% for new_html in includes %}
+  {% include new_html %}
+{% endfor %}
+
+{% include 'app/partials/filter.html' %}
+{% include 'app/partials/help.html' %}
+
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+
+    .custom-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .custom-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-img-container {
+        position: relative;
+    }
+    
+    .card-img-container::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40%;
+        background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
+    }
+    
+    .hover-shadow:hover {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .object-fit-cover {
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

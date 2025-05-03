@@ -40,13 +40,13 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="row">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label mb-2 mt-2">Applicant First Name</label>
+                                                        <div class="col-md-6" id="div_id_first_name">
+                                                            <label class="form-label mb-2 mt-2">Applicant First Name </label>
                                                             {{ form.first_name }}
                                                             {{ form.first_name.errors }}
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label class="form-label mb-2 mt-2">Applicant Last Name</label>
+                                                            <label class="form-label mb-2 mt-2">Applicant Last Name </label>
                                                             {{ form.last_name }}
                                                             {{ form.last_name.errors }}
                                                         </div>
@@ -56,7 +56,7 @@
                                         </div>
                     
                                         <div class="form-group mb-3">
-                                            <label class="form-label mb-2 mt-2">Home Address</label>
+                                            <label class="form-label mb-2 mt-2">Home Address </label>
                                             {{ form.home_address }}
                                             {{ form.home_address.errors }}
                                         </div>
@@ -64,12 +64,12 @@
                                         <div class="form-group mb-3">
                                             <div class="row">
                                                 <div class="col-lg-6 col-sm-12 col-xs-12">
-                                                    <label class="form-label mb-2 mt-2">Contact Number</label>
+                                                    <label class="form-label mb-2 mt-2">Contact Number </label>
                                                     {{ form.contact_number }}
                                                     {{ form.contact_number.errors }}
                                                 </div>
                                                 <div class="col-lg-6 col-sm-12 col-xs-12">
-                                                    <label class="form-label mb-2 mt-2">Whatsapp Number</label>
+                                                    <label class="form-label mb-2 mt-2">Whatsapp Number </label>
                                                     {{ form.whatsapp_number }}
                                                     {{ form.whatsapp_number.errors }}
                                                 </div>
@@ -79,7 +79,7 @@
                     
                                     <div class="col-lg-3">
                                         <div class="form-group mb-3 text-center">
-                                            <label class="form-label mb-2 mt-2 d-block">Applicant Image</label>
+                                            <label class="form-label mb-2 mt-2 d-block">Applicant Image </label>
                                             <input type="file" id="photoInput" name="photo" accept="image/*" style="display: none;">
                                             <img src="https://t4.ftcdn.net/jpg/02/15/84/43/360_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg"
                                                  class="img-fluid rounded mb-2"
@@ -89,7 +89,7 @@
                                             {{ form.photo.errors }}
                     
                                             <div class="form-group mb-3">
-                                                <label class="form-label mb-0 mt-2">Select Branch</label>
+                                                <label class="form-label mb-0 mt-2">Select Branch </label>
                                                 {{ form.branch }}
                                                 {{ form.branch.errors }}
                                             </div>
@@ -100,7 +100,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Joining</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Joining </label>
                                         <div class="col-md-9">
                                             {{ form.joining_date }}
                                             {{ form.joining_date.errors }}
@@ -108,7 +108,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Birth</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Date Of Birth </label>
                                         <div class="col-md-9">
                                             {{ form.date_of_birth }}
                                             {{ form.date_of_birth.errors }}
@@ -116,7 +116,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Gender</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Gender </label>
                                         <div class="col-md-9">
                                             {{ form.gender }}
                                             {{ form.gender.errors }}
@@ -124,7 +124,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Religion</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Religion </label>
                                         <div class="col-md-9">
                                             {{ form.religion }}
                                             {{ form.religion.errors }}
@@ -132,7 +132,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Blood Group</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Blood Group </label>
                                         <div class="col-md-9">
                                             {{ form.blood_group }}
                                             {{ form.blood_group.errors }}
@@ -140,7 +140,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Email Address</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Email Address </label>
                                         <div class="col-md-9">
                                             {{ form.personal_email }}
                                             {{ form.personal_email.errors }}
@@ -149,22 +149,22 @@
                     
                                     <div class="form-group mb-5 row">
                                         <div class="col-md-3">
-                                            <label class="form-label mb-2 mt-2">City</label>
+                                            <label class="form-label mb-2 mt-2">City </label>
                                             {{ form.city }}
                                             {{ form.city.errors }}
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label mb-2 mt-2">District</label>
+                                            <label class="form-label mb-2 mt-2">District </label>
                                             {{ form.district }}
                                             {{ form.district.errors }}
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label mb-2 mt-2">State</label>
+                                            <label class="form-label mb-2 mt-2">State </label>
                                             {{ form.state }}
                                             {{ form.state.errors }}
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label mb-2 mt-2">Pin Code</label>
+                                            <label class="form-label mb-2 mt-2">Pin Code </label>
                                             {{ form.pin_code }}
                                             {{ form.pin_code.errors }}
                                         </div>
@@ -173,7 +173,7 @@
                                     <h4 class="mb-4 fw-bold text-center">Parent/Guardian Informations</h4>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Name</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Name </label>
                                         <div class="col-md-9">
                                             <div class="row">
                                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
@@ -189,7 +189,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Contact Number</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Parent/Guardian Contact </label>
                                         <div class="col-md-9">
                                             {{ form.parent_contact_number }}
                                             {{ form.parent_contact_number.errors }}
@@ -197,7 +197,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Whatsapp Number</label>
+                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Whatsapp Number </label>
                                         <div class="col-md-9">
                                             {{ form.parent_whatsapp_number }}
                                             {{ form.parent_whatsapp_number.errors }}
@@ -205,7 +205,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Email Address</label>
+                                        <label class="col-md-3 form-label mb-2 mt-2">Parent/Guardian Email Address </label>
                                         <div class="col-md-9">
                                             {{ form.parent_mail_id }}
                                             {{ form.parent_mail_id.errors }}
@@ -215,7 +215,7 @@
                                     <h4 class="mb-4 fw-bold text-center">Additional Informations</h4>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">ID Card to be submit</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">ID Card to be submit </label>
                                         <div class="col-md-9">
                                             {{ form.document }}
                                             {{ form.document.errors }}
@@ -223,7 +223,7 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Education Qualification</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Education Qualification </label>
                                         <div class="col-md-9">
                                             {{ form.qualifications }}
                                             {{ form.qualifications.errors }}
@@ -231,15 +231,23 @@
                                     </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Course</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Course </label>
                                         <div class="col-md-9">
                                             {{ form.course }}
                                             {{ form.course.errors }}
                                         </div>
                                     </div>
+
+                                    <div class="form-group mb-3 row" id="div_id_batch">
+                                        <label class="col-md-3 form-label mb-0 mt-2">Batch </label>
+                                        <div class="col-md-9">
+                                            {{ form.batch }}
+                                            {{ form.batch.errors }}
+                                        </div>
+                                    </div>
                     
                                     <div class="form-group mb-3 row">
-                                        <label class="col-md-3 form-label mb-0 mt-2">Academic Year</label>
+                                        <label class="col-md-3 form-label mb-0 mt-2">Academic Year </label>
                                         <div class="col-md-9">
                                             {{ form.academic_year }}
                                             {{ form.academic_year.errors }}
@@ -248,7 +256,7 @@
                     
                                     <div class="d-flex justify-content-end mt-4">
                                         <div class="form-group">
-                                            <label for="signatureUpload" class="form-label fw-bold">Upload Your Signature:</label>
+                                            <label for="signatureUpload" class="form-label fw-bold">Upload Your Signature: </label>
                                             <input type="file" class="form-control" id="signatureUpload" name="signature" accept="image/*" required>
                                             {% if form.signature.errors %}
                                                 <div class="text-danger">{{ form.signature.errors }}</div>
@@ -259,7 +267,7 @@
                             </div>
                     
                             <div class="card-footer text-end">
-                                <button type="reset" class="btn btn-danger">Cancel</button>
+                                <button type="reset" class="btn btn-danger reset-btn">Cancel</button>
                                 <button type="submit" name="save_and_next" class="btn btn-primary">Save & Next</button>
                             </div>
                         </div>
@@ -272,6 +280,38 @@
     </div>
 </div>
 <!-- End::app-content -->
+
+{% endblock body %}
+
+
+{% block javascript %}
+<script src="{% static 'app/assets/js/main.js' %}"></script>
+<script src="{% static 'app/assets/libs/jquery/jquery.min.js' %}?v=1.8"></script>
+<script src="{% static 'app/assets/js/custom.js' %}"></script>
+
+<script>
+    $(document).on("click", ".reset-btn", function () {
+        $('form')[0].reset();  
+    })
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Select all input, select, and textarea fields that are required
+        const requiredFields = document.querySelectorAll('input[required], select[required], textarea[required]');
+    
+        requiredFields.forEach(function (field) {
+            const label = field.closest('div').querySelector('label');
+            if (label && !label.innerHTML.includes('asteriskField')) {
+                const asterisk = document.createElement('span');
+                asterisk.className = 'asteriskField';
+                asterisk.textContent = ' *';
+                label.appendChild(asterisk);
+            }
+        });
+    });
+</script>
+
 <script>
     const photoInput = document.getElementById('photoInput');
     const previewImage = document.getElementById('previewImage');
@@ -293,4 +333,72 @@
         }
     });
 </script>
-{% endblock body %}
+
+<script>
+    $(document).ready(function() {
+        const $courseSelect = $('#id_course');
+        const $batchSelect = $('#id_batch');
+        const $batchContainer = $('#div_id_batch');
+        const $branchSelect = $('#id_branch'); // Add branch select element
+
+        // Initially hide the batch dropdown if there's no selected course
+        $batchContainer.hide();
+
+        $courseSelect.on('change', function() {
+            const courseId = $(this).val();
+            const branch = $branchSelect.val(); // Get the branch selected in the form
+
+            // Show "loading..." message in the batch dropdown
+            $batchSelect.empty().append('<option value="">Loading...</option>'); 
+
+            if (courseId) {
+                $batchContainer.show(); // Show the batch dropdown when a course is selected
+
+                $.ajax({
+                    url: '/admission/ajax/get-batches/', // API endpoint to get batches
+                    type: 'GET',
+                    data: {
+                        course_id: courseId,
+                        branch: branch // Send selected branch along with the course ID
+                    },
+                    success: function(response) {
+                        if (response.batches && response.batches.length > 0) {
+                            $batchSelect.empty().append('<option value="">Select batch</option>'); // Clear existing options
+                            $.each(response.batches, function(index, batch) {
+                                $batchSelect.append(new Option(batch.name, batch.id)); // Populate batch options
+                            });
+                        } else {
+                            $batchSelect.empty().append('<option value="">No batches available for this course</option>'); // No batches found
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error: ", error);
+                        $batchSelect.empty().append('<option value="">Error loading batches</option>');
+                    }
+                });
+            } else {
+                $batchContainer.hide(); // Hide batch dropdown if no course is selected
+            }
+        });
+
+        // Trigger change event on page load to hide batch if no course is selected
+        $courseSelect.trigger('change');
+    });
+</script>
+{% endblock %}
+
+
+{% block extra_css %}
+    <style>
+        #div_id_batch {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        #div_id_batch.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+{% endblock %}

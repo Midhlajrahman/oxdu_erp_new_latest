@@ -1,7 +1,6 @@
 import datetime
 import json
-from django.db import models
-from django.db.models import Q
+from django.db.models import Count, Q, OuterRef, Subquery, IntegerField, Exists
 from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
@@ -23,7 +22,7 @@ from employees.models import Employee
 from . import forms
 from . import tables
 from .forms import PdfBookFormSet, SyllabusForm,SyllabusFormSet, ChatMessageForm
-from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, BatchSyllabusStatus, ChatSession
+from .models import Batch, ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, BatchSyllabusStatus, ChatSession, Update, PlacementRequest
 
 User = get_user_model()
 
@@ -113,7 +112,7 @@ def student_syllabus_redirect(request):
 class BatchListView(mixins.HybridListView):
     model = Batch
     table_class = tables.BatchTable
-    filterset_fields = {'academic_year': ['exact'], }
+    filterset_fields = {'course': ['exact'], }
     permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser")
     
     def get_queryset(self):
@@ -396,8 +395,7 @@ class SyllabusListView(mixins.HybridListView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context["courses"] = Course.objects.filter(is_active=True)
-        context["title"] = "Batches"
-        context['is_masters'] = True
+        context["title"] = "Syllabus"
         context["is_syllabus"] = True
         context["can_add"] = user.usertype  != "student"
         context["new_link"] = reverse_lazy("masters:pdfbook_resource_create")
@@ -591,7 +589,6 @@ class ComplaintCreateView(mixins.HybridCreateView):
     def get_success_url(self):
         return reverse_lazy("masters:complaint_detail", kwargs={"pk": self.object.pk})
 
-    
 
 class ComplaintUpdateView(mixins.HybridUpdateView):
     model = ComplaintRegistration
@@ -610,41 +607,75 @@ class ComplaintDeleteView(mixins.HybridDeleteView):
 
 
 class ChatListView(mixins.HybridListView):
+    template_name = "masters/chat/list.html"
     model = Admission
     table_class = tables.ChatSessionTable
     filterset_fields = {'batch': ['exact'], "branch": ['exact'], 'course': ['exact']}  
     permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor",)
-    
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        current_user = self.request.user
+
+        queryset = queryset.annotate(
+            unread_count=Subquery(
+                ChatSession.objects.filter(
+                    sender=OuterRef('user'),
+                    recipient=current_user,
+                    read=False
+                ).values('sender')
+                .annotate(count=Count('id'))
+                .values('count')[:1],
+                output_field=IntegerField()
+            )
+        )
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Chat with Students"
+        context["title"] = "Chat Session"
         context["is_chat_session"] = True
         context["can_add"] =  False
         return context
 
     
 class EmployeeChatListView(mixins.HybridListView):
+    template_name = "masters/chat/list.html"
     model = Employee
     table_class = tables.EmployeeChatSessionTable
     filterset_fields = {"branch": ['exact'], 'course': ['exact']}  
     permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor",)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Chat Session"
+        context["is_mentor_chat_session"] = True
+        context["can_add"] =  False
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        current_user = self.request.user
+
         queryset = queryset.filter(
-            user__branch=self.request.user.branch,
+            user__branch=current_user.branch,
             user__usertype__in=["teacher", "mentor"]
+        ).annotate(
+            unread_count=Subquery(
+                ChatSession.objects.filter(
+                    sender=OuterRef("user"),
+                    recipient=current_user,
+                    read=False
+                )
+                .values("sender")
+                .annotate(count=Count("id"))
+                .values("count")[:1],
+                output_field=IntegerField()
+            )
         )
 
         return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Chat With Teachers & Mentors"
-        context["is_mentor_chat_session"] = True
-        context["can_add"] =  False
-        return context
     
     
 class StudentChatView(TemplateView):
@@ -659,6 +690,8 @@ class StudentChatView(TemplateView):
             Q(sender=current_user, recipient=other_user) |
             Q(sender=other_user, recipient=current_user)
         ).order_by("created")
+
+        messages.filter(sender=other_user, recipient=current_user, read=False).update(read=True)
 
         context["default_user_avatar"] = f"https://ui-avatars.com/api/?name={current_user.get_full_name()}&background=fdc010&color=fff&size=128"
         
@@ -686,3 +719,120 @@ class StudentChatView(TemplateView):
             )
 
         return redirect("masters:student_chat", user_id=other_user.id)
+
+
+class UpdateListView(mixins.HybridListView):
+    template_name = "masters/update/list.html"
+    model = Update
+    table_class = tables.UpdateTable
+    filterset_fields = {'created': ['exact'],}  
+    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor")
+    branch_filter = False
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Updates"
+        context["is_update"] = True
+        context["updates"] = context["object_list"]
+        user_type = self.request.user.usertype
+        context["can_add"] = user_type not in ("mentor", "student", "teacher")
+        context["new_link"] = reverse_lazy("masters:update_create")
+        return context
+    
+
+class UpdateDetailView(mixins.HybridDetailView):
+    template_name = "masters/update/detail.html"
+    model = Update
+    permissions = ("admin_staff", "branch_staff", "teacher", "student", "mentor")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Update Details"
+        return context
+    
+
+class UpdateCreateView(mixins.HybridCreateView):
+    model = Update
+    permissions = ("admin_staff", "branch_staff",)
+    exclude = ("status", "is_active", "branch")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Update"
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy("masters:update_detail", kwargs={"pk": self.object.pk})
+
+
+class UpdateUpdateView(mixins.HybridUpdateView):
+    model = Update
+    permissions = ("admin_staff", "branch_staff",)
+    form_class = forms.UpdateForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Update"
+        return context
+    
+
+class UpdateDeleteView(mixins.HybridDeleteView):
+    model = Update
+    permissions = ("admin_staff", "branch_staff",)
+
+
+
+class PlacementRequestListView(mixins.HybridListView):
+    model = PlacementRequest
+    table_class = tables.PlacementRequestTable
+    filterset_fields = {'student': ['exact'],}  
+    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor")
+    branch_filter = False
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Placement Request"
+        context["is_update"] = True
+        context["can_add"] = True
+        context["new_link"] = reverse_lazy("masters:placement_request_create")
+        return context
+    
+
+class PlacementRequestDetailView(mixins.HybridDetailView):
+    model = PlacementRequest
+    permissions = ("admin_staff", "branch_staff", "teacher", "student", "mentor")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Placement Request"
+        return context
+    
+
+class PlacementRequestCreateView(mixins.HybridCreateView):
+    model = PlacementRequest
+    permissions = ("admin_staff", "branch_staff", "mentor", "student", "teacher")
+    exclude = ("status", "is_active", "branch")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "PlacementRequest"
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy("masters:update_detail", kwargs={"pk": self.object.pk})
+
+
+class PlacementRequestUpdateView(mixins.HybridUpdateView):
+    model = PlacementRequest
+    permissions = ("admin_staff", "branch_staff", "mentor")
+    form_class = forms.PlacementRequestForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "PlacementRequest"
+        return context
+    
+
+class PlacementRequestDeleteView(mixins.HybridDeleteView):
+    model = PlacementRequest
+    permissions = ("admin_staff", "branch_staff", "mentor",)

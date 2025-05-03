@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, ChatSession
+from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, ChatSession, Update, PlacementRequest
 
 
 class PdfBookForm(forms.ModelForm):
@@ -31,7 +31,6 @@ PdfBookFormSet = inlineformset_factory(
 class CourseSelectionForm(forms.Form):
     course = forms.ModelChoiceField(queryset=Course.objects.filter(is_active=True))
     
-
 
 class SyllabusForm(forms.ModelForm):
     class Meta:
@@ -64,3 +63,30 @@ class ChatMessageForm(forms.ModelForm):
     class Meta:
         model = ChatSession
         fields = ['message']
+
+
+class UpdateForm(forms.ModelForm):
+    class Meta:
+        model = Update
+        fields = ["title", "description", "image"]
+
+        widgets = {
+            "title": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Enter update title"
+            }),
+            "description": forms.Textarea(attrs={
+                "class": "form-control",
+                "placeholder": "Enter update description",
+                "rows": 5
+            }),
+            "image": forms.ClearableFileInput(attrs={
+                "class": "form-control-file"
+            }),
+        }
+
+    
+class PlacementRequestForm(forms.ModelForm):
+    class Meta:
+        model = PlacementRequest
+        fields = ["student", "self_intro", "about_you", "career_goals", "resume"]

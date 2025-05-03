@@ -165,6 +165,18 @@ class DashboardView(mixins.HybridTemplateView):
             context["total_balance"] = total_balance
             context["total_credited"] = total_credited
 
+        elif user.usertype == "mentor":
+            branch = user.branch 
+
+            students_in_branch = Admission.objects.filter(branch=branch)
+
+
+            context["branch"] = branch
+            context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
+            context["student_count"] = students_in_branch.count()
+            context["total_balance"] = total_balance
+            context["total_credited"] = total_credited
+
         return context
     
 

@@ -6,6 +6,7 @@ app_name = "admission"
 
 urlpatterns = [
     path('admission/<int:pk>/change-status/', views.change_status, name='change_status'),
+    path('ajax/get-batches/', views.get_batches_for_course, name='get_batches_for_course'),
     
     # admission
     path("admissions/", views.AdmissionListView.as_view(), name="admission_list"),

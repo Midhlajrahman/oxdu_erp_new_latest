@@ -1,0 +1,164 @@
+{% extends 'app/base.html' %}
+{% load static i18n crispy_forms_tags django_tables2 %}
+{% block title %}{{title|title}} : {{app_settings.site_title}}{% endblock %}
+
+{% block content %}
+
+<div class="main-content app-content">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <!-- Breadcrumb Navigation -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'masters:update_list' %}">Updates</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ object.title }}</li>
+                </ol>
+            </nav>
+        
+            <!-- Main Card -->
+            <div class="card border-0 shadow-lg mb-5">
+                <!-- Featured Image -->
+                <div class="card-img-top overflow-hidden" style="max-height: 350px; object-fit: cover;">
+                    <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-fluid w-100">
+                </div>
+        
+                <!-- Content Section -->
+                <div class="card-body px-4 py-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-muted">
+                            <i class="far fa-calendar me-1"></i> {{ object.created|date:"F j, Y" }}
+                        </small>
+                        {% if request.user.is_superuser or request.user.usertype == "admin_staff" %}
+                        <div class="action-buttons">
+                            <a href="{{ object.get_update_url }}" class="text-primary me-2" title="Edit">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <a href="{{ object.get_delete_url }}" class="text-danger" title="Delete">
+                                <i class="fas fa-trash-alt fa-sm"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+        
+                    <h3 class="fw-bold mb-3 fs-20">{{ object.title }}</h3>
+        
+                    <div class="content-body">
+                        {{ object.description|safe }}
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Related Updates -->
+            {% if related_updates %}
+            <div class="related-updates mb-5">
+                <h3 class="mb-4">Related Updates</h3>
+                <div class="row g-4">
+                    {% for item in related_updates %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                            <a href="{{ item.get_absolute_url }}" class="text-decoration-none text-dark">
+                                <div class="card-img-container overflow-hidden" style="height: 180px;">
+                                    <img src="{{ item.image.url }}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{ item.title }}">
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title fw-semibold">{{ item.title }}</h6>
+                                    <small class="text-muted"><i class="far fa-calendar me-1"></i> {{ item.created|date:"M d, Y" }}</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div>
+
+{% endblock content %}
+
+{% block extra_css %}
+    <style>
+
+        /* Detail Page Specific Styles */
+    .card-img-top {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .content-body {
+        line-height: 1.8;
+    }
+
+    .content-body img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+    }
+
+    .content-body h2, .content-body h3, .content-body h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .content-body ul, .content-body ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .content-body blockquote {
+        border-left: 4px solid #0d6efd;
+        padding-left: 1.5rem;
+        margin: 1.5rem 0;
+        font-style: italic;
+        color: #555;
+    }
+
+    .social-sharing a {
+        transition: all 0.2s;
+    }
+
+    .social-sharing a:hover {
+        transform: translateY(-2px);
+        color: #0d6efd !important;
+    }
+
+    .comments-section textarea {
+        resize: none;
+    }
+
+    .action-buttons a {
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    
+    .action-buttons a:hover {
+        transform: scale(1.1);
+        text-decoration: none;
+    }
+    
+    /* If you want to add a confirmation dialog for delete */
+    .delete-confirm {
+        color: #dc3545;
+    }
+    
+    .delete-confirm:hover {
+        color: #bb2d3b;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .card-img-top {
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .content-body {
+            font-size: 0.95rem;
+        }
+    }
+    </style>
+{% endblock %}

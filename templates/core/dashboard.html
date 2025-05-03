@@ -27,6 +27,8 @@
             {% include "app/dashboard/superuser_dashboard.html" %}
         {% elif request.user.usertype == "teacher" %}
             {% include "app/dashboard/teacher_dashboard.html" %}
+        {% elif request.user.usertype == "mentor" %}
+            {% include "app/dashboard/mentor_dashboard.html" %}
         {% elif request.user.usertype == "student" %}
             {% include "app/dashboard/student_dashboard.html" %}
         {% elif request.user.usertype == "branch_staff" %}

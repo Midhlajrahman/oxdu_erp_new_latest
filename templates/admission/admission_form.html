@@ -117,4 +117,61 @@
     });
 </script>
 
+<script>
+    $(document).ready(function() {
+        const $courseSelect = $('#id_course');
+        const $batchSelect = $('#id_batch');
+        const $batchContainer = $('#div_id_batch');
+    
+        $batchContainer.hide();
+    
+        $courseSelect.on('change', function() {
+            const courseId = $(this).val();
+    
+            $batchSelect.empty().append('<option value="">Loading...</option>');
+    
+            if (courseId) {
+                $batchContainer.show();
+    
+                $.ajax({
+                    url: '/admission/ajax/get-batches/',
+                    type: 'GET',
+                    data: { course_id: courseId },
+                    success: function(response) {
+                        if (response.batches && response.batches.length > 0) {
+                            $batchSelect.empty().append('<option value="">Select batch</option>');
+    
+                            $.each(response.batches, function(index, batch) {
+                                $batchSelect.append(new Option(batch.name, batch.id));
+                            });
+                        } else {
+                            $batchSelect.empty().append('<option value="">No batches available for this course</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error: ", error);
+                        $batchSelect.empty().append('<option value="">Error loading batches</option>');
+                    }
+                });
+            } else {
+                $batchContainer.hide();
+            }
+        });
+    });
+</script>
+
 {% endblock javascript %}
+
+{% block extra_css %}
+    <style>
+        #div_id_batch {
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        #div_id_batch.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+{% endblock %}

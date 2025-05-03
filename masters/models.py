@@ -1,4 +1,5 @@
 from django.core.validators import FileExtensionValidator
+from tinymce.models import HTMLField
 
 from core.base import BaseModel
 
@@ -13,7 +14,6 @@ class Batch(BaseModel):
     description = models.TextField(blank=True, null=True)
     starting_time = models.TimeField(blank=True, null=True)
     ending_time = models.TimeField(blank=True, null=True)
-    academic_year = models.ForeignKey('core.AcademicYear', on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self):
         return self.batch_name
@@ -205,6 +205,7 @@ class ChatSession(BaseModel):
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'])]
     )
     message = models.TextField()
+    read = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.sender} to {self.recipient}"
@@ -221,3 +222,55 @@ class ChatSession(BaseModel):
 
     def get_delete_url(self):
         return reverse_lazy("masters:chat_delete", kwargs={"pk": self.pk})
+
+    
+class Update(BaseModel):
+    title = models.CharField(max_length=200,)
+    image = models.ImageField(upload_to="updates/")
+    description = HTMLField()
+
+    def __str__(self):
+        return f"{self.title}"
+
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:update_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:update_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:update_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("masters:update_delete", kwargs={"pk": self.pk})
+
+    
+class PlacementRequest(BaseModel):
+    student = models.OneToOneField("admission.Admission", on_delete=models.CASCADE, null=True)
+    self_intro = models.FileField(upload_to="self_intro/")
+    about_you = models.TextField(
+        verbose_name="Tell us a little about yourself.",
+        help_text="Please describe your skills, strengths, and interests."
+    )
+    career_goals = models.TextField(
+        verbose_name="Where do you see yourself in the future?",
+        help_text="Please describe your career plans and aspirations."
+    )
+    resume = models.FileField(upload_to="resumes/")
+
+    def str(self):
+        return f"{self.student.fllname}"
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("masters:placement_request_list")
+    
+    def get_absolute_url(self):
+        return reverse_lazy("masters:placement_request_detail", kwargs={"pk": self.pk})
+    
+    def get_update_url(self):
+        return reverse_lazy("masters:placement_request_update", kwargs={"pk": self.pk})
+    
+    def get_delete_url(self):
+        return reverse_lazy("masters:placement_request_delete", kwargs={"pk": self.pk})

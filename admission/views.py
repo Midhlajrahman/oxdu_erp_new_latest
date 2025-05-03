@@ -60,6 +60,33 @@ def change_status(request, pk):
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
+def get_batches_for_course(request):
+    course_id = request.GET.get('course_id')
+    branch = request.GET.get('branch') 
+    
+    if not course_id:
+        return JsonResponse({'error': 'Course ID is required'}, status=400)
+
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.user.is_superuser:
+        user_branch = request.session.get('branch')
+    else:
+        user_branch = request.user.branch
+
+    if not user_branch and branch:
+        user_branch = branch
+
+    if not user_branch:
+        return JsonResponse({'error': 'User branch not found or selected branch missing'}, status=400)
+
+    batches = Batch.objects.filter(course=course, branch=user_branch)
+
+    data = [{'id': batch.id, 'name': batch.batch_name} for batch in batches]
+
+    return JsonResponse({'batches': data})
+
+
 class AdmissionListView(mixins.HybridListView):
     model = Admission
     table_class = tables.AdmissionTable
@@ -607,25 +634,22 @@ class RegistrationView(mixins.FormView):
             form.add_error("personal_email", "Email is required.")
             return self.form_invalid(form)
 
-        # Save admission but don't commit yet
         admission = form.save(commit=False)
 
-        # Create user if email is unique
         if not User.objects.filter(email=email).exists():
             user = User.objects.create_user(
                 email=email,
                 password=password,
                 first_name=admission.first_name,
                 last_name=admission.last_name,
-                branch=admission.branch,  # Ensure branch exists in form
+                branch=admission.branch, 
                 is_active = False,
-                usertype="student",  # Modify as needed
+                usertype="student", 
             )
 
-            # Optionally link user to admission if model has `user` field
             admission.user = user
 
-        admission.save()  # Save admission now
+        admission.save()
         
         self.admission_pk = admission.pk  
 

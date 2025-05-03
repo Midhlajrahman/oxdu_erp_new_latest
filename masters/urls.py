@@ -50,17 +50,26 @@ urlpatterns = [
     path("complaint/<str:pk>/update/", views.ComplaintUpdateView.as_view(), name="complaint_update"),
     path("complaint/<str:pk>/delete/", views.ComplaintDeleteView.as_view(), name="complaint_delete"),
 
+    #Update
+    path("update/list/", views.UpdateListView.as_view(), name="update_list"),
+    path("update/<str:pk>/detail/", views.UpdateDetailView.as_view(), name="update_detail"),
+    path("new/update/<str:pk>/", views.UpdateCreateView.as_view(), name="update_create"),
+    path("new/update/", views.UpdateCreateView.as_view(), name="update_create"),
+    path("update/<str:pk>/update/", views.UpdateUpdateView.as_view(), name="update_update"),
+    path("update/<str:pk>/delete/", views.UpdateDeleteView.as_view(), name="update_delete"),
+
+    #Placement Request
+    path("placement-requests/list/", views.PlacementRequestListView.as_view(), name="placement_request_list"),
+    path("placement-request/<str:pk>/detail/", views.PlacementRequestDetailView.as_view(), name="placement_request_detail"),
+    path("new/placement-request/<str:pk>/", views.PlacementRequestCreateView.as_view(), name="placement_request_create"),
+    path("new/placement-request/", views.PlacementRequestCreateView.as_view(), name="placement_request_create"),
+    path("placement-request/<str:pk>/update/", views.PlacementRequestUpdateView.as_view(), name="placement_request_update"),
+    path("placement-request/<str:pk>/delete/", views.PlacementRequestDeleteView.as_view(), name="placement_request_delete"),
+
     #Chat
     path("chat/list/", views.ChatListView.as_view(), name="chat_list"),
     path("chat/employee/list/", views.EmployeeChatListView.as_view(), name="employee_chat_list"),
     path('chat/student/<int:user_id>/', views.StudentChatView.as_view(), name='student_chat'),
     path('chat/<int:user_id>/clear/', views.clear_chat, name='clear_chat')
-
-
-    # path("chat/<str:pk>/detail/", views.ChatDetailView.as_view(), name="chat_detail"),
-    # path("new/chat/<str:pk>/", views.ChatCreateView.as_view(), name="chat_create"),
-    # path("new/chat/", views.ChatCreateView.as_view(), name="chat_create"),
-    # path("chat/<str:pk>/update/", views.ChatUpdateView.as_view(), name="chat_update"),
-    # path("chat/<str:pk>/delete/", views.ChatDeleteView.as_view(), name="chat_delete"),
 
 ]
