@@ -17,10 +17,7 @@
                                 class="header-brand-img custom-logo-dark" alt="Dayonelogo">
                         </a>
                     </div>
-                    {% comment %} <div class="p-4 pt-6 ">
-                        <h2 class="mb-2">Login</h2>
-                        <p class="text-muted mb-0">Sign In to your account</p>
-                    </div> {% endcomment %}
+                  
                     <form class="p-4 pt-3 pb-3" id="login" method="post" name="login">
                         {% csrf_token %}
                         {{form|crispy}}

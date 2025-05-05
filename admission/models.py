@@ -94,8 +94,8 @@ class Admission(BaseModel):
     # Parent Info
     parent_first_name = models.CharField(max_length=200,null=True,)
     parent_last_name = models.CharField(max_length=200, blank=True, null=True)
-    parent_contact_number = models.CharField(max_length=30,null=True, blank=True)
-    parent_whatsapp_number = models.CharField(max_length=30, null=True, blank=True)
+    parent_contact_number = models.CharField(max_length=30, null=True, )
+    parent_whatsapp_number = models.CharField(max_length=30, null=True, )
     parent_mail_id = models.EmailField(verbose_name="Mail Id", null=True, blank=True)
     
     # finance
@@ -138,7 +138,7 @@ class Admission(BaseModel):
         return reverse_lazy("admission:admission_delete", kwargs={"pk": self.pk})
 
     def get_syllabus_detail_url(self):
-        return reverse_lazy("masters:syllabus_detail", kwargs={"pk": self.course.pk})
+        return reverse_lazy("masters:syllabus_detail", kwargs={"course_pk": self.course.pk, "batch_pk": self.batch.pk})
     
     @staticmethod
     def get_fee_overview_list_url():

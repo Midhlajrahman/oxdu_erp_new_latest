@@ -14,6 +14,7 @@ class Batch(BaseModel):
     description = models.TextField(blank=True, null=True)
     starting_time = models.TimeField(blank=True, null=True)
     ending_time = models.TimeField(blank=True, null=True)
+    academic_year = models.ForeignKey("core.AcademicYear", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.batch_name
@@ -248,19 +249,40 @@ class Update(BaseModel):
     
 class PlacementRequest(BaseModel):
     student = models.OneToOneField("admission.Admission", on_delete=models.CASCADE, null=True)
-    self_intro = models.FileField(upload_to="self_intro/")
-    about_you = models.TextField(
-        verbose_name="Tell us a little about yourself.",
-        help_text="Please describe your skills, strengths, and interests."
+    resume = models.URLField(
+        verbose_name="Resume Link",
+        help_text="Please provide a link to your resume."
     )
-    career_goals = models.TextField(
-        verbose_name="Where do you see yourself in the future?",
-        help_text="Please describe your career plans and aspirations."
+    portfolio_link = models.URLField(
+        verbose_name="Portfolio Link",
+        blank=True,
+        help_text="Link to your portfolio or work samples"
     )
-    resume = models.FileField(upload_to="resumes/")
+    behance_link = models.URLField(
+        verbose_name="Behance Profile Link",
+        blank=True,
+        help_text="Link to your Behance portfolio"
+    )
+    experience = models.TextField(
+        verbose_name="Experience",
+        blank=True,
+        help_text="Please provide details of your experience, if any."
+    )
 
-    def str(self):
-        return f"{self.student.fllname}"
+    status  = models.CharField(
+        max_length=30,
+        choices=[
+            ("Request Send", "Request Send"),
+            ("Under Review", "Under Review"),
+            ("Completed", "Completed"),
+            ("Rejected", "Rejected")
+        ],
+        default="Request Send"
+    )
+
+    
+    def __str__(self):
+        return self.student.fullname()
     
     @staticmethod
     def get_list_url():

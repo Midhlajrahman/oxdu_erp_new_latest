@@ -74,14 +74,6 @@
                     <!-- End::header-link -->
                 </div>
             <!-- End::header-element -->
-
-            {% if request.user.usertype == "student" %}
-            <a href="{% url 'masters:placement_request_create' %}" class="header-element header-details d-none d-lg-flex">
-                <div class="text-bold">
-                    <span class="badge bg-danger"><i class="fe fe-calendar"></i> Request for Placement</span>
-                </div>
-            </a>
-            {% endif %}
             
             <div class="header-element header-details d-none d-lg-flex">
                 <span class="badge bg-primary"><i class="fe fe-calendar"></i> {{ loged_academic_year }}</span>

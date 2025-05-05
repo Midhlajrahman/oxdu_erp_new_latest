@@ -35,7 +35,8 @@ urlpatterns = [
     
     #Syllabus
     path("syllabus/list/", views.SyllabusListView.as_view(), name="syllabus_list"),
-    path("syllabus/<str:pk>/detail/", views.SyllabusDetailView.as_view(), name="syllabus_detail"),
+    # path("syllabus/<str:pk>/detail/", views.SyllabusDetailView.as_view(), name="syllabus_detail"),
+    path('syllabus/<int:course_pk>/<int:batch_pk>/detail/', views.SyllabusDetailView.as_view(), name='syllabus_detail'),
     path('courses/<int:course_id>/syllabus/create/', views.SyllabusCreateView.as_view(), name='syllabus_create'),
     path("new/syllabus/", views.SyllabusCreateView.as_view(), name="syllabus_create"),
     path("syllabus/<str:pk>/update/", views.SyllabusUpdateView.as_view(), name="syllabus_update"),

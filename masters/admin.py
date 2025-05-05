@@ -28,4 +28,4 @@ class SyllabusAdmin(BaseAdmin):
 
 @admin.register(BatchSyllabusStatus)
 class BatchSyllabusStatusAdmin(BaseAdmin):
-    pass
+    list_display = ("batch", "syllabus", "user", "status")

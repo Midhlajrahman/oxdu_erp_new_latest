@@ -89,4 +89,8 @@ class UpdateForm(forms.ModelForm):
 class PlacementRequestForm(forms.ModelForm):
     class Meta:
         model = PlacementRequest
-        fields = ["student", "self_intro", "about_you", "career_goals", "resume"]
+        fields = ["student", "resume", "portfolio_link", "behance_link", "experience"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["student"].disabled = True

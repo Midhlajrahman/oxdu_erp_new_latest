@@ -397,7 +397,7 @@ class SyllabusListView(mixins.HybridListView):
         context["courses"] = Course.objects.filter(is_active=True)
         context["title"] = "Syllabus"
         context["is_syllabus"] = True
-        context["can_add"] = user.usertype  != "student"
+        context["can_add"] = user.usertype not in ["student", "teacher", "mentor"]
         context["new_link"] = reverse_lazy("masters:pdfbook_resource_create")
         return context
     
@@ -408,31 +408,69 @@ class SyllabusDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        course_pk = self.kwargs.get("pk")
+        course_pk = self.kwargs.get("course_pk")
+        batch_pk = self.kwargs.get("batch_pk")
+
         course = get_object_or_404(Course, pk=course_pk)
+        batch = get_object_or_404(Batch, pk=batch_pk)
+
         user = self.request.user
+        branch = self.request.session.get('branch')
+
+        syllabus_qs = Syllabus.objects.filter(course=course, is_active=True)
+        syllabus_ids = syllabus_qs.values_list('id', flat=True)
+
         if user.usertype not in ["student", "teacher"]:
-            syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
+            teacher_users = User.objects.filter(employee__course=course)
             completed_statuses = BatchSyllabusStatus.objects.filter(
-                syllabus_id__in=syllabus_ids
+                syllabus_id__in=syllabus_ids,
+                user__in=teacher_users
             )
-            completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
-            pending_statuses = Syllabus.objects.filter(course=course, is_active=True).exclude(id__in=completed_statuses_ids)
+            completed_status_ids = completed_statuses.values_list('syllabus_id', flat=True)
+            pending_statuses = syllabus_qs.exclude(id__in=completed_status_ids)
+
+            students = Admission.objects.filter(
+                branch=branch,
+                batch=batch,
+                course=course,
+                is_active=True
+            )
+
+            student_data = []
+            for student in students:
+                statuses = []
+                for syllabus in syllabus_qs:
+                    viewed = BatchSyllabusStatus.objects.filter(
+                        syllabus=syllabus,
+                        user=student.user
+                    ).exists()
+                    statuses.append({
+                        "title": syllabus.title,
+                        "week": syllabus.week,
+                        "viewed": viewed
+                    })
+                student_data.append({
+                    "name": student.fullname(),
+                    "admission_number": student.admission_number,
+                    "statuses": statuses
+                })
+
+            context["students"] = student_data
+            context["batch"] = batch
+
         else:
-            syllabus_ids = Syllabus.objects.filter(course=course).values_list('id', flat=True)
             completed_statuses = BatchSyllabusStatus.objects.filter(
                 syllabus_id__in=syllabus_ids,
                 user=user
             )
-            print("status==",completed_statuses)
-            completed_statuses_ids = completed_statuses.values_list('syllabus_id', flat=True)
-            
-            pending_statuses = Syllabus.objects.filter(is_active=True).exclude(id__in=completed_statuses_ids)
+            completed_status_ids = completed_statuses.values_list('syllabus_id', flat=True)
+            pending_statuses = syllabus_qs.exclude(id__in=completed_status_ids)
 
         context["title"] = f"Syllabus - {course.name}"
         context["course"] = course
         context["pending_items"] = pending_statuses
         context["completed_items"] = completed_statuses
+
         return context
 
 
@@ -781,7 +819,6 @@ class UpdateDeleteView(mixins.HybridDeleteView):
     permissions = ("admin_staff", "branch_staff",)
 
 
-
 class PlacementRequestListView(mixins.HybridListView):
     model = PlacementRequest
     table_class = tables.PlacementRequestTable
@@ -792,7 +829,7 @@ class PlacementRequestListView(mixins.HybridListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Placement Request"
-        context["is_update"] = True
+        context["is_placement_request"] = True
         context["can_add"] = True
         context["new_link"] = reverse_lazy("masters:placement_request_create")
         return context
@@ -810,14 +847,44 @@ class PlacementRequestDetailView(mixins.HybridDetailView):
 
 class PlacementRequestCreateView(mixins.HybridCreateView):
     model = PlacementRequest
+    exclude = ('student', 'status', )
     permissions = ("admin_staff", "branch_staff", "mentor", "student", "teacher")
-    exclude = ("status", "is_active", "branch")
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            admission = Admission.objects.get(user=request.user)
+        except Admission.DoesNotExist:
+            return self.handle_no_permission()
+
+        if PlacementRequest.objects.filter(student=admission, status__in=["Request Send", "Under Review"]).exists():
+            return render(request, 'masters/placement-request/403.html', status=403)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        try:
+            admission = Admission.objects.get(user=self.request.user)
+            initial["student"] = admission
+        except Admission.DoesNotExist:
+            pass
+        return initial
+
+    def form_valid(self, form):
+        try:
+            admission = Admission.objects.get(user=self.request.user)
+            form.instance.student = admission
+        except Admission.DoesNotExist:
+            form.add_error(None, "Student record not found.")
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "PlacementRequest"
+        context["title"] = "Placement Request"
         return context
-    
+
     def get_success_url(self):
         return reverse_lazy("masters:update_detail", kwargs={"pk": self.object.pk})
 

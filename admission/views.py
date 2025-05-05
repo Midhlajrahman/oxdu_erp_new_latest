@@ -91,7 +91,7 @@ class AdmissionListView(mixins.HybridListView):
     model = Admission
     table_class = tables.AdmissionTable
     filterset_fields = {'course': ['exact'], "branch": ['exact'], "batch": ['exact'], "admission_number": ['exact'], "admission_date": ['exact']}
-    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser",)
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser", "mentor",)
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -147,7 +147,7 @@ class InactiveAdmissionListView(mixins.HybridListView):
 class AdmissionDetailView(mixins.HybridDetailView):
     queryset = Admission.objects.filter(is_active=True)
     template_name = "admission/profile.html"
-    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "mentor")
 
 
 class AdmissionCreateView(mixins.HybridCreateView):
@@ -184,7 +184,7 @@ class AdmissionCreateView(mixins.HybridCreateView):
 
 class AdmissionUpdateView(mixins.HybridUpdateView):
     model = Admission
-    permissions = ("manager", "admin_staff")
+    permissions = ("branch_staff", "admin_staff", "mentor", "is_superuser")
     template_name = "admission/admission_form.html"
 
     def get_form_class(self):

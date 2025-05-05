@@ -51,7 +51,7 @@ class SyllabusBatchTable(BaseTable):
     action = columns.TemplateColumn(
         """
         <div class="btn-group">
-            <a class="btn btn-default mx-1 btn-sm" title='View' href="{{record.get_syllabus_detail_url}}"><i class="fa fa-eye"></i></a>
+            <a class="btn btn-default mx-1 btn-sm" title='View' href="{% url 'masters:syllabus_detail' course_pk=record.course.pk batch_pk=record.pk %}"><i class="fa fa-eye"></i></a>
         </div>
         """,
         orderable=False,
@@ -172,7 +172,13 @@ class PlacementRequestTable(BaseTable):
         accessor="student.batch",
         verbose_name="Batch",
     )
+    student__age = columns.Column(
+        accessor="student.age",
+        verbose_name="Age", 
+        attrs={"td": {"style": "font-weight: bold;"}}
+    )
+    
     class Meta(BaseTable.Meta):
         model = PlacementRequest
-        fields = ("student__admission_number", "student", "student__course", "student__batch", )
+        fields = ("student__admission_number", "student", "student__age", "student__course", "student__batch", "status",)
         attrs = {"class": "table table-striped table-bordered"}
