@@ -145,7 +145,7 @@ class InactiveAdmissionListView(mixins.HybridListView):
     
 
 class AdmissionDetailView(mixins.HybridDetailView):
-    queryset = Admission.objects.filter(is_active=True)
+    queryset = Admission.objects.all()
     template_name = "admission/profile.html"
     permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "mentor")
 
@@ -213,7 +213,6 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
         context["subtitle"] = subtitles.get(info_type, "Personal Data")
         context['info_type_urls'] = urls
         context[f"is_{info_type}"] = True
-        context["is_update"] = True
         context["is_admission"] = True
         return context
 

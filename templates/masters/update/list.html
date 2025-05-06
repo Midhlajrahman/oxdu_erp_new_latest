@@ -37,33 +37,43 @@
 
     <!-- Start::row -->
     <div class="row">
-        <div class="col-xl-12">
-            <div class="row g-4">
-                {% for object in updates %}
-                <div class="col-md-4 col-sm-6">
-                    <div class="card custom-card h-100 border-0 shadow-sm hover-shadow transition-all">
-                        <a href="{{object.get_absolute_url}}" class="text-decoration-none text-dark">
-                            <div class="card-img-container overflow-hidden" style="height: 200px;">
-                                <img src="{{object.image.url}}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{object.title}}">
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex flex-column h-100">
-                                    <h6 class="card-title fw-semibold text-dark">{{object.title}}</h6>
-                                    <p class="card-text text-muted mb-4 flex-grow-1">{{ object.description|truncatechars:150|safe }}</p>
-                                    <div class="d-flex align-items-center justify-content-between mt-auto">
-                                        <small class="text-muted"><i class="far fa-calendar me-2"></i>{{object.created|date:"M d, Y"}}</small>
-                                        <a href="{{object.get_absolute_url}}">
-                                         <span class="badge bg-light text-dark"><i class="far fa-eye me-1"></i> Read More</span>
-                                        </a>
+        {% if updates%}
+            <div class="col-xl-12">
+                <div class="row g-4">
+                    {% for object in updates %}
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card custom-card h-100 border-0 shadow-sm hover-shadow transition-all">
+                            <a href="{{object.get_absolute_url}}" class="text-decoration-none text-dark">
+                                <div class="card-img-container overflow-hidden" style="height: 200px;">
+                                    <img src="{{object.image.url}}" class="card-img-top h-100 w-100 object-fit-cover" alt="{{object.title}}">
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-column h-100">
+                                        <h6 class="card-title fw-semibold text-dark">{{object.title}}</h6>
+                                        <p class="card-text text-muted mb-4 flex-grow-1">{{ object.description|truncatechars:150|safe }}</p>
+                                        <div class="d-flex align-items-center justify-content-between mt-auto">
+                                            <small class="text-muted"><i class="far fa-calendar me-2"></i>{{object.created|date:"M d, Y"}}</small>
+                                            <a href="{{object.get_absolute_url}}">
+                                            <span class="badge bg-light text-dark"><i class="far fa-eye me-1"></i> Read More</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+            </div>
+            
+        {% else %}
+
+        <div class="card">
+            <div class="card-body">
+                {{title|title}} {% translate "list is empty." %}
             </div>
         </div>
+        {% endif %}
     </div>
   </div>
 
