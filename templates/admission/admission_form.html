@@ -122,17 +122,21 @@
         const $courseSelect = $('#id_course');
         const $batchSelect = $('#id_batch');
         const $batchContainer = $('#div_id_batch');
-    
-        $batchContainer.hide();
-    
+
+        if ($batchSelect.val()) {
+            $batchContainer.show();
+        } else {
+            $batchContainer.hide();
+        }
+
         $courseSelect.on('change', function() {
             const courseId = $(this).val();
-    
+
             $batchSelect.empty().append('<option value="">Loading...</option>');
-    
+
             if (courseId) {
                 $batchContainer.show();
-    
+
                 $.ajax({
                     url: '/admission/ajax/get-batches/',
                     type: 'GET',
@@ -140,9 +144,10 @@
                     success: function(response) {
                         if (response.batches && response.batches.length > 0) {
                             $batchSelect.empty().append('<option value="">Select batch</option>');
-    
+
                             $.each(response.batches, function(index, batch) {
-                                $batchSelect.append(new Option(batch.name, batch.id));
+                                const option = new Option(batch.name, batch.id);
+                                $batchSelect.append(option);
                             });
                         } else {
                             $batchSelect.empty().append('<option value="">No batches available for this course</option>');
