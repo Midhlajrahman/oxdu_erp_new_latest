@@ -3,7 +3,6 @@ import django_tables2 as tables
 from django_tables2 import columns
 from django.utils.html import format_html
 
-
 from .models import Admission, AttendanceRegister, FeeReceipt
 
 class AdmissionTable(BaseTable):
@@ -52,16 +51,7 @@ class AttendanceRegisterTable(BaseTable):
         
     
 class FeeReceiptTable(BaseTable):
-    action = columns.TemplateColumn(
-        """
-        <div class="btn-group">
-            <a class="btn btn-default mx-1 btn-sm" title='View' href="{{record.get_absolute_url}}"><i class="fa fa-eye"></i></a>
-            <a class="btn btn-default mx-1 btn-sm" title='Edit' href="{{record.get_update_url}}"><i class="fa fa-edit"></i></a>
-            <a class="btn btn-default mx-1 btn-sm" title='Delete' href="{{record.get_delete_url}}"><i class="fa fa-trash"></i></a>
-        </div>
-        """,
-        orderable=False,
-    )   
+       
     created = None
     class Meta:
         model = FeeReceipt
@@ -83,12 +73,15 @@ class StudentFeeOverviewTable(BaseTable):
     course__fees = columns.Column(verbose_name="Course Fees")
     get_total_fee_amount = columns.Column(verbose_name="Total Receipt", orderable=False,)
     get_balance_amount = columns.Column(verbose_name="Balance Due", orderable=False,)
+
+    def render_course__fees(self, value):
+        return format_html('<span class="fw-bold">₹{}</span>', value)
     
     def render_get_total_fee_amount(self, value):
-        return format_html('<span style="font-weight: bold; color: green;">{}</span>', value)
+        return format_html('<span class="fw-bold text-success">₹{}</span>', value)
 
     def render_get_balance_amount(self, value):
-        return format_html('<span style="font-weight: bold; color: red;">{}</span>', value)
+        return format_html('<span class="fw-bold text-danger">₹{}</span>', value)
     
     class Meta:
         model = Admission

@@ -164,6 +164,8 @@ class Admission(BaseModel):
         total_paid = FeeReceipt.objects.filter(student=self).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
         return self.course.fees - total_paid
     
+    
+    
     def get_fee(self):
         return FeeStructure.objects.filter(course=self.course)
     
@@ -256,7 +258,7 @@ class StudentFee(BaseModel):
 class FeeReceipt(BaseModel):
     student = models.ForeignKey(Admission, on_delete=models.PROTECT)
     receipt_no = models.CharField(max_length=10,default=generate_receipt_no, null=True)
-    date = models.DateField(default=timezone.now)
+    date = models.DateTimeField(null=True)
     note = models.CharField(max_length=128,blank=True,null=True)
     payment_type = models.CharField(max_length=30, choices=PAYMENT_METHOD_CHOICES, default='Cash')
     amount = models.DecimalField(max_digits=14, decimal_places=2, null=True, )
@@ -270,6 +272,20 @@ class FeeReceipt(BaseModel):
     def get_balance_amount(self):
         total_paid = FeeReceipt.objects.filter(student=self.student).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
         return self.student.course.fees - total_paid
+    
+    def get_receipt_balance(self):
+        total_course_fees = self.student.course.fees 
+        
+        previous_payments = FeeReceipt.objects.filter(
+            student=self.student, 
+            id__lt=self.id  
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        remaining_balance = total_course_fees - previous_payments
+        
+        receipt_balance = remaining_balance - self.amount  
+
+        return max(receipt_balance, 0)
     
     def get_due_amount(self):
         total_course_fees = self.student.course.fees 

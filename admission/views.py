@@ -460,13 +460,14 @@ class AttendanceRegisterDeleteView(mixins.HybridDeleteView):
 class FeeReceiptListView(mixins.HybridListView):
     model = FeeReceipt
     table_class = tables.FeeReceiptTable
-    filterset_fields = {'student': ['exact'], }
+    filterset_fields = {'student': ['exact'], 'date': ['exact'], 'receipt_no': ['exact'], 'payment_type': ['exact']}
     permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser", "student")
     branch_filter = False
     
     def get_queryset(self):
         queryset = super().get_queryset().filter(is_active=True)
         user = self.request.user
+        get_branch = self.request.session.get('branch')
 
         if user.usertype == "student":
             student_admissions = Admission.objects.filter(user=user)
@@ -478,6 +479,9 @@ class FeeReceiptListView(mixins.HybridListView):
         elif user.usertype == "branch_staff":
             queryset = queryset.filter(student__branch=user.branch)
 
+        else :
+            queryset = queryset.filter(student__branch=get_branch)
+
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -485,7 +489,7 @@ class FeeReceiptListView(mixins.HybridListView):
         context["is_admission"] = True
         context["fee_reciept"] = True
         user = self.request.user
-        context["can_add"] = user.usertype in ["teacher", "branch_staff"]
+        context["can_add"] = user.usertype in ["teacher", "branch_staff", "admin_staff"]
         if context["can_add"]:
             context["new_link"] = reverse_lazy("admission:feereceipt_create")
         return context
@@ -550,7 +554,6 @@ class StudentFeeOverviewListView(mixins.HybridListView):
     table_class = tables.StudentFeeOverviewTable
     filterset_fields = {'branch': ['exact'], 'course': ['exact'], 'batch': ['exact'], }
     permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "student")
-    branch_filter = False
     
     def get_queryset(self):
         queryset = super().get_queryset().filter(is_active=True)

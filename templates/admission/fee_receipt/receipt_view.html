@@ -31,7 +31,8 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="invoice-header text-start d-block">
-                                    <img src="{% static 'app/assets/images/brand-logos/desktop-logo.png' %}" alt="">
+                                    <img src="{% static 'app/assets/images/brand-logos/desktop-dark.png' %}" alt="logo" class="desktop-dark">
+                                    <img src="{% static 'app/assets/images/brand-logos/desktop-white.png' %}" alt="logo" class="desktop-white">
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -57,9 +58,9 @@
                                 <div class="billed-from text-md-end">
                                     <label class="fw-medium">Receipt From</label>
                                     <h6>Oxdu Tech School.</h6>
-                                    <p>Near Calicut International Airport Ali Tower, Kondotty, Kerala 673638<br>
-                                    Phone : +91 088480 09860<br>
-                                    Email: Info@oxdu.in</p>
+                                    <p>{{object.student.branch.get_address}}<br>
+                                    Phone : {{object.student.branch.contact_number}}<br>
+                                    Email: {{object.student.branch.email}}</p>
                                 </div><!-- billed-from -->
                             </div>
                         </div>
@@ -78,7 +79,7 @@
                                         <td class="fw-medium">{{object.student.course}}</td>
                                         <td class="text-center fw-bold">₹{{object.student.course.fees}}</td>
                                         <td class="text-end fw-bold text-success">₹{{object.amount}}</td>
-                                        <td class="text-end fw-bold text-danger">₹{{object.get_balance_amount}}</td>
+                                        <td class="text-end fw-bold text-danger">₹{{object.get_receipt_balance|default:"0"}}</td>
                                     </tr>
                                    
                                     <tr>
@@ -140,5 +141,22 @@
         });
     }
 </script>
+
+<style>
+
+    [data-header-styles=dark] .desktop-white{
+        display: none;
+    }
+    [data-header-styles=dark] .desktop-dark{
+        display: block;
+    }
+    [data-header-styles=light] .desktop-dark{
+        display: none;
+    }
+    [data-header-styles=light] .desktop-white{
+        display: block;
+    }
+    
+</style>
 
 {% endblock content %}
