@@ -1,31 +1,38 @@
 from django.contrib import admin
-from .models import FeeReceipt, StudentFee,AttendanceRegister, FeeStructure, Attendance, Admission
+from core.base import BaseAdmin
+from .models import FeeReceipt, StudentFee,AttendanceRegister, FeeStructure, Attendance, Admission, AdmissionEnquiry
 
 # Register your models here.
 
 @admin.register(AttendanceRegister)
-class AttendanceRegisterAdmin(admin.ModelAdmin):
+class AttendanceRegisterAdmin(BaseAdmin):
     pass
 
 
 @admin.register(Attendance)
-class AttendanceAdmin(admin.ModelAdmin):
+class AttendanceAdmin(BaseAdmin):
     pass
 
 
 @admin.register(FeeStructure)
-class FeeStructureAdmin(admin.ModelAdmin):
+class FeeStructureAdmin(BaseAdmin):
     pass
 
 @admin.register(StudentFee)
-class StudentFeeAdmin(admin.ModelAdmin):
+class StudentFeeAdmin(BaseAdmin):
     pass
 
 @admin.register(FeeReceipt)
-class FeeReceiptAdmin(admin.ModelAdmin):
+class FeeReceiptAdmin(BaseAdmin):
     pass
 
 @admin.register(Admission)
-class AdmissionAdmin(admin.ModelAdmin):
+class AdmissionAdmin(BaseAdmin):
     list_display = ("fullname", "branch", "course", "is_active",)
+    list_filter = ("branch", "course", "is_active")
+
+
+@admin.register(AdmissionEnquiry)
+class AdmissionEnquiryAdmin(BaseAdmin):
+    list_display = ("full_name", "branch", "course", 'tele_caller', "is_active",)
     list_filter = ("branch", "course", "is_active")

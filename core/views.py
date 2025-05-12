@@ -3,8 +3,6 @@ from datetime import datetime
 from django.db.models import Sum
 from collections import defaultdict
 from branches.models import Branch
-from core.models import LockingAccount
-from core.models import LockingGroup
 from core.models import Setting
 from branches.tables import BranchTable
 from admission.models import Admission, Attendance, FeeReceipt
@@ -12,8 +10,6 @@ from employees.models import Employee
 from masters.models import Batch, Course
 
 from .forms import HomeForm
-from .forms import LockingAccountFormSet
-from .forms import LockingGroupFormSet
 from .forms import SettingForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
@@ -204,43 +200,6 @@ class GeneralSettings(mixins.HybridUpdateView):
     def get_success_message(self, cleaned_data):
         message = "Settings Updated Successfully"
         return message
-
-
-class GroupSettings(mixins.HybridView):
-    template_name = "core/group_settings.html"
-
-    def get(self, request):
-        formset = LockingGroupFormSet(queryset=LockingGroup.objects.all())
-        context = {"sub_title": "Manage Locking Groups", "title": "Group Settings", "formset": formset}
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        formset = LockingGroupFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-            messages.success(request, "Locking Groups Updated")
-            return redirect("core:group_settings")
-        context = {"sub_title": "Manage Locking Groups", "title": "Group Settings", "formset": formset}
-        return render(request, self.template_name, context)
-
-
-class AccountSettings(mixins.HybridView):
-    template_name = "core/account_settings.html"
-
-    def get(self, request):
-        formset = LockingAccountFormSet(queryset=LockingAccount.objects.all())
-        context = {"sub_title": "Manage Locking Accounts", "title": "Account Settings", "formset": formset}
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        formset = LockingAccountFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-            messages.success(request, "Locking Accounts Updated")
-            return redirect("core:account_settings")
-        print(formset.errors)
-        context = {"sub_title": "Manage Locking Accounts", "title": "Account Settings", "formset": formset}
-        return render(request, self.template_name, context)
 
 
 class AcademicYearListView(mixins.HybridListView):

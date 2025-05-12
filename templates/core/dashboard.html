@@ -33,6 +33,8 @@
             {% include "app/dashboard/student_dashboard.html" %}
         {% elif request.user.usertype == "branch_staff" %}
             {% include "app/dashboard/branch_manager_dashboard.html" %}
+        {% elif request.user.usertype == "tele_caller" %}
+            {% include "app/dashboard/tele_caller_dashboard.html" %}
         {% endif %}
 
    

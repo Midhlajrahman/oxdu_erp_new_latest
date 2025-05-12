@@ -105,6 +105,15 @@ DURATION_CHOICES = (
 )
 ENQUIRY_STATUS_TYPE_CHOICES = (("OPEN", "OPEN"), ("CLOSED", "CLOSED"), ("REJECTED_BY_COMPANY", "REJECTED_BY_COMPANY"), ("REJECTED_BY_CLIENT", "rejected_BY_CLIENT"))
 
+ENQUIRY_STATUS = (
+    ('new_enquiry', 'New Enquiry'),
+    ('follow_up', 'Follow Up'),
+    ('demo', 'Ready for Demo'),
+    ('interested', 'Interested'),
+    ('admitted', 'Admitted'),
+    ('rejected', 'Rejected'),
+)
+
 MARITAL_CHOICES = (("SINGLE", "Single"), ("MARRIED", "Married"), ("IN_A_RELATIONSHIP", "In a Relationship"), ("DIVORCED", "Divorced"), ("WIDOWED", "Widowed"), ("OTHER", "Other"))
 NOTICE_PERIOD_CHOICES = (
     ("0", "0"),
@@ -145,7 +154,7 @@ EMPLOYEE_STATUS_CHOICES = (("Appointed", "Appointed"), ("Resigned", "Resigned"),
 
 PAYMENT_METHOD_CHOICES = [('cash', 'Cash'), ('bank', 'Bank Transfer')]
 
-USERTYPE_CHOICES = (('admin_staff', 'Admin Staff'), ('branch_staff', 'Branch Staff'), ('teacher', 'Teacher'), ('mentor', 'Mentor'), ('student', 'Student'))
+USERTYPE_CHOICES = (('admin_staff', 'Admin Staff'), ('branch_staff', 'Branch Staff'), ('teacher', 'Teacher'), ('mentor', 'Mentor'), ('tele_caller', 'Tele Caller'), ('student', 'Student'))
 
 ACCOUNTING_MASTER_CHOICES = (("Assets", "Assets"), ("Liabilities", "Liabilities"), ("Equity", "Equity"), ("Income", "Income"), ("Expense", "Expense"))
 

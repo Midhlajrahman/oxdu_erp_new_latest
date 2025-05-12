@@ -1,8 +1,6 @@
 from .base import BaseAdmin
 from .models import AcademicYear
 from .models import Link
-from .models import LockingAccount
-from .models import LockingGroup
 from .models import Setting
 from django.contrib import admin
 
@@ -13,22 +11,9 @@ class SettingAdmin(BaseAdmin):
     search_fields = ("branch__name",)
 
 
-@admin.register(LockingGroup)
-class LockingGroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "group")
-
-
-@admin.register(LockingAccount)
-class LockingAccountAdmin(admin.ModelAdmin):
-    list_display = ("name", "account")
-
-
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):
     list_display = ("__str__",)
-
-
-
 
 
 @admin.register(Link)

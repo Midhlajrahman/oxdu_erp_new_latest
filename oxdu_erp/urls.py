@@ -19,7 +19,6 @@ module_urls = i18n_patterns(
     path("accounts/", include("accounts.urls", namespace="accounts")),
     path("employees/", include("employees.urls", namespace="employees")),
     path("admission/", include("admission.urls", namespace="admission")),
-    path("accounting/", include("accounting.urls", namespace="accounting")),
     path("branches/", include("branches.urls", namespace="branches")),
     path("masters/", include("masters.urls", namespace="masters")),
     prefix_default_language=False,

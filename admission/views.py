@@ -1,4 +1,7 @@
 import datetime
+import openpyxl
+import csv
+from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
@@ -23,7 +26,7 @@ from django.forms import formset_factory, inlineformset_factory
 from core.utils import build_url
 from core import mixins
 
-from admission .models import Admission, Attendance, AttendanceRegister, FeeReceipt, FeeStructure, StudentFee
+from admission .models import Admission, Attendance, AttendanceRegister, FeeReceipt, AdmissionEnquiry
 from masters.models import Batch, Course
 from employees.models import Employee
 from branches.models import Branch
@@ -32,7 +35,7 @@ from core.pdfview import PDFView
 
 from . import tables
 from . import forms
-from admission.forms import AttendanceForm, AttendanceUpdateForm, FeeReceiptFormSet
+from admission.forms import AttendanceForm, AttendanceUpdateForm, FeeReceiptFormSet, AdmissionEnquiryForm
 # from .forms import AdmissionForm
 
 
@@ -87,6 +90,105 @@ def get_batches_for_course(request):
     return JsonResponse({'batches': data})
 
 
+
+class ImportEnquiryView(View):
+    def post(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            messages.error(request, "No file uploaded.")
+            return redirect('admission:public_lead_list')
+
+        try:
+            if file.name.endswith('.xlsx'):
+                wb = openpyxl.load_workbook(file)
+                sheet = wb.active
+                for row in sheet.iter_rows(min_row=2, values_only=True):
+                    phone = row[0] if len(row) > 0 else None
+                    full_name = row[1] if len(row) > 1 else None
+                    city = row[2] if len(row) > 2 else None
+
+                    if phone:
+                        AdmissionEnquiry.objects.create(
+                            contact_number=phone,
+                            full_name=full_name,
+                            city=city,
+                        )
+
+            elif file.name.endswith('.csv'):
+                decoded_file = file.read().decode('utf-8').splitlines()
+                reader = csv.reader(decoded_file)
+                next(reader, None)  # Skip header
+                for row in reader:
+                    full_name = row[0] if len(row) > 0 else None
+                    city = row[1] if len(row) > 1 else None
+                    phone = row[2] if len(row) > 2 else None
+
+                    if phone:
+                        AdmissionEnquiry.objects.create(
+                            contact_number=phone,
+                            full_name=full_name,
+                            city=city,
+                        )
+
+            else:
+                messages.error(request, "Unsupported file type. Please upload .xlsx or .csv.")
+                return redirect('admission:public_lead_list')
+
+            messages.success(request, "Leads imported successfully.")
+        except Exception as e:
+            messages.error(request, f"Import failed: {e}")
+
+        return redirect('admission:public_lead_list')
+
+    
+def add_to_me(request, pk):
+    enquiry = get_object_or_404(AdmissionEnquiry, pk=pk)
+
+    try:
+        employee = Employee.objects.get(user=request.user)
+    except Employee.DoesNotExist:
+        messages.error(request, "You are not registered as an employee.")
+        return redirect('admission:public_lead_list')
+
+    if enquiry.tele_caller is None:
+        enquiry.tele_caller = employee
+        enquiry.save()
+        messages.success(request, "You have been assigned to this enquiry.")
+    else:
+        messages.warning(request, "This enquiry already has a tele-caller.")
+        
+    return redirect('admission:public_lead_list')
+
+
+def student_check_data(request):
+    personal_email = request.GET.get('personal_email')
+    student = AdmissionEnquiry.objects.filter(personal_email=personal_email).first()
+
+    if student:
+        return JsonResponse({
+            'status': True,
+            'student_name': student.full_name,
+            'student_id': student.pk,
+            'full_name': student.full_name,
+            'date_of_birth': student.date_of_birth.strftime('%d/%m/%Y') if student.date_of_birth else None,
+            'religion': student.religion,
+            'city': student.city,
+            'district': student.district,
+            'state': student.state,
+            'pin_code': student.pin_code,
+            'personal_email': student.personal_email,
+            'contact_number': student.contact_number,
+            'whatsapp_number': student.whatsapp_number,
+            'parent_full_name': student.parent_full_name,
+            'parent_contact_number': student.parent_contact_number,
+            'parent_whatsapp_number': student.parent_whatsapp_number,
+            'parent_mail_id': student.parent_mail_id,
+            # 'photo': student.photo.url if student.photo else None,  # Only if needed
+        })
+    else:
+        return JsonResponse({'status': False})
+
+
 class AdmissionListView(mixins.HybridListView):
     model = Admission
     table_class = tables.AdmissionTable
@@ -122,7 +224,7 @@ class InactiveAdmissionListView(mixins.HybridListView):
         'admission_number': ['exact'],
         'admission_date': ['exact'],
     }
-    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "mentor", )
 
     def get_queryset(self):
         queryset = Admission.objects.filter(is_active=False)
@@ -248,6 +350,141 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
 class AdmissionDeleteView(mixins.HybridDeleteView):
     model = Admission
     permissions = ("is_superuser", "teacher", "branch_staff", )
+
+
+class PublicLeadListView(mixins.HybridListView):
+    template_name = "admission/enquiry/list.html"
+    model = AdmissionEnquiry
+    table_class = tables.PublicEnquiryListTable
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'], 'date': ['exact']}
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller")
+    branch_filter = False
+
+    def get_table(self, **kwargs):
+        table = super().get_table(**kwargs)
+        table.request = self.request 
+        return table
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        queryset = queryset.filter(tele_caller__isnull=True)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Leads"
+        context["is_enquiry"] = True  
+        user_type = self.request.user.usertype
+        context["can_add"] = user_type in ("tele_caller",)
+        context["new_link"] = reverse_lazy("admission:admission_enquiry_create")    
+        return context
+
+    
+class AdmissionEnquiryView(mixins.HybridListView):
+    model = AdmissionEnquiry
+    table_class = tables.AdmissionEnquiryTable
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor")
+    branch_filter = True
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        if user.usertype == "branch_staff" or user.usertype == "mentor":
+            queryset = queryset.filter(status="demo")
+        elif user.usertype == "tele_caller":
+            try:
+                employee = user.employee
+                queryset = queryset.filter(tele_caller=employee)
+            except Employee.DoesNotExist:
+                queryset = queryset.none()
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_type = self.request.user.usertype
+
+        context.update({
+            "title": "Leads",
+            "is_admission": True,
+            "is_enquiry": True,
+            "can_add": user_type in ("tele_caller",),
+            "new_link": reverse_lazy("admission:admission_enquiry_create"),
+        })
+
+        return context
+    
+
+class AdmissionEnquiryDetailView(mixins.HybridDetailView):
+    model = AdmissionEnquiry
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Lead Details"
+        return context
+    
+
+class AdmissionEnquiryCreateView(mixins.HybridCreateView):
+    model = AdmissionEnquiry
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    exclude = ('tele_caller',)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_admission"] = True
+        context["is_enquiry"] = True  
+        context["is_create"] = True
+        context["title"] = "New Lead"
+        return context
+
+    def form_valid(self, form):
+        user = self.request.user
+        if hasattr(user, "employee") and user.usertype == "tele_caller":
+            form.instance.tele_caller = user.employee
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_list_url()
+
+
+class AdmissionEnquiryUpdateView(mixins.HybridUpdateView):
+    model = AdmissionEnquiry
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    exclude = ('tele_caller',)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_admission"] = True
+        context["is_enquiry"] = True  
+        context["title"] = "Edit Lead"
+        return context
+
+    def form_valid(self, form):
+        user = self.request.user
+        if hasattr(user, "employee") and user.usertype == "tele_caller":
+            if not form.instance.tele_caller:
+                form.instance.tele_caller = user.employee
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_list_url()
+    
+
+class AdmissionEnquiryDeleteView(mixins.HybridDeleteView):
+    model = AdmissionEnquiry
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+
+
+class DeleteUnassignedLeadsView(View):
+    def post(self, request):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            count, _ = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).delete()
+            return JsonResponse({'message': f'{count} unassigned leads deleted successfully.'})
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 class AttendanceRegisterListView(mixins.HybridListView):

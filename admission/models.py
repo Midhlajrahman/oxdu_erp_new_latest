@@ -11,7 +11,7 @@ from core.choices import GENDER_CHOICES
 from core.choices import RELIGION_CHOICES
 from core.choices import PAYMENT_PERIOD_CHOICES
 from core.choices import ATTENDANCE_STATUS
-from core.choices import MONTH_CHOICES, YEAR_CHOICES
+from core.choices import MONTH_CHOICES, YEAR_CHOICES, ENQUIRY_STATUS
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
@@ -316,3 +316,47 @@ class FeeReceipt(BaseModel):
 
     def get_delete_url(self):
         return reverse_lazy("admission:fee_receipt_delete", kwargs={"pk": self.pk})
+
+
+class AdmissionEnquiry(BaseModel):
+    tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, limit_choices_to={"user__usertype": "tele_caller", "user__is_active": True}, null=True)
+    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True)
+    course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
+    date = models.DateField(null=True)
+    status = models.CharField(max_length=30, choices=ENQUIRY_STATUS, default="new_enquiry")
+
+    # Student Info
+    full_name = models.CharField(max_length=200, null=True)
+    date_of_birth = models.DateField(null=True)
+    religion = models.CharField(max_length=20, choices=RELIGION_CHOICES, blank=True, null=True)
+    city = models.CharField(max_length=180, blank=True, null=True)
+    district = models.CharField(max_length=180, blank=True, null=True)
+    state = models.CharField(max_length=180, blank=True, null=True)
+    pin_code = models.CharField(max_length=180, blank=True, null=True)
+    personal_email = models.EmailField(null=True, unique=True)
+    contact_number = models.CharField(max_length=30,null=True,)
+    whatsapp_number = models.CharField(max_length=30,null=True,)
+
+    # Parent Info
+    parent_full_name = models.CharField(max_length=200,null=True,)
+    parent_contact_number = models.CharField(max_length=30, null=True, )
+    parent_whatsapp_number = models.CharField(max_length=30, null=True, )
+    parent_mail_id = models.EmailField(verbose_name="Mail Id", null=True, blank=True)
+
+    def str(self):
+        return f"{self.full_name} - {self.course.name}"
+    
+    @staticmethod
+    def get_list_url():
+        return reverse_lazy("admission:admission_enquiry")
+
+    def get_absolute_url(self):
+        return reverse_lazy("admission:admission_enquiry_detail", kwargs={"pk": self.pk})
+
+    def get_update_url(self):
+        return reverse_lazy("admission:admission_enquiry_update", kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse_lazy("admission:admission_enquiry_delete", kwargs={"pk": self.pk})
+    
+    

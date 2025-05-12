@@ -82,50 +82,6 @@ class AcademicYear(BaseModel):
         return f"{self.start_year_session[2:]}-{self.end_year_session[2:]}"
 
 
-class LockingGroup(models.Model):
-    GROUP_CHOICES = [
-        ('SUNDRY_DEBTORS', 'Sundry Debtors'),
-        ('SUNDRY_CREDITORS', 'Sundry Creditors'),
-        ('INDIRECT_EXPENSE', 'Indirect Expense'),
-        ('BANK_ACCOUNT', 'Bank Account'),
-        ('CASH_ACCOUNT', 'Cash Account'),
-    ]
-
-    name = models.CharField(max_length=50, choices=GROUP_CHOICES, unique=True)
-    group = models.OneToOneField("accounting.GroupMaster", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-
-class LockingAccount(models.Model):
-    ACCOUNT_CHOICES = [
-        ('airline_rcvd_ia', 'Air-Line RCVD [IA]'),
-        ('airline_rcvd_da', 'Air-Line RCVD [DA]'),
-        ('hotel_rcvd', 'Hotel RCVD'),
-        ('visa_rcvd', 'Visa RCVD'),
-        ('miscellaneous_rcvd', 'Miscellaneous RCVD'),
-        ('transportation_rcvd', 'Transportation RCVD'),
-        ('package_rcvd', 'Package RCVD'),
-        ('airline_paid_ia', 'Air-Line PAID [IA]'),
-        ('airline_paid_da', 'Air-Line PAID [DA]'),
-        ('hotel_paid', 'Hotel PAID'),
-        ('visa_paid', 'Visa PAID'),
-        ('miscellaneous_paid', 'Miscellaneous PAID'),
-        ('transportation_paid', 'Transportation PAID'),
-        ('package_paid', 'Package PAID'),
-        ('CGST', 'CGST'),
-        ('SGST', 'SGST'),
-        ('round_off', 'Round Off'),
-        ('cash_account', 'Cash Account'),
-    ]
-    name = models.CharField(max_length=50, choices=ACCOUNT_CHOICES, unique=True)
-    account = models.OneToOneField("accounting.Account", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-
 class Link(models.Model):
     """
     A model representing a link, which can be displayed in the application.

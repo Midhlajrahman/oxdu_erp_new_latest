@@ -1,7 +1,5 @@
 from .models import AcademicYear
 from branches.models import Branch
-from .models import LockingAccount
-from .models import LockingGroup
 from .models import Setting
 from django import forms
 
@@ -120,34 +118,6 @@ class SettingForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-
-class LockingGroupForm(forms.ModelForm):
-    class Meta:
-        model = LockingGroup
-        fields = ("name", "group")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control form-select'
-
-
-LockingGroupFormSet = forms.modelformset_factory(LockingGroup, form=LockingGroupForm, extra=1)
-
-
-class LockingAccountForm(forms.ModelForm):
-    class Meta:
-        model = LockingAccount
-        fields = ("name", "account")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control form-select'
-
-
-LockingAccountFormSet = forms.modelformset_factory(LockingAccount, form=LockingAccountForm, extra=1)
 
 
 class HomeForm(forms.Form):

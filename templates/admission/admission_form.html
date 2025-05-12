@@ -48,18 +48,40 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <form class="form-horizontal" method="post" autocomplete="off" enctype="multipart/form-data" action="">
+                                <form class="form-horizontal" method="post" autocomplete="off" enctype="multipart/form-data" >
                                 {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-lg-4" id="studentEmailContainer">
+                                        <div class="form-group" id="div_id_studentEmail">
+                                            <label for="studentEmail">Enter Student Email Address</label>
+                                            <input type="text" class="form-control" id="studentEmail" name="studentEmail" placeholder="Enter Your Student Email">
+                                        </div>
+                                    </div>
+                                
+                                    <div class="col-lg-4 mt-5" id="studentEmailError" style="display: none;">
+                                        <p class="text-danger">The Student Email was not found.</p>
+                                    </div>
+                                
+                                    <div class="col-lg-4" id="studentNameContainer" style="display: none;">
+                                        <label for="studentName">Student Name</label>
+                                        <p id="studentName" class="form-control"></p>
+                                    </div>
+                                
+                                    <!-- Clear Email Button -->
+                                    <div class="col-lg-4 mt-3">
+                                        <button type="button" id="clearEmailBtn" class="btn btn-secondary" style="display: none;">Clear Email</button>
+                                    </div>
+                                </div>
+
                                 {{form|crispy}}
                                 <div class="row my-2">
                                     <div class="mb-3">
                                         <div class="form-group">
                                             {% if not is_account %}
-                                            <input type="submit" name="save_and_next" class="btn btn-primary me-2" value="Save and Next">
+                                            <input type="submit" id="saveAndNextBtn" name="save_and_next" class="btn btn-primary me-2" value="Save and Next">
                                             {% endif %}
-                                            <input type="submit" name="_save" class="btn btn-primary me-2" value="Save">
-                                            <button type="button" onclick="history.back()"
-                                                class="border btn btn-outline-info">Cancel</button>
+                                            <input type="submit" id="saveBtn" name="_save" class="btn btn-primary me-2" value="Save">
+                                            <button type="button" onclick="history.back()" class="border btn btn-outline-info">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -86,6 +108,98 @@
 {% block javascript %}
 
 {{form.media}}
+<script>
+    // Save email and name immediately before form submits
+    document.addEventListener("DOMContentLoaded", function () {
+        // Restore email and name on page load
+        const savedEmail = localStorage.getItem('studentEmail');
+        const savedName = localStorage.getItem('studentName');
+
+        if (savedEmail && savedName) {
+            $('#studentEmail').val(savedEmail).trigger('change');
+            $('#studentName').text(savedName);
+            $('#studentNameContainer').show();
+            $('#clearEmailBtn').show();
+        }
+
+        // Button click handling
+        $('#saveAndNextBtn').on('click', function () {
+            const email = $('#studentEmail').val().trim();
+            const name = $('#studentName').text().trim();
+
+            if (email && name) {
+                localStorage.setItem('studentEmail', email);
+                localStorage.setItem('studentName', name);
+            }
+        });
+
+        $('#saveBtn').on('click', function () {
+            localStorage.removeItem('studentEmail');
+            localStorage.removeItem('studentName');
+        });
+    });
+
+    // Clear Email Button
+    $('#clearEmailBtn').on('click', function () {
+        $('#studentEmail').val('');
+        localStorage.removeItem('studentEmail');
+        localStorage.removeItem('studentName');
+        $('#studentName').text('');
+        $('#studentNameContainer').hide();
+        $('#clearEmailBtn').hide();
+        $('#viewStudentBtn').hide();
+        $('#createStudentBtn').show();
+        $('#studentEmailError').hide();
+    });
+
+    // Handle email input change and autofill
+    $('#studentEmail').on('change', function () {
+        const personal_email = $(this).val().trim();
+        if (!personal_email) return;
+
+        const url = "{% url 'admission:student_check_data' %}";
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: { 'personal_email': personal_email },
+            success: function (response) {
+                if (response.status) {
+                    $('#studentEmailError').hide();
+                    $('#studentName').text(response.student_name);
+                    $('#studentNameContainer').show();
+                    $('#clearEmailBtn').show();
+
+                    // Autofill fields
+                    $('#id_first_name').val(response.full_name);
+                    $('#id_date_of_birth').val(response.date_of_birth);
+                    $('#id_religion').val(response.religion);
+                    $('#id_city').val(response.city);
+                    $('#id_district').val(response.district);
+                    $('#id_state').val(response.state);
+                    $('#id_pin_code').val(response.pin_code);
+                    $('#id_personal_email').val(response.personal_email);
+                    $('#id_contact_number').val(response.contact_number);
+                    $('#id_whatsapp_number').val(response.whatsapp_number);
+                    $('#id_parent_first_name').val(response.parent_full_name);
+                    $('#id_parent_contact_number').val(response.parent_contact_number);
+                    $('#id_parent_whatsapp_number').val(response.parent_whatsapp_number);
+                    $('#id_parent_mail_id').val(response.parent_mail_id);
+
+                    $('#viewStudentBtn').attr('data-student-id', response.student_id).show();
+                    $('#createStudentBtn').hide();
+                } else {
+                    $('#studentNameContainer, #clearEmailBtn').hide();
+                    $('#createStudentBtn').show();
+                    $('#studentEmailError').show();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error checking email:', error);
+            }
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function () {
         initializeSelect2WithModal('#id_department', '#department-form-modal',"Search Department");

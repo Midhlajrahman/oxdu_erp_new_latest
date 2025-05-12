@@ -1,17 +1,6 @@
-from core.models import LockingAccount
-from core.models import LockingGroup
 
 from django.urls import reverse_lazy
 from django.utils.http import urlencode
-
-
-def get_locked_groups_ids():
-    return {group.name: group.group.pk for group in LockingGroup.objects.all()}
-
-
-def get_locked_account_ids():
-    return {account.name: account.account.pk for account in LockingAccount.objects.all()}
-
 
 def build_url(viewname, kwargs=None, query_params=None):
     """

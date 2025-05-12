@@ -5,6 +5,9 @@ from django.urls import path
 app_name = "admission"
 
 urlpatterns = [
+    path('enquiry/import/', views.ImportEnquiryView.as_view(), name='import_enquiry'),
+    path("student_check_data/", views.student_check_data, name="student_check_data"),
+    path('add-to-me/<int:pk>/', views.add_to_me, name='add_to_me'),
     path('admission/<int:pk>/change-status/', views.change_status, name='change_status'),
     path('ajax/get-batches/', views.get_batches_for_course, name='get_batches_for_course'),
     
@@ -15,6 +18,18 @@ urlpatterns = [
     path("new/admission/", views.AdmissionCreateView.as_view(), name="admission_create"),
     path("admission/<str:pk>/update/", views.AdmissionUpdateView.as_view(), name="admission_update"),
     path("admission/<str:pk>/delete/", views.AdmissionDeleteView.as_view(), name="admission_delete"),
+
+    # enquiry
+    path("public-leads/", views.PublicLeadListView.as_view(), name="public_lead_list"),
+    path("enquiries/", views.AdmissionEnquiryView.as_view(), name="admission_enquiry"),
+    path("admission-enquiry/<str:pk>/", views.AdmissionEnquiryDetailView.as_view(), name="admission_enquiry_detail"),
+    path("new/admission-enquiry/<int:pk>/", views.AdmissionEnquiryCreateView.as_view(), name="admission_enquiry_create"),
+    path("new/admission-enquiry/", views.AdmissionEnquiryCreateView.as_view(), name="admission_enquiry_create"),
+    path("admission-enquiry/<str:pk>/update/", views.AdmissionEnquiryUpdateView.as_view(), name="admission_enquiry_update"),
+    path("admission-enquiry/<str:pk>/delete/", views.AdmissionEnquiryDeleteView.as_view(), name="admission_enquiry_delete"),
+    path('enquiry/delete-unassigned/', views.DeleteUnassignedLeadsView.as_view(), name='delete_unassigned_leads'),
+
+
     
     #attendance
     path("attendance-registers/", views.AttendanceRegisterListView.as_view(), name="attendance_register_list"),

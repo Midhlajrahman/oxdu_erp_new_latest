@@ -17,8 +17,8 @@ class Batch(BaseModel):
     academic_year = models.ForeignKey("core.AcademicYear", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.batch_name
-    
+        return f"{self.batch_name} - ({self.course})"
+
     @staticmethod
     def get_list_url():
         return reverse_lazy("masters:batch_list")

@@ -46,7 +46,7 @@ class UserDetailView(mixins.HybridDetailView):
 class UserCreateView(mixins.HybridCreateView):
     model = User
     form_class = UserForm
-    permissions = ("manager", "admin_staff")
+    permissions = ("manager", "admin_staff", "branch_staff")
     exclude = None
 
     def get_template_names(self):
@@ -107,7 +107,7 @@ class UserCreateView(mixins.HybridCreateView):
 class StudentUserCreateView(mixins.HybridCreateView):
     model = User
     form_class = UserForm
-    permissions = ("manager", "admin_staff")
+    permissions = ("manager", "admin_staff", "branch_staff")
     exclude = None
 
     def get_template_names(self):
@@ -169,7 +169,7 @@ class StudentUserUpdateView(mixins.HybridUpdateView):
     exclude = None
     fields = ("email", "usertype")
     template_name = "admission/admission_form.html"
-    permissions = ("manager", "admin_staff")
+    permissions = ("manager", "admin_staff", "branch_staff")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -195,7 +195,7 @@ class UserUpdateView(mixins.HybridUpdateView):
     exclude = None
     fields = ("email", "usertype")
     template_name = "employees/employee_form.html"
-    permissions = ("manager", "admin_staff")
+    permissions = ("manager", "admin_staff", "branch_staff")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

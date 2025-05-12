@@ -1,6 +1,6 @@
 from core.base import BaseForm
 from django.db import transaction
-from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee
+from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee, AdmissionEnquiry
 from django import forms
 from decimal import Decimal
 
@@ -209,3 +209,11 @@ class RegistrationForm(forms.ModelForm):
         ]
         for field in required_fields:
             self.fields[field].required = True
+
+        
+
+class AdmissionEnquiryForm(forms.ModelForm):
+    class Meta:
+        model = AdmissionEnquiry
+        exclude = ('tele_caller',)
+        

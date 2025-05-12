@@ -200,6 +200,7 @@ class EmployeeCreateView(mixins.HybridCreateView):
             employee.user = user
             employee.branch = user.branch
             employee.usertype = user.usertype
+            employee.photo = user.image
             employee.save()
         else:
             user.save()

@@ -31,7 +31,45 @@ class AdmissionTable(BaseTable):
         fields = ("admission_number","admission_date","fullname", "course", "contact_number", "is_active", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
         
+
+class AdmissionEnquiryTable(BaseTable):
+    created = None
+    full_name = columns.Column(verbose_name="Student",)
+    course = columns.Column(verbose_name="Course")
+    contact_number = columns.Column(verbose_name="Mob")
+    date = columns.Column(verbose_name="Enquiry Date")
+    personal_email = columns.Column(verbose_name="Email")
+    status = columns.Column(verbose_name="Enquiry Status")
     
+    class Meta:
+        model = Admission
+        fields = ("date","full_name", "course", "contact_number", "personal_email", "status", "action")
+        attrs = {"class": "table star-student table-hover table-bordered"}
+
+    
+class PublicEnquiryListTable(BaseTable):
+    full_name = columns.Column(verbose_name="Full Name")
+
+    action = tables.TemplateColumn(
+        template_code='''
+            {% if record.tele_caller %}
+                <span class="badge bg-success">Assigned</span>
+            {% elif table.request.user.usertype == "tele_caller" %}
+                <a href="{% url 'admission:add_to_me' record.id %}" class="btn btn-sm btn-danger fw-bold">ADD TO ME</a>
+            {% else %}
+                <span class="badge bg-danger text-white">Not Assigned</span>
+            {% endif %}
+        ''',
+        verbose_name='Action',
+        orderable=False,
+    )
+
+    class Meta:
+        model = Admission
+        fields = ("full_name", "contact_number", "created", "action")
+        attrs = {"class": "table star-student table-hover table-bordered"}
+    
+
 class AttendanceRegisterTable(BaseTable):
     action = columns.TemplateColumn(
         """

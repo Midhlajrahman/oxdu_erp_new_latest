@@ -120,8 +120,8 @@
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link dropdown-toggle mx-0 w-100" id="mainHeaderProfile" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     <div>
-                        {% if request.user.image %}
-                        <img src="{{request.user.image.url}}" alt="img" class="rounded-3 avatar avatar-md">
+                        {% if request.user.employee.photo %}
+                        <img src="{{request.user.employee.photo.url}}" alt="img" class="rounded-3 avatar avatar-md">
                         {% else %}
                         <img src="{{default_user_avatar}}" alt="img" class="rounded-3 avatar avatar-md">
                         {% endif %}
@@ -132,7 +132,7 @@
                     <Li>
                         <div class="p-3 text-center border-bottom">
                             <a href="#" class="text-center fw-semibold">{{request.user}}</a>
-                            <p class="text-center user-semi-title fs-13 mb-0">{{request.user.designation}}</p>
+                            <p class="text-center user-semi-title fs-13 mb-0">{{request.user.usertype}}</p>
                         </div>
                     </Li>
                     {% comment %}
