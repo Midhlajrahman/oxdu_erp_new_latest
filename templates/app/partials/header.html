@@ -139,6 +139,9 @@
                     <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="fe fe-user me-2"></i>Profile</a></li>
                     {% endcomment %}
                     {% comment %} <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:general_settings' %}"><i class="fe fe-settings me-2"></i>Settings</a></li> {% endcomment %}
+                    {% if request.user.usertype == "student" %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:id_card' %}"><i class="fe fe-edit-3 me-2"></i>ID Card</a></li>
+                    {% endif %}
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'auth_password_change' %}"><i class="fe fe-edit-3 me-2"></i>Change Password</a></li>
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'user_sessions:session_list' %}"><i class="fe fe-headphones me-2"></i>My Sessions</a></li>
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'auth_logout' %}"><i class="fe fe-power me-2"></i>Log Out</a></li>
