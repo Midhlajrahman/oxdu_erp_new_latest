@@ -67,10 +67,6 @@
                         </li>
 
                         <li class="slide">
-                            <a href="{% url 'admission:public_lead_list' %}" class="side-menu__item {% if is_enquiry %}active{% endif %}">Admission Enquiry</a>
-                        </li>
-
-                        <li class="slide">
                             <a href="{% url 'admission:attendance_register_list' %}" class="side-menu__item {% if is_attendance %}active{% endif %}">Student Attendance</a>
                         </li>
 
@@ -135,21 +131,26 @@
 
                 <!-- Start::slide -->
                 <li class="slide has-sub">
-                    <a href="javascript:void(0);" class="side-menu__item {% if is_admission %} active {% endif %}">
+                    <a href="javascript:void(0);" class="side-menu__item {% if is_lead  %} active {% endif %}">
                         <i class="la la-graduation-cap side-menu__icon"></i>
                         <span class="side-menu__label">Leads</span>
                         <i class="fe fe-chevron-right side-menu__angle"></i>
                     </a>
                     <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1">
-                            <a href="javascript:void(0);">Student Registration</a>
-                        </li>
-
                        
                         <li class="slide">
                             <a href="{% url 'admission:admission_enquiry' %}" class="side-menu__item {% if is_enquiry %}active{% endif %}">Ready for Demo Leads</a>
                         </li>
 
+                        {%  if request.user.employee.is_also_tele_caller == "Yes" %}
+                        <li class="slide">
+                            <a href="{% url 'admission:my_lead_list' %}" class="side-menu__item {% if is_my_lead %}active{% endif %}">My Leads</a>
+                        </li>
+
+                        <li class="slide">
+                            <a href="{% url 'admission:public_lead_list' %}" class="side-menu__item {% if is_public_lead %}active{% endif %}">Public Leads</a>
+                        </li>
+                        {% endif %}
 
                     </ul>
                 </li>

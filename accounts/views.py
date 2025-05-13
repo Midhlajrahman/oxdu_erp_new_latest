@@ -5,7 +5,7 @@ from admission.models import Admission
 
 from . import tables
 from .forms import CustomLoginForm
-from .forms import UserForm
+from .forms import UserForm, StudentUserForm
 from .models import User
 from django.contrib.auth.views import LoginView
 from django.http import Http404, HttpResponseRedirect
@@ -106,7 +106,7 @@ class UserCreateView(mixins.HybridCreateView):
 
 class StudentUserCreateView(mixins.HybridCreateView):
     model = User
-    form_class = UserForm
+    form_class = StudentUserForm
     permissions = ("manager", "admin_staff", "branch_staff")
     exclude = None
 

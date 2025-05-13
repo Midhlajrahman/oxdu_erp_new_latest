@@ -132,7 +132,7 @@
                     <Li>
                         <div class="p-3 text-center border-bottom">
                             <a href="#" class="text-center fw-semibold">{{request.user}}</a>
-                            <p class="text-center user-semi-title fs-13 mb-0">{{request.user.usertype}}</p>
+                            <p class="text-center user-semi-title fs-13 mb-0">{{request.user.get_usertype_display}}</p>
                         </div>
                     </Li>
                     {% comment %}

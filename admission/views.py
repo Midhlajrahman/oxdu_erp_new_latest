@@ -356,7 +356,7 @@ class PublicLeadListView(mixins.HybridListView):
     template_name = "admission/enquiry/list.html"
     model = AdmissionEnquiry
     table_class = tables.PublicEnquiryListTable
-    filterset_fields = {'course': ['exact'], 'branch': ['exact'], 'date': ['exact']}
+    filterset_fields = {'city': ['exact'], 'branch': ['exact'], 'date': ['exact']}
     permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller")
     branch_filter = False
 
@@ -373,34 +373,56 @@ class PublicLeadListView(mixins.HybridListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Leads"
-        context["is_enquiry"] = True  
+        context["title"] = "Public Leads"
+        context["is_lead"] = True
+        context["is_public_lead"] = True  
         user_type = self.request.user.usertype
         context["can_add"] = user_type in ("tele_caller",)
         context["new_link"] = reverse_lazy("admission:admission_enquiry_create")    
         return context
 
+
+class MyleadListView(mixins.HybridListView):
+    model = AdmissionEnquiry
+    table_class = tables.AdmissionEnquiryTable
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor")
+    branch_filter = False
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        queryset = queryset.filter(tele_caller=user.employee)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_type = self.request.user.usertype
+
+        context.update({
+            "title": "My Leads",
+            "is_my_lead": True,
+            "can_add": user_type in ("tele_caller",),
+            "new_link": reverse_lazy("admission:admission_enquiry_create"),
+        })
+
+        return context
     
 class AdmissionEnquiryView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
     filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
     permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor")
-    branch_filter = True
+    branch_filter = False
 
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
 
-        if user.usertype == "branch_staff" or user.usertype == "mentor":
+        if user.usertype in ["branch_staff", "mentor"]:
             queryset = queryset.filter(status="demo")
-        elif user.usertype == "tele_caller":
-            try:
-                employee = user.employee
-                queryset = queryset.filter(tele_caller=employee)
-            except Employee.DoesNotExist:
-                queryset = queryset.none()
-
+        else:
+            queryset = queryset.filter(tele_caller=user.employee)
         return queryset
 
     def get_context_data(self, **kwargs):

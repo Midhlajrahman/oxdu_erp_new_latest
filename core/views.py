@@ -1,11 +1,12 @@
 from core import mixins
+from core.pdfview import PDFView
 from datetime import datetime
 from django.db.models import Sum
 from collections import defaultdict
 from branches.models import Branch
 from core.models import Setting
 from branches.tables import BranchTable
-from admission.models import Admission, Attendance, FeeReceipt
+from admission.models import Admission, Attendance, FeeReceipt, AdmissionEnquiry
 from employees.models import Employee
 from masters.models import Batch, Course
 
@@ -160,16 +161,25 @@ class DashboardView(mixins.HybridTemplateView):
             context["student_count"] = students_in_branch.count()
             context["total_balance"] = total_balance
             context["total_credited"] = total_credited
+            context['demo_leads'] = AdmissionEnquiry.objects.filter(status="demo").count()
 
         elif user.usertype == "mentor":
             branch = user.branch 
-
             students_in_branch = Admission.objects.filter(branch=branch)
 
 
             context["branch"] = branch
             context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
             context["student_count"] = students_in_branch.count()
+
+        elif user.usertype == "tele_caller":
+            branch = user.branch 
+            students_in_branch = Admission.objects.filter(branch=branch)
+
+            context['total_my_leads'] = AdmissionEnquiry.objects.filter(tele_caller=self.request.user.employee).count()
+            context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
+            context["student_count"] = students_in_branch.count()
+            context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
 
         return context
     
@@ -245,3 +255,28 @@ class AcademicYearUpdateView(mixins.HybridUpdateView):
 class AcademicYearDeleteView(mixins.HybridDeleteView):
     model = AcademicYear
     permissions = ("is_superuser", "teacher", "branch_staff", )
+
+
+class IDCardView(PDFView):
+    template_name = 'core/id_card.html'
+    pdfkit_options = {
+        "page-height": "3.5433in",
+        "page-width": "1.9685in",
+        "encoding": "UTF-8",
+        "margin-top": "0",
+        "margin-bottom": "0",
+        "margin-left": "0",
+        "margin-right": "0",
+    }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.usertype == "student":
+            instance = get_object_or_404(Admission, user=self.request.user)
+        else:
+            instance = get_object_or_404(Employee, user=self.request.user)
+        context["title"] = "Registration"
+        context["instance"] = instance
+        return context
+    
+    def get_filename(self):
+        return "id_card.pdf"

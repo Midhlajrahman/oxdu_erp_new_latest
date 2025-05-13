@@ -90,6 +90,7 @@ class EmployeeOfficialDataForm(forms.ModelForm):
             "department",
             "designation",
             "course",
+            "is_also_tele_caller",
             "date_of_confirmation",
             "date_of_joining",
             "official_email",

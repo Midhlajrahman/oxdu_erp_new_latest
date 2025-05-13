@@ -48,7 +48,7 @@
 
                 <!-- Start::slide -->
                 <li class="slide ">
-                    <a href="{% url 'admission:admission_enquiry' %}" class="side-menu__item {% if is_syllabus %}active{% endif %}">
+                    <a href="{% url 'admission:my_lead_list' %}" class="side-menu__item {% if is_my_lead %}active{% endif %}">
                         <i class="la la-question-circle side-menu__icon"></i>
                         <span class="side-menu__label">My Leads</span>
                     </a>
@@ -57,7 +57,7 @@
 
                 <!-- Start::slide -->
                 <li class="slide ">
-                    <a href="{% url 'admission:public_lead_list' %}" class="side-menu__item {% if is_syllabus %}active{% endif %}">
+                    <a href="{% url 'admission:public_lead_list' %}" class="side-menu__item {% if is_public_lead %}active{% endif %}">
                         <i class="la la-list-alt side-menu__icon"></i>
                         <span class="side-menu__label">Public Leads</span>
                     </a>

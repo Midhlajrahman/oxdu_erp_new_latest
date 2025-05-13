@@ -17,18 +17,20 @@
       <div class="page-rightheader">
         <div class="btn-list">
             {% if request.user.usertype == "admin_staff" or request.user.is_superuser %}
+
             <!-- Button to trigger file input -->
-            <form method="post" action="{% url 'admission:import_enquiry' %}" enctype="multipart/form-data">
+            <form id="importForm" method="post" action="{% url 'admission:import_enquiry' %}" enctype="multipart/form-data">
               {% csrf_token %}
-              <input type="file" name="file" id="fileInput" style="display: none;" onchange="this.form.submit()" />
+              <input type="file" name="file" id="fileInput" accept=".csv" style="display: none;" />
               
             </form>
-            <button id="delete-unassigned-btn" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Unassigned Leads">
-              <i class="fe fe-trash-2"></i> Delete Unassigned
-            </button>
 
             <button type="button" class="btn btn-light3" onclick="document.getElementById('fileInput').click()" data-bs-toggle="tooltip" data-bs-placement="top" title="Import">
               <i class="fe fe-upload"></i> Import
+            </button>
+            
+            <button id="delete-unassigned-btn" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Unassigned Leads">
+              <i class="fe fe-trash-2"></i> Delete Unassigned
             </button>
 
             <a href="{% static 'app/assets/images/lead.csv' %}" 
@@ -186,6 +188,29 @@
   </div>
 
 
+<!-- Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="previewModalLabel">Preview File</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="filePreview" class="table-responsive">Loading preview...</div>
+        <div id="viewAllWrapper" class="text-center mt-3">
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="viewAllRows()">View All</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="submitImport()">Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {% for new_html in includes %}
   {% include new_html %}
 {% endfor %}
@@ -199,14 +224,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // Get CSRF token from cookie
   function getCookie(name) {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
           const cookies = document.cookie.split(';');
           for (let i = 0; i < cookies.length; i++) {
               const cookie = cookies[i].trim();
-              // Does this cookie string begin with the name we want?
               if (cookie.substring(0, name.length + 1) === (name + '=')) {
                   cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                   break;
@@ -228,6 +251,17 @@
           reverseButtons: true
       }).then((result) => {
           if (result.isConfirmed) {
+              // Show loading spinner
+              Swal.fire({
+                  title: 'Deleting...',
+                  text: 'Please wait while we process your request.',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+
               fetch("{% url 'admission:delete_unassigned_leads' %}", {
                   method: 'POST',
                   headers: {
@@ -248,6 +282,59 @@
       });
   });
 </script>
+
+<script>
+  let fullCSVLines = [];
+  
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.onload = function(event) {
+          const content = event.target.result;
+          fullCSVLines = content.split('\n').filter(line => line.trim() !== ''); // Save for full view
+          renderCSVPreview(fullCSVLines, false); // Preview only first 5
+  
+          // Show modal
+          new bootstrap.Modal(document.getElementById('previewModal')).show();
+      };
+  
+      reader.readAsText(file);
+  });
+  
+  function renderCSVPreview(lines, showAll = false) {
+      if (lines.length === 0) {
+          document.getElementById('filePreview').innerHTML = '<p>No content to preview.</p>';
+          document.getElementById('viewAllWrapper').style.display = 'none';
+          return;
+      }
+  
+      const headers = lines[0].split(',');
+      let html = '<table class="table table-bordered table-sm"><thead>';
+      html += '<tr>' + headers.map(h => `<th>${h.trim()}</th>`).join('') + '</tr></thead><tbody>';
+  
+      const rowsToShow = showAll ? lines.slice(1) : lines.slice(1, 6); // First 5 or all
+      rowsToShow.forEach(line => {
+          const row = line.split(',');
+          html += '<tr>' + row.map(col => `<td>${col.trim()}</td>`).join('') + '</tr>';
+      });
+  
+      html += '</tbody></table>';
+      document.getElementById('filePreview').innerHTML = html;
+  
+      // Show or hide "View All" button
+      document.getElementById('viewAllWrapper').style.display = showAll || lines.length <= 6 ? 'none' : 'block';
+  }
+  
+  function viewAllRows() {
+      renderCSVPreview(fullCSVLines, true);
+  }
+  
+  function submitImport() {
+      document.getElementById('importForm').submit();
+  }
+  </script>
 
 <script>
     $('.submit_btn').click(function(){

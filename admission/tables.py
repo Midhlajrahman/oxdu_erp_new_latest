@@ -54,7 +54,7 @@ class PublicEnquiryListTable(BaseTable):
         template_code='''
             {% if record.tele_caller %}
                 <span class="badge bg-success">Assigned</span>
-            {% elif table.request.user.usertype == "tele_caller" %}
+            {% elif table.request.user.usertype == "tele_caller" or table.request.user.employee.is_also_tele_caller %}
                 <a href="{% url 'admission:add_to_me' record.id %}" class="btn btn-sm btn-danger fw-bold">ADD TO ME</a>
             {% else %}
                 <span class="badge bg-danger text-white">Not Assigned</span>
@@ -63,10 +63,14 @@ class PublicEnquiryListTable(BaseTable):
         verbose_name='Action',
         orderable=False,
     )
+    contact_number = columns.Column(verbose_name="Contact Number")
+    
+    def render_contact_number(self, value):
+        return f"**** **** {value[-4:]}" if value else ""
 
     class Meta:
         model = Admission
-        fields = ("full_name", "contact_number", "created", "action")
+        fields = ("full_name", "contact_number", "city", "created", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
     
 

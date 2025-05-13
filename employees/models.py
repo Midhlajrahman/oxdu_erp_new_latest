@@ -93,6 +93,7 @@ class Employee(BaseModel):
     department = models.ForeignKey("employees.Department", on_delete=models.PROTECT, limit_choices_to={"is_active": True}, null=True)
     designation = models.ForeignKey("employees.Designation", on_delete=models.PROTECT, limit_choices_to={"is_active": True}, null=True)
     course = models.ForeignKey("masters.Course", on_delete=models.PROTECT, limit_choices_to={"is_active": True}, blank=True, null=True)
+    is_also_tele_caller = models.CharField(max_length=128, choices=[("Yes", "Yes"), ("No", "No")], default="No")
 
     status = models.CharField(max_length=120, choices=EMPLOYEE_STATUS_CHOICES, default='Appointed')
     resigned_date = models.DateField(null=True, blank=True)
@@ -100,6 +101,7 @@ class Employee(BaseModel):
     resigned_form = models.FileField(null=True, blank=True, upload_to="resigned-form/")
     termination_date = models.DateField(null=True, blank=True)
     termination_reason = models.CharField(max_length=100, null=True, blank=True)
+
     # Parent Info
     father_name = models.CharField(max_length=128, blank=True, null=True)
     father_mobile = models.CharField(max_length=128, blank=True, null=True)
@@ -117,6 +119,7 @@ class Employee(BaseModel):
     joining_letter = models.FileField(blank=True, null=True, upload_to="employees/doc/")
     agreement_letter = models.FileField(blank=True, null=True, upload_to="employees/doc/")
     experience_letter = models.FileField(blank=True, null=True, upload_to="employees/doc/")
+
     # Residence Info
     type_of_residence = models.CharField(max_length=128, choices=RESIDENCE_CHOICES, blank=True, null=True)
     residence_name = models.CharField(max_length=128, blank=True, null=True)
@@ -127,7 +130,6 @@ class Employee(BaseModel):
     permanent_zip_code = models.CharField(max_length=128, blank=True, null=True)
 
     # Account Info
-
     bank_name = models.CharField(max_length=128, blank=True, null=True)
     account_name = models.CharField(max_length=128, blank=True, null=True)
     account_number = models.CharField("Bank Account Number", max_length=128, blank=True, null=True)

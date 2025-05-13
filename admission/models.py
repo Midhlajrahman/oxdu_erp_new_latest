@@ -63,7 +63,7 @@ class Admission(BaseModel):
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE) 
     first_name = models.CharField(max_length=200,null=True)
     last_name = models.CharField(max_length=200, blank=True, null=True)
-    joining_date = models.DateField(blank=True, null=True)
+    joining_date = models.DateField(null=True)
     date_of_birth = models.DateField(null=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True, null=True)
     blood_group = models.CharField(max_length=20,choices=BLOOD_CHOICES, blank=True, null=True)
@@ -86,7 +86,7 @@ class Admission(BaseModel):
     photo = models.FileField(upload_to="admission/documents/", null=True, blank=True)
     
     course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
-    batch = models.ForeignKey('masters.Batch',on_delete= models.CASCADE,limit_choices_to={"is_active": True}, null=True, blank=True)
+    batch = models.ForeignKey('masters.Batch',on_delete= models.CASCADE,limit_choices_to={"is_active": True}, null=True)
     other_details = models.TextField(blank=True, null=True)
     document = models.FileField(upload_to="admission/documents/", null=True, blank=True)
     signature = models.FileField(upload_to="admission/signature/", null=True, blank=True)
@@ -319,7 +319,7 @@ class FeeReceipt(BaseModel):
 
 
 class AdmissionEnquiry(BaseModel):
-    tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, limit_choices_to={"user__usertype": "tele_caller", "user__is_active": True}, null=True)
+    tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, null=True)
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True)
     course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
     date = models.DateField(null=True)
@@ -345,6 +345,11 @@ class AdmissionEnquiry(BaseModel):
 
     def str(self):
         return f"{self.full_name} - {self.course.name}"
+
+    class Meta:
+        ordering = ['-id']  
+        verbose_name = 'Admission Enquiry'
+        verbose_name_plural = 'Admission Enquiries'
     
     @staticmethod
     def get_list_url():

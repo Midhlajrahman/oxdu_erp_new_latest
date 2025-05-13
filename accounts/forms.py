@@ -22,3 +22,9 @@ class UserForm(BaseForm):
     class Meta:
         model = User
         fields = ("email", "usertype", "password")
+
+
+class StudentUserForm(BaseForm):
+    class Meta:
+        model = User
+        fields = ("email", "password")

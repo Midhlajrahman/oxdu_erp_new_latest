@@ -21,6 +21,7 @@ urlpatterns = [
 
     # enquiry
     path("public-leads/", views.PublicLeadListView.as_view(), name="public_lead_list"),
+    path("my-leads/", views.MyleadListView.as_view(), name="my_lead_list"),
     path("enquiries/", views.AdmissionEnquiryView.as_view(), name="admission_enquiry"),
     path("admission-enquiry/<str:pk>/", views.AdmissionEnquiryDetailView.as_view(), name="admission_enquiry_detail"),
     path("new/admission-enquiry/<int:pk>/", views.AdmissionEnquiryCreateView.as_view(), name="admission_enquiry_create"),

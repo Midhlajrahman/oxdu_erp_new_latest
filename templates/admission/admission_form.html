@@ -50,26 +50,27 @@
                             <div class="col-12">
                                 <form class="form-horizontal" method="post" autocomplete="off" enctype="multipart/form-data" >
                                 {% csrf_token %}
-                                <div class="row">
+                                <div class="row pb-5">
+                                    <h6>Has the student's information already been entered?</h6>
                                     <div class="col-lg-4" id="studentEmailContainer">
                                         <div class="form-group" id="div_id_studentEmail">
-                                            <label for="studentEmail">Enter Student Email Address</label>
+                                            {% comment %} <label for="studentEmail">Enter Student Email Address</label> {% endcomment %}
                                             <input type="text" class="form-control" id="studentEmail" name="studentEmail" placeholder="Enter Your Student Email">
                                         </div>
                                     </div>
                                 
-                                    <div class="col-lg-4 mt-5" id="studentEmailError" style="display: none;">
+                                    <!-- Clear Email Button -->
+                                    <div class="col-lg-4 ">
+                                        <button type="button" id="clearEmailBtn" class="btn btn-secondary" style="display: none;">Clear Email</button>
+                                    </div>
+
+                                    <div class="col-lg-4" id="studentEmailError" style="display: none;">
                                         <p class="text-danger">The Student Email was not found.</p>
                                     </div>
-                                
+
                                     <div class="col-lg-4" id="studentNameContainer" style="display: none;">
                                         <label for="studentName">Student Name</label>
                                         <p id="studentName" class="form-control"></p>
-                                    </div>
-                                
-                                    <!-- Clear Email Button -->
-                                    <div class="col-lg-4 mt-3">
-                                        <button type="button" id="clearEmailBtn" class="btn btn-secondary" style="display: none;">Clear Email</button>
                                     </div>
                                 </div>
 
@@ -191,6 +192,8 @@
                     $('#studentNameContainer, #clearEmailBtn').hide();
                     $('#createStudentBtn').show();
                     $('#studentEmailError').show();
+                    $('#clearEmailBtn').show();
+                    
                 }
             },
             error: function (xhr, status, error) {
