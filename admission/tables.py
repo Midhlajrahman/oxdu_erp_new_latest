@@ -33,17 +33,20 @@ class AdmissionTable(BaseTable):
         
 
 class AdmissionEnquiryTable(BaseTable):
-    created = None
-    full_name = columns.Column(verbose_name="Student",)
+    full_name = columns.Column(verbose_name="Student")
     course = columns.Column(verbose_name="Course")
-    contact_number = columns.Column(verbose_name="Mob")
+    contact_number = columns.TemplateColumn(
+        verbose_name="Mob",
+        template_code='<a href="tel:{{ record.contact_number }}">{{ record.contact_number }}</a>',
+        orderable=False
+    )
     date = columns.Column(verbose_name="Enquiry Date")
     personal_email = columns.Column(verbose_name="Email")
     status = columns.Column(verbose_name="Enquiry Status")
-    
+
     class Meta:
         model = Admission
-        fields = ("date","full_name", "course", "contact_number", "personal_email", "status", "action")
+        fields = ("date", "full_name", "course", "contact_number", "personal_email", "status", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
 
     
