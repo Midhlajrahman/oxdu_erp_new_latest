@@ -1,4 +1,4 @@
-from datetime import date
+from django.core.validators import RegexValidator
 import os
 import uuid
 from django.db.models import Sum
@@ -22,6 +22,12 @@ from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 from datetime import datetime
 
+from admission.utils import send_sms
+
+phone_validator = RegexValidator(
+    regex=r'^91\d{10}$',
+    message='Enter number in international format like 91987654321 (no + or spaces).'
+)
 
 def generate_admission_no(course):
     first_letter = course.name[0].upper() if course and course.name else 'X'
@@ -94,8 +100,8 @@ class Admission(BaseModel):
     # Parent Info
     parent_first_name = models.CharField(max_length=200,null=True,)
     parent_last_name = models.CharField(max_length=200, blank=True, null=True)
-    parent_contact_number = models.CharField(max_length=30, null=True, )
-    parent_whatsapp_number = models.CharField(max_length=30, null=True, )
+    parent_contact_number = models.CharField(max_length=12, null=True, validators=[phone_validator], help_text="Enter Contact number with country code, e.g. 91987654321")
+    parent_whatsapp_number = models.CharField(max_length=12, null=True, validators=[phone_validator],help_text="Enter WhatsApp number with country code, e.g. 91987654321")
     parent_mail_id = models.EmailField(verbose_name="Mail Id", null=True, blank=True)
     
     # finance
@@ -216,6 +222,33 @@ class Attendance(BaseModel):
 
     def __str__(self):
         return f"{self.student.fullname()} - {self.register.date} - {self.status}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new and self.status == 'Absent':
+            phone_number = self.student.parent_whatsapp_number
+            if phone_number:
+                combined_message = (
+                    f"*Oxdu Tech School - Attendance Notification / ഹാജര്‍ അറിയിപ്പ്*\n\n"
+                    
+                    f"*English:*\n"
+                    f"Dear Parent,\n\n"
+                    f"This is to inform you that your child *{self.student.fullname()}* "
+                    f"was marked absent on *{self.register.date.strftime('%B %d, %Y')}*.\n"
+                    f"If there is a valid reason for the absence, kindly inform the office.\n\n"
+                    
+                    f"*Malayalam:*\n"
+                    f"പ്രിയപ്പെട്ട രക്ഷിതാവേ,\n\n"
+                    f"താങ്കളുടെ മകന്‍/മകളായ *{self.student.fullname()}* "
+                    f"*{self.register.date.strftime('%Y-%m-%d')}* തീയതിയില്‍ ഹാജരായിരുന്നില്ല.\n"
+                    f"ആയതിനാൽ യഥാർത്ഥ കാരണം ദയവായി അറിയിക്കുക.\n\n"
+                    
+                    f"Regards,\n"
+                    f"*Oxdu Tech School*"
+                )
+                send_sms(phone_number, combined_message)
 
     def get_absolute_url(self):
         return reverse_lazy("admission:attendance_register_detail", kwargs={"pk": self.pk})

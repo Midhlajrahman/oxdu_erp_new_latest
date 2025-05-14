@@ -120,10 +120,12 @@
                 <!-- Start::header-link|dropdown-toggle -->
                 <a href="javascript:void(0);" class="header-link dropdown-toggle mx-0 w-100" id="mainHeaderProfile" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     <div>
-                        {% if request.user.employee.photo %}
-                        <img src="{{request.user.employee.photo.url}}" alt="img" class="rounded-3 avatar avatar-md">
+                        {% if request.user.usertype == "student" %}
+                            <img src="{{ request.user.student.photo.url|default:default_user_avatar }}" alt="img" class="rounded-3 avatar avatar-md">
+                        {% elif request.user.usertype == "employee" %}
+                            <img src="{{ request.user.employee.photo.url|default:default_user_avatar }}" alt="img" class="rounded-3 avatar avatar-md">
                         {% else %}
-                        <img src="{{default_user_avatar}}" alt="img" class="rounded-3 avatar avatar-md">
+                            <img src="{{ default_user_avatar }}" alt="img" class="rounded-3 avatar avatar-md">
                         {% endif %}
                     </div>
                 </a>
@@ -141,6 +143,10 @@
                     {% comment %} <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:general_settings' %}"><i class="fe fe-settings me-2"></i>Settings</a></li> {% endcomment %}
                     {% if request.user.usertype == "student" %}
                         <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:id_card' %}"><i class="fas fa-id-card me-2"></i>ID Card</a></li>
+                    {% endif %}
+                    
+                    {% if request.user.usertype == "admin_staff" or request.user.is_superuser %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:setting_list' %}"><i class="fas fa-cog me-2"></i>Settings</a></li>
                     {% endif %}
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'auth_password_change' %}"><i class="fe fe-edit-3 me-2"></i>Change Password</a></li>
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'user_sessions:session_list' %}"><i class="fe fe-headphones me-2"></i>My Sessions</a></li>

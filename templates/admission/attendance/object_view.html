@@ -52,6 +52,15 @@
               {% endif %}
               {% endfor %}
               <tr>
+                <td>Starting Time</td>
+                <td> {{object.batch.starting_time}}</td>
+              </tr>
+
+              <tr>
+                <td>Ending Time</td>
+                <td> {{object.batch.ending_time}}</td>
+              </tr>
+              <tr>
                 <td>Full Present</td>
                 <td> {{ object.get_total_present }}/{{object.get_total_attendence}} </td>
               </tr>
@@ -91,7 +100,7 @@
             </thead>
             <tbody>
               {% for i in object.get_attendence %}
-              <tr>
+              <tr class="{% if i.status == "Present" %} table-success {% else %} table-danger {% endif %}" >
                 <td>{{forloop.counter}}</td>
                 <td><a href="{{i.student.get_absolute_url}}">{{i.student}}</a> </td>
                 <td>{{i.status}}</td>

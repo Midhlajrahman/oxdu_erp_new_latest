@@ -41,11 +41,11 @@ def get_default_document_settings():
 
 
 class Setting(BaseModel):
-    branch = models.OneToOneField('branches.Branch', on_delete=models.CASCADE)
-    document_settings = models.JSONField(default=get_default_document_settings, help_text="Stores prefixes and start counts for invoices and purchases.")
+    instance_id = models.CharField(max_length=50, null=True)
+    access_token = models.CharField(max_length=50, null=True)
 
     def __str__(self):
-        return str(self.branch)
+        return str(self.access_token)
 
     class Meta:
         verbose_name = "Settings"

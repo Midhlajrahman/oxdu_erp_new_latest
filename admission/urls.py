@@ -29,8 +29,6 @@ urlpatterns = [
     path("admission-enquiry/<str:pk>/update/", views.AdmissionEnquiryUpdateView.as_view(), name="admission_enquiry_update"),
     path("admission-enquiry/<str:pk>/delete/", views.AdmissionEnquiryDeleteView.as_view(), name="admission_enquiry_delete"),
     path('enquiry/delete-unassigned/', views.DeleteUnassignedLeadsView.as_view(), name='delete_unassigned_leads'),
-
-
     
     #attendance
     path("attendance-registers/", views.AttendanceRegisterListView.as_view(), name="attendance_register_list"),

@@ -145,7 +145,7 @@
                     <select name="batch" id="is_batch" class="form-control" required>
                         <option value="">Choose Batch </option>
                         {% for batch in batches %}
-                            <option value="{{ batch.pk }}">{{ batch.batch_name }}</option>
+                            <option value="{{ batch.pk }}">{{ batch }}</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -11,7 +11,6 @@ from employees.models import Employee
 from masters.models import Batch, Course
 
 from .forms import HomeForm
-from .forms import SettingForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -19,6 +18,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 
 from .models import AcademicYear
+from core.tables import SettingsTable
 
 
 class HomeView(mixins.LoginRequiredMixin, mixins.FormView):
@@ -184,32 +184,53 @@ class DashboardView(mixins.HybridTemplateView):
         return context
     
 
-class GeneralSettings(mixins.HybridUpdateView):
+class Settings(mixins.HybridListView):
     model = Setting
-    template_name = "core/general_settings.html"
-    exclude = None
-    form_class = SettingForm
-
-    def get_object(self):
-        # Fetch the current branch, assuming the branch is passed in the URL or session
-        branch_id = self.request.session.get('branch')  # or self.request.session.get('branch_id')
-        branch = get_object_or_404(Branch, id=branch_id)
-
-        # Fetch the single instance of Setting for the current branch or create one if it doesn't exist
-        obj, created = self.model.objects.get_or_create(branch=branch)
-        return obj
+    permissions = ("is_superuser", "admin_staff",)
+    branch_filter = False
+    table_class = SettingsTable
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "General Settings"
+        context["title"] = "Settings"
+        return context
+
+    
+class SettingsDetailView(mixins.HybridDetailView):
+    model = Setting
+    permissions = ("admin_staff", "is_superuser",)
+
+
+class SettingsCreate(mixins.HybridCreateView):
+    model = Setting
+    fields = ["instance_id", "access_token"]
+    permissions = ("is_superuser", "admin_staff",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Settings"
         return context
 
     def get_success_url(self):
-        return reverse_lazy('core:general_settings')
+        return reverse_lazy('core:setting_list')
 
     def get_success_message(self, cleaned_data):
-        message = "Settings Updated Successfully"
-        return message
+        return "Settings Updated Successfully"
+
+    def form_valid(self, form):
+        Setting.objects.all().delete()
+        return super().form_valid(form)
+
+    
+
+class SettingsUpdateView(mixins.HybridUpdateView):
+    model = Setting
+    permissions = ("is_superuser", "admin_staff", )
+
+
+class SettingsDeleteView(mixins.HybridDeleteView):
+    model = Setting
+    permissions = ("is_superuser", "admin_staff",)
 
 
 class AcademicYearListView(mixins.HybridListView):
@@ -230,12 +251,12 @@ class AcademicYearListView(mixins.HybridListView):
     
 class AcademicYearDetailView(mixins.HybridDetailView):
     model = AcademicYear
-    permissions = ("branch_staff", "teacher", "is_superuser",)
+    permissions = ("branch_staff", "admin_staff", "teacher", "is_superuser",)
     
 
 class AcademicYearCreateView(mixins.HybridCreateView):
     model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", )
+    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff", )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -249,12 +270,12 @@ class AcademicYearCreateView(mixins.HybridCreateView):
 
 class AcademicYearUpdateView(mixins.HybridUpdateView):
     model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", )
+    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff", )
 
 
 class AcademicYearDeleteView(mixins.HybridDeleteView):
     model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", )
+    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff",)
 
 
 class IDCardView(PDFView):

@@ -35,12 +35,12 @@ from core.pdfview import PDFView
 
 from . import tables
 from . import forms
+
 from admission.forms import AttendanceForm, AttendanceUpdateForm, FeeReceiptFormSet, AdmissionEnquiryForm
 # from .forms import AdmissionForm
 
 
 User = get_user_model()
-
 
 @require_POST
 @csrf_protect
@@ -522,13 +522,16 @@ class AttendanceRegisterListView(mixins.HybridListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["batches"] = Batch.objects.filter(is_active=True)
+        if self.request.user.usertype == 'teacher':
+            context["batches"] = Batch.objects.filter(is_active=True, course=self.request.user.employee.course, branch=self.request.user.branch)
+        else:
+            context["batches"] = Batch.objects.filter(is_active=True, branch=self.request.user.branch)
         context["title"] = "Attendance"
         context['is_admission'] = True
         context["is_attendance"] = True  
         context['is_batch_attendance'] = True
         user_type = self.request.user.usertype
-        context["can_add"] = user_type not in ("student",)
+        context["can_add"] = user_type in ("teacher",)
         return context
     
     

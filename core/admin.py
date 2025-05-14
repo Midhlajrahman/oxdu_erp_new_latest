@@ -1,15 +1,7 @@
 from .base import BaseAdmin
 from .models import AcademicYear
 from .models import Link
-from .models import Setting
 from django.contrib import admin
-
-
-@admin.register(Setting)
-class SettingAdmin(BaseAdmin):
-    list_display = ("branch", "document_settings")
-    search_fields = ("branch__name",)
-
 
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):
