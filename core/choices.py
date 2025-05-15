@@ -220,6 +220,7 @@ INVOICE_STATUS_CHOICES = [
 
 ATTENDANCE_STATUS = (
     ('Present','Present'),
+    ('Late','Late'),
     ('Absent','Absent'),
 )
 

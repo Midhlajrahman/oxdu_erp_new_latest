@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django import forms
 from django.forms import inlineformset_factory
 
-from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, ChatSession, Update, PlacementRequest
+from .models import ComplaintRegistration, Course, PDFBookResource, PdfBook, Syllabus, ChatSession, Update, PlacementRequest, Batch
 
 
 class PdfBookForm(forms.ModelForm):
@@ -94,3 +94,9 @@ class PlacementRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["student"].disabled = True
+
+    
+class BatchForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ["course", "batch_name", "academic_year", "description", "starting_time", "ending_time", "starting_date", "ending_date",]

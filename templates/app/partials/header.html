@@ -142,7 +142,7 @@
                     {% endcomment %}
                     {% comment %} <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:general_settings' %}"><i class="fe fe-settings me-2"></i>Settings</a></li> {% endcomment %}
                     {% if request.user.usertype == "student" %}
-                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:id_card' %}"><i class="fas fa-id-card me-2"></i>ID Card</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'core:my_id_card' %}"><i class="fas fa-id-card me-2"></i>ID Card</a></li>
                     {% endif %}
                     
                     {% if request.user.usertype == "admin_staff" or request.user.is_superuser %}

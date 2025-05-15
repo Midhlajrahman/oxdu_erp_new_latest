@@ -10,14 +10,16 @@ from django.urls import reverse_lazy
 class Batch(BaseModel):
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, null=True)
     course =models.ForeignKey("masters.Course", on_delete=models.CASCADE, null=True)
+    academic_year = models.ForeignKey("core.AcademicYear", on_delete=models.CASCADE, null=True)
     batch_name = models.CharField(max_length=120)
-    description = models.TextField(blank=True, null=True)
     starting_time = models.TimeField(blank=True, null=True)
     ending_time = models.TimeField(blank=True, null=True)
-    academic_year = models.ForeignKey("core.AcademicYear", on_delete=models.CASCADE, null=True)
+    starting_date = models.DateField(null=True)
+    ending_date = models.DateField(null=True)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.batch_name} - ({self.course})"
+        return f"{self.batch_name} - {self.course.name} - {self.starting_date}"
 
     @staticmethod
     def get_list_url():

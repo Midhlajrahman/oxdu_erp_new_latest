@@ -94,18 +94,7 @@
                         <li class="slide side-menu__label1">
                             <a href="javascript:void(0);">Masters</a>
                         </li>
-                        {% comment %} <li class="slide">
-                            <a href="{% url 'accounting:account_list' %}" class="side-menu__item">Account Master</a>
-                        </li>
-                        <li class="slide">
-                            <a href="{% url 'accounting:group_master_list' %}" class="side-menu__item">Group Master</a>
-                        </li> {% endcomment %}
-                        <li class="slide">
-                            <a href="{% url 'employees:department_list' %}" class="side-menu__item {% if is_department %}active{% endif %}">Departments</a>
-                        </li>
-                        <li class="slide">
-                            <a href="{% url 'employees:designation_list' %}" class="side-menu__item {% if is_designation %}active{% endif %}">Designations</a>
-                        </li>
+                        
                         <li class="slide">
                             <a href="{% url 'core:academicyear_list' %}" class="side-menu__item {% if is_academic_year %}active{% endif %}">Academic Year</a>
                         </li>

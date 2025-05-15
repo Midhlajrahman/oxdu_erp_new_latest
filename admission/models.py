@@ -145,6 +145,9 @@ class Admission(BaseModel):
 
     def get_syllabus_detail_url(self):
         return reverse_lazy("masters:syllabus_detail", kwargs={"course_pk": self.course.pk, "batch_pk": self.batch.pk})
+
+    def get_id_card_absolute_url(self):
+        return reverse_lazy("core:id_card", kwargs={"pk": self.pk})
     
     @staticmethod
     def get_fee_overview_list_url():
@@ -186,6 +189,7 @@ class AttendanceRegister(BaseModel):
         return f"{self.batch} - {self.date}"
     
     class Meta:
+        ordering = ['-date']
         verbose_name = "Batch Attendance Register"
         verbose_name_plural = "Batch Attendance Registers"
         
@@ -218,6 +222,8 @@ class AttendanceRegister(BaseModel):
 class Attendance(BaseModel):
     register = models.ForeignKey(AttendanceRegister, on_delete=models.CASCADE)
     student = models.ForeignKey(Admission, on_delete=models.CASCADE,limit_choices_to={'is_active': True,})
+    login_time = models.TimeField(null=True,)
+    logout_time = models.TimeField(null=True,)
     status = models.CharField(max_length=30,choices=ATTENDANCE_STATUS)
 
     def __str__(self):

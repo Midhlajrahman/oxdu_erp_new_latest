@@ -112,8 +112,8 @@ def student_syllabus_redirect(request):
 class BatchListView(mixins.HybridListView):
     model = Batch
     table_class = tables.BatchTable
-    filterset_fields = {'course': ['exact'], }
-    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser")
+    filterset_fields = {'course': ['exact'], "starting_date": ['exact'], "ending_date": ['exact'], "starting_time": ['exact'], "ending_time": ['exact'] }
+    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser",)
     
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)

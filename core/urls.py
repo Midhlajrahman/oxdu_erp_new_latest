@@ -22,6 +22,7 @@ urlpatterns = [
     path("academic-year/<str:pk>/delete/", views.AcademicYearDeleteView.as_view(), name="academicyear_delete"),
 
     #ID Card
-    path("id-card/", views.IDCardView.as_view(), name="id_card"),
+    path("id-card/<str:pk>/", views.IDCardView.as_view(), name="id_card"),
+    path("id-card/", views.MyIDCardView.as_view(), name="my_id_card"),
     
 ]

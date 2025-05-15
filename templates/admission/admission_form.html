@@ -101,8 +101,8 @@
     </div>
 </div>
 
-{% include 'employees/partials/department_form_modal.html' %}
-{% include 'employees/partials/designation_form_modal.html' %}
+{% include 'admission/partials/academic_year_form_modal.html' %}
+{% include 'admission/partials/batch_form_modal.html' %}
 
 {% endblock content %}
 
@@ -205,10 +205,10 @@
 
 <script>
     $(document).ready(function () {
-        initializeSelect2WithModal('#id_department', '#department-form-modal',"Search Department");
-        initializeSelect2WithModal('#id_designation', '#designation-form-modal',"Search Designation");
-        handleFormSubmit("#id_department", "#department-form-modal");      
-        handleFormSubmit("#id_designation", "#designation-form-modal");      
+        initializeSelect2WithModal('#id_academic_year', '#academic_year-form-modal',"Search Academi Year");
+        initializeSelect2WithModal('#id_batch', '#batch-form-modal',"Search Batch");
+        handleFormSubmit("#id_academic_year", "#academic_year-form-modal");      
+        handleFormSubmit("#id_batch", "#batch-form-modal");      
     });
 </script>
 

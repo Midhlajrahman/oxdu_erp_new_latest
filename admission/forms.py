@@ -1,6 +1,6 @@
 from core.base import BaseForm
 from django.db import transaction
-from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee, AdmissionEnquiry
+from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee, AdmissionEnquiry, AttendanceRegister
 from django import forms
 from decimal import Decimal
 
@@ -106,13 +106,13 @@ class AdmissionFinancialDataForm(forms.ModelForm):
         return admission
         
 
-class AttendanceForm(forms.ModelForm):
+class AttendanceForm(BaseForm):
     student_name = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
     student_pk = forms.IntegerField(widget=forms.HiddenInput())  
 
     class Meta:
         model = Attendance
-        fields = ('status', )  
+        fields = ('status',)  
         widgets = {
             'status': forms.Select(attrs={'class': 'select form-control', 'required': True}),
         }
@@ -217,3 +217,18 @@ class AdmissionEnquiryForm(forms.ModelForm):
         model = AdmissionEnquiry
         exclude = ('tele_caller',)
         
+
+class AttendanceRegisterForm(forms.ModelForm):
+    starting_time = forms.TimeField(required=False, disabled=True)
+    ending_time = forms.TimeField(required=False, disabled=True)
+
+    class Meta:
+        model = AttendanceRegister
+        exclude = ('branch', 'batch')
+        fields = ('date', 'course', 'starting_time', 'ending_time')
+
+    def __init__(self, *args, batch=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if batch:
+            self.fields['starting_time'].initial = batch.starting_time
+            self.fields['ending_time'].initial = batch.ending_time

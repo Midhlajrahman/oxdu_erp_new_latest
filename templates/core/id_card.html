@@ -18,7 +18,7 @@
             margin: 0;
         }
         .id-card-1{
-            height: 530px;
+            height: 560px;
             width: 300px;
             padding: 0px !important;
             margin: 0px !important;
@@ -28,7 +28,7 @@
             background-position: center;
         }
         .id-card-2{
-            height: 530px;
+            height: 570px;
             width: 300px;
             padding: 0px !important;
             margin: 0px !important;
@@ -67,7 +67,7 @@
             width: 150px;
             position: absolute !important;
             left: 25%;
-            top: 29.2%;
+            top: 30.4%;
             border-radius: 2px;
             background-size: cover;
             background-position: center;
@@ -84,7 +84,11 @@
                 <div class="id-card-img" style="background-image: url('{{ instance.photo.url }}');"></div>
             {% endif %} 
             <p class="fullname" style="top: 68%; left: 35%; width:70%">{{instance.fullname}}</p>
-            <p class="position" style="top: 72%; left: 42%;">{{instance.user.get_usertype_display}}</p>
+            {% if instance.user.usertype == "student" %}
+                <p class="position" style="top: 72%; left: 42%;">{{instance.user.get_usertype_display}}</p>
+            {% else %}
+                <p class="position" style="top: 72%; left: 42%;">{{instance.designation}}</p>
+            {% endif %}
             
         </div>
         
@@ -93,15 +97,15 @@
     <div class="id-card-2">
         <div class="card">
             {% if instance.user.usertype == "student" %}
-               <p class="id-no" style="top: 15.5%; left: 12%;">{{instance.admission_number}}</p>
+               <p class="id-no" style="top: 17.5%; left: 12%;">{{instance.admission_number}}</p>
             {% else %}
-                <p class="id-no" style="top: 15.5%; left: 12%;">{{instance.employee_id}}</p>
+                <p class="id-no" style="top: 17.5%; left: 12%;">{{instance.employee_id}}</p>
             {% endif %}
-            <p class="id-no" style="top: 25%; left: 12%;">{{instance.date_of_birth}}</p>
-            <p class="id-no" style="top: 33.5%; left: 12%;">{{instance.contact_number}}</p>
-            <p class="id-no" style="top: 42%; left: 12%;">{{instance.parent_contact_number}}</p>
-            <p class="id-no" style="top: 50.2%; left: 12%;">{{instance.get_blood_group_display}}</p>
-            <p class="id-no" style="top: 56%; left: 23%; width: 60%; text-align: center;">{{instance.branch.get_address}}</p>
+            <p class="id-no" style="top: 26.5%; left: 12%;">{{instance.date_of_birth}}</p>
+            <p class="id-no" style="top: 34.5%; left: 12%;">{{instance.contact_number}}</p>
+            <p class="id-no" style="top: 42.5%; left: 12%;">{{instance.parent_contact_number}}</p>
+            <p class="id-no" style="top: 50.8%; left: 12%;">{{instance.get_blood_group_display}}</p>
+            <p class="id-no" style="top: 56%; left: 20%; display: flex; justify-content: center; width: 60%; text-align: center; font-size: 10px; line-height: 18px;">{{instance.branch.get_address}}</p>
             
         </div>
         

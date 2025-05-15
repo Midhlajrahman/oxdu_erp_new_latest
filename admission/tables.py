@@ -26,9 +26,23 @@ class AdmissionTable(BaseTable):
         verbose_name="Status"
     )
 
+    id_card = tables.TemplateColumn(
+        template_code="""
+        {% if request.user.is_superuser or request.user.usertype == 'admin_staff' %}
+            <a href="{{ record.get_id_card_absolute_url }}" 
+            class="btn btn-sm btn-outline-success px-3 shadow-sm d-inline-flex align-items-center"
+            title="Download ID Card">
+            <i class="bi bi-person-badge-fill me-1"></i> ID Card
+            </a>
+        {% endif %}
+        """,
+        verbose_name="ID Card",
+        orderable=False
+    )
+
     class Meta:
         model = Admission
-        fields = ("admission_number","admission_date","fullname", "course", "contact_number", "is_active", "action")
+        fields = ("admission_number","admission_date","fullname", "course", "contact_number", "is_active", "action", "id_card")
         attrs = {"class": "table star-student table-hover table-bordered"}
         
 

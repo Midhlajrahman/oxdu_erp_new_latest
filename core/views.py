@@ -278,17 +278,18 @@ class AcademicYearDeleteView(mixins.HybridDeleteView):
     permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff",)
 
 
-class IDCardView(PDFView):
-    template_name = 'core/id_card.html'
+class MyIDCardView(PDFView):
+    template_name = 'core/student_id_card.html'
     pdfkit_options = {
-        "page-height": "3.5433in",
-        "page-width": "1.9685in",
+        "page-height": "3.534in",
+        "page-width": "1.9690in",
         "encoding": "UTF-8",
         "margin-top": "0",
         "margin-bottom": "0",
         "margin-left": "0",
         "margin-right": "0",
     }
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.usertype == "student":
@@ -298,6 +299,42 @@ class IDCardView(PDFView):
         context["title"] = "Registration"
         context["instance"] = instance
         return context
-    
+
+    def get_filename(self):
+        return "id_card.pdf"
+
+
+class IDCardView(PDFView):
+    template_name = 'core/id_card.html'
+    pdfkit_options = {
+        "page-height": "3.534in",
+        "page-width": "1.9690in",
+        "encoding": "UTF-8",
+        "margin-top": "0",
+        "margin-bottom": "0",
+        "margin-left": "0",
+        "margin-right": "0",
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs.get("pk")
+
+        if pk:
+            if self.request.user.usertype == "student":
+                instance = get_object_or_404(Admission, pk=pk)
+            else:
+                instance = get_object_or_404(Employee, pk=pk)
+
+        else:
+            if self.request.user.usertype == "student":
+                instance = get_object_or_404(Admission, user=self.request.user)
+            else:
+                instance = get_object_or_404(Employee, user=self.request.user)
+
+        context["title"] = "Registration"
+        context["instance"] = instance
+        return context
+
     def get_filename(self):
         return "id_card.pdf"

@@ -6,9 +6,10 @@ from .models import Batch, Course, PDFBookResource, PdfBook, ComplaintRegistrati
 
 
 class BatchTable(BaseTable):
+    created = None
     class Meta(BaseTable.Meta):
         model = Batch
-        fields = ("branch", "batch_name", "course", "starting_time", "ending_time", )
+        fields = ("branch", "batch_name", "course", "starting_date", "ending_date", "starting_time", "ending_time", )
         
     
 class CourseTable(BaseTable):

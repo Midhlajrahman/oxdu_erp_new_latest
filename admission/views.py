@@ -28,10 +28,11 @@ from core import mixins
 
 from admission .models import Admission, Attendance, AttendanceRegister, FeeReceipt, AdmissionEnquiry
 from masters.models import Batch, Course
+from masters.forms import BatchForm
 from employees.models import Employee
 from branches.models import Branch
 from core.pdfview import PDFView
-
+from core.forms import AcademicYearForm
 
 from . import tables
 from . import forms
@@ -316,6 +317,8 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
         context['info_type_urls'] = urls
         context[f"is_{info_type}"] = True
         context["is_admission"] = True
+        context['academic_year_form'] = AcademicYearForm(self.request.POST or None)
+        context['batch_form'] = BatchForm(self.request.POST or None)
         return context
 
     def get_success_url(self):
@@ -517,8 +520,20 @@ class AttendanceRegisterListView(mixins.HybridListView):
     template_name = 'admission/attendance/list.html'
     
     def get_queryset(self):
-        user = self.request.user 
-        return AttendanceRegister.objects.filter(branch=user.branch)
+        user = self.request.user
+        branch = self.request.session.get('branch', getattr(user, 'branch', None))
+
+        if user.usertype == 'admin_staff' or user.is_superuser:
+            return AttendanceRegister.objects.filter(branch=branch)
+
+        elif user.usertype == 'teacher':
+            if hasattr(user, 'employee'):
+                employee = user.employee
+                teacher_courses = Course.objects.filter(employee=employee)
+                if teacher_courses.exists():
+                    return AttendanceRegister.objects.filter(branch=branch, course__in=teacher_courses)
+        
+        return AttendanceRegister.objects.filter(branch=branch)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -549,14 +564,14 @@ class AttendanceRegisterDetailView(mixins.HybridDetailView):
 class AttendanceRegisterCreateView(mixins.HybridCreateView):
     model = AttendanceRegister
     permissions = ()
-    exclude = ("batch", "branch",)
+    form_class = forms.AttendanceRegisterForm
     template_name = "admission/attendance/object_form.html"
 
     def get_form(self):
-        form = super().get_form()
+        form = self.form_class(**self.get_form_kwargs())
         form.fields['date'].initial = datetime.date.today()
-        
-        user = self.request.user 
+
+        user = self.request.user
 
         if user.usertype == 'teacher':
             try:
@@ -566,8 +581,6 @@ class AttendanceRegisterCreateView(mixins.HybridCreateView):
                 if teacher_courses.exists():
                     form.fields['course'].queryset = teacher_courses
                     form.fields['course'].initial = teacher_courses.first()  
-                    
-                
             except AttributeError:
                 pass
         else:
@@ -652,6 +665,12 @@ class AttendanceRegisterCreateView(mixins.HybridCreateView):
             return self.form_invalid(form)
 
         return HttpResponseRedirect(self.get_success_url())
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        batch = Batch.objects.get(pk=self.kwargs['pk'])
+        kwargs['batch'] = batch
+        return kwargs
     
     def get_success_url(self):
         return reverse('admission:attendance_register_list')
