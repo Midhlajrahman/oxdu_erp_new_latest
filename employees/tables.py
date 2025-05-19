@@ -13,7 +13,7 @@ class EmployeeTable(BaseTable):
 
     class Meta(BaseTable.Meta):
         model = Employee
-        fields = ("employee_id", "fullname", "mobile", "department", "designation")
+        fields = ("employee_id", "branch", "fullname", "mobile", "department", "designation")
 
 
 class PartnerTable(BaseTable):

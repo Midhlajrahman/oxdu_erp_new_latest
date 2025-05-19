@@ -2,7 +2,6 @@ import operator
 import re
 from functools import reduce
 
-from core.models import AcademicYear
 from branches.models import Branch
 
 from django.contrib import messages
@@ -70,23 +69,6 @@ class CustomLoginRequiredMixin(LoginRequiredMixin):
 
         return super().dispatch(request, *args, **kwargs)
 
-class AcademicYearBranchSessionMixin:
-    def dispatch(self, request, *args, **kwargs):
-        # Check if the user is authenticated
-        if not request.user.is_authenticated:
-            return redirect(reverse_lazy("auth_login"))
-
-        academic_year = request.session.get('academic_year')
-        branch = request.session.get('branch')
-
-        # Redirect to core:home with a message if academic_year or branch is missing
-        if not academic_year or not branch:
-            messages.warning(request, "Please select an academic year and branch to proceed.")
-            return redirect(reverse_lazy("core:home"))
-
-        # Proceed with the original dispatch method
-        return super().dispatch(request, *args, **kwargs)
-
 
 class CustomModelFormMixin:
     exclude = None
@@ -100,7 +82,7 @@ class CustomModelFormMixin:
         return super().get_form_class()
 
 
-class HybridDetailView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, DetailView,):
+class HybridDetailView(CustomLoginRequiredMixin, DetailView,):
     template_name = "app/common/object_view.html"
 
     def get_context_data(self, **kwargs):
@@ -112,10 +94,9 @@ class HybridDetailView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin,
         return context
 
 
-class HybridCreateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMessageMixin, CreateView):
+class HybridCreateView(CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMessageMixin, CreateView):
     exclude = ("creator","branch")
     template_name = "app/common/object_form.html"
-    academic_year_field = "academic_year"
     branch_field = "branch"
     inline_formset = None
 
@@ -128,7 +109,7 @@ class HybridCreateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin,
     def form_valid(self, form):
         form.instance.creator = self.request.user
 
-        for field in [self.academic_year_field, self.branch_field]:
+        for field in [self.branch_field]:
             if hasattr(form.instance, field):
                 setattr(form.instance, field, getattr(self, f'get_{field}')())
 
@@ -184,18 +165,13 @@ class HybridCreateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin,
                     field.queryset = active_objects
         return form
 
-    def get_academic_year(self):
-        academic_year_id = self.request.session.get('academic_year')
-        loged_academic_year = AcademicYear.objects.filter(id=academic_year_id).first() if academic_year_id else None
-        return loged_academic_year
-
     def get_branch(self):
         branch_id = self.request.session.get('branch')
         loged_branch = Branch.objects.filter(id=branch_id).first() if branch_id else None
         return loged_branch
 
 
-class HybridUpdateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMessageMixin, UpdateView):
+class HybridUpdateView(CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMessageMixin, UpdateView):
     exclude = ("creator","branch")
     template_name = "app/common/object_form.html"
     inline_formset = None
@@ -232,14 +208,14 @@ class HybridUpdateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin,
         return Branch.objects.filter(id=self.request.session.get('branch')).first()
 
 
-class HybridDeleteView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, DeleteView,):
+class HybridDeleteView(CustomLoginRequiredMixin, DeleteView,):
     template_name = "app/common/confirm_delete.html"
 
     def get_success_url(self):
         return self.object.get_list_url()
 
 
-class HybridListView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, ExportMixin, SingleTableMixin, FilterView, ListView):
+class HybridListView(CustomLoginRequiredMixin, ExportMixin, SingleTableMixin, FilterView, ListView):
     template_name = "app/common/object_list.html"
     table_pagination = {"per_page": 50}
     branch_filter = True
@@ -266,10 +242,13 @@ class HybridListView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, E
     def get_queryset(self):
         queryset = super().get_queryset()
         branch_id = self.request.session.get('branch')
+        user = self.request.user
+
         if self.branch_filter and branch_id:
-            branch = Branch.objects.get(id=branch_id)
-            queryset = queryset.filter(**{self.branch_field_name: branch})
-        # Apply search filter dynamically
+            if not (user.is_superuser or getattr(user, 'usertype', None) == 'admin staff'):
+                branch = Branch.objects.get(id=branch_id)
+                queryset = queryset.filter(**{self.branch_field_name: branch})
+
         self.setup_search_fields()
         search_fields = getattr(self, "search_fields", None)
         if search_fields:
@@ -277,8 +256,8 @@ class HybridListView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, E
             if query:
                 q_list = [Q(**{f"{field}__icontains": query}) for field in search_fields]
                 queryset = queryset.filter(reduce(operator.or_, q_list))
+
         try:
-            queryset.filter(is_active=True)
             return queryset.filter(is_active=True)
         except FieldError:
             return queryset
@@ -322,17 +301,17 @@ class HybridListView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, E
 
     
 
-class HybridFormView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, FormView):
+class HybridFormView(CustomLoginRequiredMixin, FormView):
     pass
 
 
-class HybridTemplateView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, TemplateView):
+class HybridTemplateView(CustomLoginRequiredMixin, TemplateView):
     template_name = "app/common/object_view.html"
 
 
-class HybridView(AcademicYearBranchSessionMixin, CustomLoginRequiredMixin, View):
+class HybridView(CustomLoginRequiredMixin, View):
     pass
 
 
-class OpenView(AcademicYearBranchSessionMixin, TemplateView):
+class OpenView(TemplateView):
     pass

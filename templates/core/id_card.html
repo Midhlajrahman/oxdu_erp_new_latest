@@ -8,6 +8,7 @@
     <title>ID CARD</title>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Metrophobic&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
         body{
             padding: 0px !important;
             margin: 0px !important;
@@ -16,25 +17,29 @@
         *{
             padding: 0;
             margin: 0;
+            font-family: "Outfit", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 900;
+            font-style: normal;
         }
         .id-card-1{
-            height: 560px;
-            width: 300px;
+            height: 640px;
+            width: 100%;
             padding: 0px !important;
             margin: 0px !important;
-            background-image: url("{% static 'app/assets/images/id-card/student-id-card-1.png'%}");
+            background-image: url("{% static 'app/assets/images/id-card/id_card_1.png'%}");
             background-repeat: no-repeat;
-            background-size: contain;
+            background-size: cover;
             background-position: center;
         }
         .id-card-2{
-            height: 570px;
-            width: 300px;
+            height: 612px;
+            width: 350px;
             padding: 0px !important;
             margin: 0px !important;
-            background-image: url("{% static 'app/assets/images/id-card/student-id-card-2.png'%}");
+            background-image: url("{% static 'app/assets/images/id-card/id_card_2.png'%}");
             background-repeat: no-repeat;
-            background-size: contain;
+            background-size: cover;
             background-position: center;
         }
        
@@ -47,27 +52,30 @@
         
         .position{
             position: absolute;
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 500;
+            text-transform: uppercase;
+            
         }
         
         .fullname{
             position: absolute;
-            font-weight: 600;
-            font-size: 15px;
+            font-weight: 800;
+            font-size: 20px;
+            text-transform: uppercase;
         }
         .id-no{
             position: absolute;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 17px;
             color: gray;
         }
         .id-card-img {
-            height: 178px;
-            width: 150px;
+            height: 345px;
+            width: 308px;
             position: absolute !important;
-            left: 25%;
-            top: 30.4%;
+            left: 18%;
+            top: 43%;
             border-radius: 2px;
             background-size: cover;
             background-position: center;
@@ -81,13 +89,13 @@
     <div class="id-card-1">
         <div class="card">
             {% if instance.photo %}
-                <div class="id-card-img" style="background-image: url('{{ instance.photo.url }}');"></div>
+                <div class="id-card-img" style="background-image: url('{{ photo_url }}');"></div>
             {% endif %} 
-            <p class="fullname" style="top: 68%; left: 35%; width:70%">{{instance.fullname}}</p>
+            <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname}}</p>
             {% if instance.user.usertype == "student" %}
-                <p class="position" style="top: 72%; left: 42%;">{{instance.user.get_usertype_display}}</p>
+                <p class="position" style="top: 74%; left: 38.5%;">{{instance.user.get_usertype_display}}</p>
             {% else %}
-                <p class="position" style="top: 72%; left: 42%;">{{instance.designation}}</p>
+                <p class="position" style="top: 74%; left: 38%;">{{instance.designation}}</p>
             {% endif %}
             
         </div>
@@ -97,16 +105,15 @@
     <div class="id-card-2">
         <div class="card">
             {% if instance.user.usertype == "student" %}
-               <p class="id-no" style="top: 17.5%; left: 12%;">{{instance.admission_number}}</p>
+               <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.admission_number}}</p>
             {% else %}
-                <p class="id-no" style="top: 17.5%; left: 12%;">{{instance.employee_id}}</p>
+                <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.employee_id}}</p>
             {% endif %}
-            <p class="id-no" style="top: 26.5%; left: 12%;">{{instance.date_of_birth}}</p>
-            <p class="id-no" style="top: 34.5%; left: 12%;">{{instance.contact_number}}</p>
-            <p class="id-no" style="top: 42.5%; left: 12%;">{{instance.parent_contact_number}}</p>
-            <p class="id-no" style="top: 50.8%; left: 12%;">{{instance.get_blood_group_display}}</p>
-            <p class="id-no" style="top: 56%; left: 20%; display: flex; justify-content: center; width: 60%; text-align: center; font-size: 10px; line-height: 18px;">{{instance.branch.get_address}}</p>
-            
+            <p class="id-no" style="top: 21.3%; left: 8%;">{{instance.date_of_birth|date:"d/Y/m"}}</p>
+            <p class="id-no" style="top: 30.8%; left: 8%;">{{instance.mobile}}</p>
+            <p class="id-no" style="top: 41%; left: 8%;">{{instance.guardian_mobile}}</p>
+            <p class="id-no" style="top: 50%; left: 8%;">{{instance.get_blood_group_display}}</p>
+            <p class="id-no" style="top: 59%; left: 15%; display: flex; justify-content: center; width: 70%; text-align: center; font-size: 13px; line-height: 18px;">{{instance.branch.get_address}}</p>
         </div>
         
     </div>

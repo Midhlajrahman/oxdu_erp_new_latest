@@ -1,11 +1,6 @@
 from .base import BaseAdmin
-from .models import AcademicYear
 from .models import Link
 from django.contrib import admin
-
-@admin.register(AcademicYear)
-class AcademicYearAdmin(admin.ModelAdmin):
-    list_display = ("__str__",)
 
 
 @admin.register(Link)

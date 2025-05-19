@@ -64,7 +64,6 @@ class AdmissionOfficialDataForm(forms.ModelForm):
             "is_active",
             "joining_date",
             "admission_date",
-            "academic_year",
             "course",
             "batch",
             "other_details",
@@ -161,7 +160,7 @@ class RegistrationForm(forms.ModelForm):
             "first_name", "last_name", "home_address", "contact_number", 
             "whatsapp_number", "joining_date", "date_of_birth", "city", "district", "state", "pin_code", "gender", "religion", "blood_group", 
             "personal_email", "parent_first_name", "parent_last_name", "parent_contact_number", 
-            "parent_whatsapp_number", "parent_mail_id", "photo", "branch", "course", "batch", "academic_year", "qualifications", "document", "signature",
+            "parent_whatsapp_number", "parent_mail_id", "photo", "branch", "course", "batch", "qualifications", "document", "signature",
         )
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter First Name", }),
@@ -188,7 +187,6 @@ class RegistrationForm(forms.ModelForm):
             "branch" : forms.Select(attrs={"class": "form-control"}),
             "course": forms.Select(attrs={"class": "form-control"}),
             "batch": forms.Select(attrs={"class": "form-control"}),
-            "academic_year": forms.Select(attrs={"class": "form-control"}),
             "qualifications": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter Education Qualification"}),
             "document" : forms.FileInput(attrs={"class": "form-control form-control-file"}),
             "signature" : forms.FileInput(attrs={"class": "form-control form-control-file"}),
@@ -205,7 +203,7 @@ class RegistrationForm(forms.ModelForm):
         "state", "pin_code", "gender", "religion", "blood_group", "personal_email",
         "parent_first_name", "parent_last_name", "parent_contact_number",
         "parent_whatsapp_number", "parent_mail_id", "photo", "branch", "course",
-        "batch", "academic_year", "qualifications", "document", "signature", "password"
+        "batch", "qualifications", "document", "signature", "password"
         ]
         for field in required_fields:
             self.fields[field].required = True

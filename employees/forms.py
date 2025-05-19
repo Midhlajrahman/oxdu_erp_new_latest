@@ -86,6 +86,7 @@ class EmployeeOfficialDataForm(forms.ModelForm):
         model = Employee
         fields = (
             "is_active",
+            "branch",
             "employee_id",
             "department",
             "designation",

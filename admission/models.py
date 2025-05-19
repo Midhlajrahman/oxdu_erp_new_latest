@@ -88,7 +88,6 @@ class Admission(BaseModel):
     
     admission_number = models.CharField(max_length=10, null=True, blank=True)
     admission_date = models.DateField(default=timezone.now)
-    academic_year = models.ForeignKey("core.AcademicYear", on_delete=models.CASCADE,null=True,)
     photo = models.FileField(upload_to="admission/documents/", null=True, blank=True)
     
     course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
@@ -172,8 +171,6 @@ class Admission(BaseModel):
     def get_balance_amount(self):
         total_paid = FeeReceipt.objects.filter(student=self).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
         return self.course.fees - total_paid
-    
-    
     
     def get_fee(self):
         return FeeStructure.objects.filter(course=self.course)

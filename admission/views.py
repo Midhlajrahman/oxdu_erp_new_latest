@@ -32,7 +32,6 @@ from masters.forms import BatchForm
 from employees.models import Employee
 from branches.models import Branch
 from core.pdfview import PDFView
-from core.forms import AcademicYearForm
 
 from . import tables
 from . import forms
@@ -194,7 +193,7 @@ class AdmissionListView(mixins.HybridListView):
     model = Admission
     table_class = tables.AdmissionTable
     filterset_fields = {'course': ['exact'], "branch": ['exact'], "batch": ['exact'], "admission_number": ['exact'], "admission_date": ['exact']}
-    permissions = ("branch_staff", "teacher", "admin_staff" "is_superuser", "mentor",)
+    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser", "mentor",)
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -317,7 +316,6 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
         context['info_type_urls'] = urls
         context[f"is_{info_type}"] = True
         context["is_admission"] = True
-        context['academic_year_form'] = AcademicYearForm(self.request.POST or None)
         context['batch_form'] = BatchForm(self.request.POST or None)
         return context
 
@@ -424,8 +422,10 @@ class AdmissionEnquiryView(mixins.HybridListView):
 
         if user.usertype in ["branch_staff", "mentor"]:
             queryset = queryset.filter(status="demo")
-        else:
+        elif user.usertype == "tele_caller":
             queryset = queryset.filter(tele_caller=user.employee)
+        elif user.usertype == "admin_staff" or user.is_superuser:
+            queryset = queryset.filter(tele_caller__isnull=False)
         return queryset
 
     def get_context_data(self, **kwargs):

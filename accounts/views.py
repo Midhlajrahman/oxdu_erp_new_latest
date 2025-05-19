@@ -19,9 +19,7 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         super().form_valid(form)
-        academic_year = form.cleaned_data.get('academic_year')
         branch = form.cleaned_data.get('branch')
-        self.request.session['academic_year'] = academic_year.id
         self.request.session['branch'] = branch.id
         return HttpResponseRedirect(self.get_success_url())
 

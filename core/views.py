@@ -1,7 +1,13 @@
 from core import mixins
+from django.db.models import Q
+from django.db.models import Count
+from django.core.files.storage import default_storage
 from core.pdfview import PDFView
 from datetime import datetime
 from django.db.models import Sum
+from django.conf import settings
+from django.template import loader
+from django.test import override_settings
 from collections import defaultdict
 from branches.models import Branch
 from core.models import Setting
@@ -17,43 +23,43 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 
-from .models import AcademicYear
 from core.tables import SettingsTable
 
+from .utils import remove_bg
 
-class HomeView(mixins.LoginRequiredMixin, mixins.FormView):
-    template_name = "core/home.html"
-    form_class = HomeForm
-    success_url = reverse_lazy('core:dashboard')
+# class HomeView(mixins.LoginRequiredMixin, mixins.FormView):
+#     template_name = "core/home.html"
+#     form_class = HomeForm
+#     success_url = reverse_lazy('core:dashboard')
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        if not user.is_superuser:
-            branch = user.branch
-            academic_year = HomeForm.base_fields['academic_year'].queryset.first()
+#     def get(self, request, *args, **kwargs):
+#         user = request.user
+#         if not user.is_superuser:
+#             branch = user.branch
+#             academic_year = HomeForm.base_fields['academic_year'].queryset.first()
 
-            if branch and academic_year:
-                request.session['branch'] = branch.id
-                request.session['academic_year'] = academic_year.id
-                return redirect(self.success_url)
+#             if branch and academic_year:
+#                 request.session['branch'] = branch.id
+#                 request.session['academic_year'] = academic_year.id
+#                 return redirect(self.success_url)
 
-        return super().get(request, *args, **kwargs)
+#         return super().get(request, *args, **kwargs)
 
-    def get_form(self, *args, **kwargs):
-        user = self.request.user
-        form = super().get_form(*args, **kwargs)
-        if not user.is_superuser:
-            form.fields['branch'].initial = user.branch
-            form.fields['branch'].queryset = form.fields['branch'].queryset.filter(id=user.branch.id)
-        return form
+#     def get_form(self, *args, **kwargs):
+#         user = self.request.user
+#         form = super().get_form(*args, **kwargs)
+#         if not user.is_superuser:
+#             form.fields['branch'].initial = user.branch
+#             form.fields['branch'].queryset = form.fields['branch'].queryset.filter(id=user.branch.id)
+#         return form
 
-    def form_valid(self, form):
-        self.request.session['branch'] = form.cleaned_data['branch'].id
-        self.request.session['academic_year'] = form.cleaned_data['academic_year'].id
-        return super().form_valid(form)
+#     def form_valid(self, form):
+#         self.request.session['branch'] = form.cleaned_data['branch'].id
+#         self.request.session['academic_year'] = form.cleaned_data['academic_year'].id
+#         return super().form_valid(form)
 
 
-class DashboardView(mixins.HybridTemplateView):
+class HomeView(mixins.HybridTemplateView):
     template_name = "core/dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -133,13 +139,42 @@ class DashboardView(mixins.HybridTemplateView):
                 context["student_count"] = student_list.count()
                 context["months"] = months
                 context["batches"] = Batch.objects.all()
-                context["academic_years"] = AcademicYear.objects.all()
         
         elif user.is_superuser or user.usertype == "admin_staff":
-            context["branch_count"] = Branch.objects.count()
+            context["branch_count"] = Branch.objects.filter(is_active=True).count() or 0
             context["total_employee_count"] = Employee.objects.count()
             context["total_student_count"] = Admission.objects.count()
             context["total_course_count"] = Course.objects.count()
+
+            branch_infos = Branch.objects.filter(is_active=True).annotate(
+                student_count=Count("admission", distinct=True),
+                employee_count=Count("employee", distinct=True),
+            )
+
+            branch_infos = list(branch_infos)
+
+            for branch in branch_infos:
+                students = Admission.objects.filter(branch=branch)
+
+                total_pending_amount = 0
+                total_fee_paid = 0
+
+                for student in students:
+                    total_paid = FeeReceipt.objects.filter(student=student).aggregate(
+                        total=Sum("amount")
+                    )["total"] or 0
+                    
+                    total_fee_paid += total_paid
+
+                    pending_amount = student.course.fees - total_paid
+                    if pending_amount > 0:
+                        total_pending_amount += pending_amount
+
+                branch.pending_fee_amount = total_pending_amount
+                branch.total_fee_paid = total_fee_paid
+
+            context["branch_infos"] = branch_infos
+
             
         elif user.usertype == "branch_staff":
             branch = user.branch 
@@ -182,7 +217,7 @@ class DashboardView(mixins.HybridTemplateView):
             context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
 
         return context
-    
+
 
 class Settings(mixins.HybridListView):
     model = Setting
@@ -233,79 +268,7 @@ class SettingsDeleteView(mixins.HybridDeleteView):
     permissions = ("is_superuser", "admin_staff",)
 
 
-class AcademicYearListView(mixins.HybridListView):
-    model = AcademicYear
-    permissions = ("branch_staff", "teacher", "admin_staff", "is_superuser")
-    branch_filter = False  
-    
-    def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["is_master"] = True
-        context["is_academic_year"] = True
-        context["can_add"] = True
-        context["new_link"] = reverse_lazy("core:academicyear_create")
-        return context
-    
-class AcademicYearDetailView(mixins.HybridDetailView):
-    model = AcademicYear
-    permissions = ("branch_staff", "admin_staff", "teacher", "is_superuser",)
-    
-
-class AcademicYearCreateView(mixins.HybridCreateView):
-    model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff", )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "New Academic Year"
-        return context
-
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
-    
-
-class AcademicYearUpdateView(mixins.HybridUpdateView):
-    model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff", )
-
-
-class AcademicYearDeleteView(mixins.HybridDeleteView):
-    model = AcademicYear
-    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff",)
-
-
-class MyIDCardView(PDFView):
-    template_name = 'core/student_id_card.html'
-    pdfkit_options = {
-        "page-height": "3.534in",
-        "page-width": "1.9690in",
-        "encoding": "UTF-8",
-        "margin-top": "0",
-        "margin-bottom": "0",
-        "margin-left": "0",
-        "margin-right": "0",
-    }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.usertype == "student":
-            instance = get_object_or_404(Admission, user=self.request.user)
-        else:
-            instance = get_object_or_404(Employee, user=self.request.user)
-        context["title"] = "Registration"
-        context["instance"] = instance
-        return context
-
-    def get_filename(self):
-        return "id_card.pdf"
-
-
 class IDCardView(PDFView):
-    template_name = 'core/id_card.html'
     pdfkit_options = {
         "page-height": "3.534in",
         "page-width": "1.9690in",
@@ -315,26 +278,45 @@ class IDCardView(PDFView):
         "margin-left": "0",
         "margin-right": "0",
     }
+
+    def get_template_names(self):
+        if self.request.user.usertype == "student":
+            return "core/student_id_card.html"
+        return "core/id_card.html"
+        
+    def render_html(self, *args, **kwargs):
+        static_url = "%s://%s%s" % (self.request.scheme, self.request.get_host(), settings.STATIC_URL)
+        media_url = "%s://%s%s" % (self.request.scheme, self.request.get_host(), settings.MEDIA_URL)
+
+        with override_settings(STATIC_URL=static_url, MEDIA_URL=media_url):
+            template = loader.get_template(self.get_template_names())
+            context = self.get_context_data(*args, **kwargs)
+            return template.render(context)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get("pk")
 
         if pk:
-            if self.request.user.usertype == "student":
-                instance = get_object_or_404(Admission, pk=pk)
-            else:
-                instance = get_object_or_404(Employee, pk=pk)
-
+            instance = get_object_or_404(Admission, pk=pk) if self.request.user.usertype == "student" else get_object_or_404(Employee, pk=pk)
         else:
-            if self.request.user.usertype == "student":
-                instance = get_object_or_404(Admission, user=self.request.user)
-            else:
-                instance = get_object_or_404(Employee, user=self.request.user)
+            instance = get_object_or_404(Admission, user=self.request.user) if self.request.user.usertype == "student" else get_object_or_404(Employee, user=self.request.user)
 
-        context["title"] = "Registration"
+        context["title"] = "Id Card"
         context["instance"] = instance
+
+        if self.request.user.usertype != "student" and instance.photo:
+            try:
+                processed_path = remove_bg(instance.photo.path)
+                context["photo_url"] = default_storage.url(processed_path)
+            except Exception as e:
+                print(f"Error removing background: {e}")
+                context["photo_url"] = instance.photo.url 
+        else:
+            context["photo_url"] = instance.photo.url if instance.photo else ""
+
         return context
 
     def get_filename(self):
         return "id_card.pdf"
+

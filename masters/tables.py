@@ -60,7 +60,7 @@ class SyllabusBatchTable(BaseTable):
 
     class Meta(BaseTable.Meta):
         model = Batch
-        fields = ("branch", "batch_name", "course", "academic_year")
+        fields = ("branch", "batch_name", "course",)
         attrs = {"class": "table table-striped table-bordered"}
 
     

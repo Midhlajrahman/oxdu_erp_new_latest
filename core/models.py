@@ -52,36 +52,6 @@ class Setting(BaseModel):
         verbose_name_plural = "Settings"
 
 
-class AcademicYear(BaseModel):
-    start_month_session = models.CharField(max_length=10, choices=MONTH_CHOICES)
-    start_year_session = models.PositiveIntegerField(choices=YEAR_CHOICES)
-    end_month_session = models.CharField(max_length=10, choices=MONTH_CHOICES)
-    end_year_session = models.PositiveIntegerField(choices=YEAR_CHOICES)
-
-    class Meta:
-        unique_together = ("start_month_session", "start_year_session")
-        ordering = ("-start_year_session", "-start_month_session")
-        
-    @staticmethod
-    def get_list_url():
-        return reverse_lazy("core:academicyear_list")
-
-    def get_absolute_url(self):
-        return reverse_lazy("core:academicyear_detail", kwargs={"pk": self.pk})
-
-    def get_update_url(self):
-        return reverse_lazy("core:academicyear_update", kwargs={"pk": self.pk})
-    
-    def get_delete_url(self):
-        return reverse_lazy("core:academicyear_delete", kwargs={"pk": self.pk})
-
-    def __str__(self):
-        return f"{self.get_start_month_session_display()} {self.start_year_session} - {self.get_end_month_session_display()} {self.end_year_session}"
-
-    def display(self):
-        return f"{self.start_year_session[2:]}-{self.end_year_session[2:]}"
-
-
 class Link(models.Model):
     """
     A model representing a link, which can be displayed in the application.
