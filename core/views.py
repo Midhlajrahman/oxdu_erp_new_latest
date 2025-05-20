@@ -1,3 +1,4 @@
+import os
 from core import mixins
 from django.db.models import Q
 from django.db.models import Count
@@ -24,8 +25,6 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 
 from core.tables import SettingsTable
-
-from .utils import remove_bg
 
 # class HomeView(mixins.LoginRequiredMixin, mixins.FormView):
 #     template_name = "core/home.html"
@@ -163,12 +162,13 @@ class HomeView(mixins.HybridTemplateView):
                     total_paid = FeeReceipt.objects.filter(student=student).aggregate(
                         total=Sum("amount")
                     )["total"] or 0
-                    
+
                     total_fee_paid += total_paid
 
-                    pending_amount = student.course.fees - total_paid
-                    if pending_amount > 0:
-                        total_pending_amount += pending_amount
+                    if student.course and student.course.fees is not None:
+                        pending_amount = student.course.fees - total_paid
+                        if pending_amount > 0:
+                            total_pending_amount += pending_amount
 
                 branch.pending_fee_amount = total_pending_amount
                 branch.total_fee_paid = total_fee_paid
@@ -280,13 +280,11 @@ class IDCardView(PDFView):
     }
 
     def get_template_names(self):
-        if self.request.user.usertype == "student":
-            return "core/student_id_card.html"
-        return "core/id_card.html"
-        
+        return "core/student_id_card.html" if self.request.user.usertype == "student" else "core/id_card.html"
+
     def render_html(self, *args, **kwargs):
-        static_url = "%s://%s%s" % (self.request.scheme, self.request.get_host(), settings.STATIC_URL)
-        media_url = "%s://%s%s" % (self.request.scheme, self.request.get_host(), settings.MEDIA_URL)
+        static_url = f"{self.request.scheme}://{self.request.get_host()}{settings.STATIC_URL}"
+        media_url = f"{self.request.scheme}://{self.request.get_host()}{settings.MEDIA_URL}"
 
         with override_settings(STATIC_URL=static_url, MEDIA_URL=media_url):
             template = loader.get_template(self.get_template_names())
@@ -297,23 +295,13 @@ class IDCardView(PDFView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get("pk")
 
-        if pk:
-            instance = get_object_or_404(Admission, pk=pk) if self.request.user.usertype == "student" else get_object_or_404(Employee, pk=pk)
+        if self.request.user.usertype == "student":
+            instance = get_object_or_404(Admission, pk=pk) if pk else get_object_or_404(Admission, user=self.request.user)
         else:
-            instance = get_object_or_404(Admission, user=self.request.user) if self.request.user.usertype == "student" else get_object_or_404(Employee, user=self.request.user)
+            instance = get_object_or_404(Employee, pk=pk) if pk else get_object_or_404(Employee, user=self.request.user)
 
         context["title"] = "Id Card"
         context["instance"] = instance
-
-        if self.request.user.usertype != "student" and instance.photo:
-            try:
-                processed_path = remove_bg(instance.photo.path)
-                context["photo_url"] = default_storage.url(processed_path)
-            except Exception as e:
-                print(f"Error removing background: {e}")
-                context["photo_url"] = instance.photo.url 
-        else:
-            context["photo_url"] = instance.photo.url if instance.photo else ""
 
         return context
 

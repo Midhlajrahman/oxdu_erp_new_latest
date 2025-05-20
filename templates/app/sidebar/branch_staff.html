@@ -85,39 +85,6 @@
 
                 <!-- Start::slide -->
                 <li class="slide has-sub">
-                    <a href="javascript:void(0);" class="side-menu__item {% if is_master %} active {% endif %}">
-                        <i class="la la-cog side-menu__icon"></i>
-                        <span class="side-menu__label">Masters</span>
-                        <i class="fe fe-chevron-right side-menu__angle"></i>
-                    </a>
-                    <ul class="slide-menu child1">
-                        <li class="slide side-menu__label1">
-                            <a href="javascript:void(0);">Masters</a>
-                        </li>
-                        
-                        
-                        <li class="slide">
-                            <a href="{% url 'masters:batch_list' %}" class="side-menu__item {% if is_batch %}active{% endif %}">Batches</a>
-                        </li>
-
-                        <li class="slide">
-                            <a href="{% url 'masters:course_list' %}" class="side-menu__item {% if is_course %}active{% endif %}">Courses</a>
-                        </li>
-
-                        <li class="slide">
-                            <a href="{% url 'masters:pdf_book_resource_list' %}" class="side-menu__item {% if is_pdf_resource %}active{% endif %}">PDF Book</a>
-                        </li>
-                        
-                        <li class="slide">
-                            <a href="{% url 'masters:complaint_list' %}" class="side-menu__item {% if is_complaint %}active{% endif %}">Complaints</a>
-                        </li>
-                        
-                    </ul>
-                </li>
-                <!-- End::slide -->
-
-                <!-- Start::slide -->
-                <li class="slide has-sub">
                     <a href="javascript:void(0);" class="side-menu__item {% if is_lead  %} active {% endif %}">
                         <i class="la la-graduation-cap side-menu__icon"></i>
                         <span class="side-menu__label">Leads</span>
@@ -160,7 +127,24 @@
                     </a>
                 </li>
                 <!-- End::slide -->
-               
+
+                <!-- Start::slide -->
+                <li class="slide ">
+                    <a href="{% url 'masters:pdf_book_resource_list' %}" class="side-menu__item {% if is_pdf_resource %}active{% endif %}">
+                        <i class="la la-bell side-menu__icon"></i>
+                        <span class="side-menu__label">PDF Book</span>
+                    </a>
+                </li>
+                <!-- End::slide -->
+
+                <!-- Start::slide -->
+                <li class="slide ">
+                    <a href="{% url 'masters:complaint_list' %}" class="side-menu__item {% if is_complaint %}active{% endif %}">
+                        <i class="la la-bell side-menu__icon"></i>
+                        <span class="side-menu__label">Complaints</span>
+                    </a>
+                </li>
+                <!-- End::slide -->
        
             </ul>
             <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24"> <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z"></path> </svg></div>

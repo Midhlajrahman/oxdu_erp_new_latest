@@ -71,11 +71,11 @@
             color: gray;
         }
         .id-card-img {
-            height: 345px;
-            width: 308px;
+            height: 500px;
+            width: 100%;
             position: absolute !important;
-            left: 18%;
-            top: 43%;
+            left: 6%;
+            top: 19.8%;
             border-radius: 2px;
             background-size: cover;
             background-position: center;
@@ -91,12 +91,8 @@
             {% if instance.photo %}
                 <div class="id-card-img" style="background-image: url('{{ photo_url }}');"></div>
             {% endif %} 
-            <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname}}</p>
-            {% if instance.user.usertype == "student" %}
-                <p class="position" style="top: 74%; left: 38.5%;">{{instance.user.get_usertype_display}}</p>
-            {% else %}
-                <p class="position" style="top: 74%; left: 38%;">{{instance.designation}}</p>
-            {% endif %}
+            <p class="fullname" style="top: 50%; left: 8%; width:70%">{{instance.fullname}}</p>
+            <p class="position" style="top: 54%; left: 8%;">{{instance.designation}}</p>
             
         </div>
         

@@ -160,3 +160,15 @@
 
 </header>
 <!-- /app-header -->
+
+{% block extra_css %}
+<style>
+    .avatar.avatar-md {
+        width: 2.5rem;
+        height: 2.5rem;
+        line-height: 2.5rem;
+        font-size: .8rem;
+        object-fit: cover !important;
+    }
+</style>
+{% endblock %}

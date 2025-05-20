@@ -201,7 +201,9 @@ class AdmissionListView(mixins.HybridListView):
         user = self.request.user
         if user.usertype == "teacher":
             queryset = queryset.filter(branch=user.branch, course=user.employee.course)
-        
+
+        elif user.usertype == "branch_staff":
+            queryset = queryset.filter(branch=user.branch)
         return queryset
     
     def get_context_data(self, **kwargs):

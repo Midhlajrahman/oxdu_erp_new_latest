@@ -1,7 +1,11 @@
+import os
+import hashlib
+# from pixellib.tune_bg import alter_bg
+from django.conf import settings
 import requests
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-import uuid
+
 
 from django.urls import reverse_lazy
 from django.utils.http import urlencode
@@ -20,19 +24,30 @@ def build_url(viewname, kwargs=None, query_params=None):
         url = f"{url}?{urlencode(query_params)}"
     return url
 
+# def get_image_hash(image_path):
+#     with open(image_path, 'rb') as f:
+#         return hashlib.md5(f.read()).hexdigest()
 
-def remove_bg(image_path):
-    api_key = "v1nasmu4ViyDFom4NP4Pixur"
-    with open(image_path, 'rb') as file:
-        response = requests.post(
-            'https://api.remove.bg/v1.0/removebg',
-            files={'image_file': file},
-            data={'size': 'auto'},
-            headers={'X-Api-Key': api_key}
-        )
+# def remove_bg_pixellib(input_path, subdir='processed_photos'):
+#     """
+#     Removes background using PixelLib and returns relative media path.
+#     Skips processing if file already exists.
+#     """
+#     image_hash = get_image_hash(input_path)
+#     output_dir = os.path.join(settings.MEDIA_ROOT, subdir)
+#     os.makedirs(output_dir, exist_ok=True)
 
-    if response.status_code == 200:
-        filename = f"temp/removed_bg_{uuid.uuid4().hex}.png"
-        return default_storage.save(filename, ContentFile(response.content))
-    else:
-        raise Exception(f"Remove.bg API error: {response.status_code} - {response.text}")
+#     output_filename = f"{image_hash}.png"
+#     output_path = os.path.join(output_dir, output_filename)
+
+#     # Return cached image if it exists
+#     if os.path.exists(output_path):
+#         return os.path.join(subdir, output_filename)
+
+#     # Load model and remove background
+#     model_path = os.path.join(settings.BASE_DIR, "models", "deeplabv3_xception_tf_dim_ordering_tf_kernels.h5")
+#     change_bg = alter_bg(model_type="pb")
+#     change_bg.load_pascalvoc_model(model_path)
+#     change_bg.color_bg(input_path, colors=(255, 255, 255), output_image_name=output_path)
+
+#     return os.path.join(subdir, output_filename)

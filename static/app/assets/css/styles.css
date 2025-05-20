@@ -23892,6 +23892,7 @@ ul.inbox-pagination li {
   height: 2.5rem;
   line-height: 2.5rem;
   font-size: 0.8rem;
+  object-fit: cover !important;
 }
 .avatar.avatar-md .avatar-badge {
   padding: 0.4rem;
@@ -23901,10 +23902,12 @@ ul.inbox-pagination li {
   font-size: 0.65rem;
   inset-block-start: -6%;
   inset-inline-end: -13%;
+  object-fit: cover !important;
 }
 .avatar.avatar-md.online:before, .avatar.avatar-md.offline:before {
   width: 0.75rem;
   height: 0.75rem;
+  
 }
 .avatar.avatar-md svg {
   width: 1.5rem;
