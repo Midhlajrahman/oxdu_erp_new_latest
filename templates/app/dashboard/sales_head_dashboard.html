@@ -1,0 +1,66 @@
+{% load static %}
+
+ <!-- Start::row-1 -->
+ <div class="row">
+    <div class="col-xxl-9 col-md-12 col-lg-12">
+        <div class="row">
+          
+            <div class="col-xl-3 col-lg-43 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <a href="{% url 'employees:tele_caller_list' %}">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Total Tele Callers</span>
+                                        <h3 class="mb-0 mt-1 mb-2">{{tele_callers_count}}</h3>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="icon1 bg-success my-auto float-end card-icon"> <i class="fe fe-users"></i> </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <a href="{% url "admission:my_lead_list" %}">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Assigned Leads</span>
+                                        <h3 class="mb-0 mt-1 mb-2">{{assigned_lead_count}}</h3>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="icon1 bg-primary my-auto  float-end card-icon"> <i class="fas fa-tasks"></i> </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-3 col-md-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <a href="{% url 'admission:public_lead_list' %}">
+                        <div class="row">
+                                <div class="col-8">
+                                    <div class="mt-0 text-start"> <span class="fs-14 fw-medium">Leads in Queue</span>
+                                    <h3 class="mb-0 mt-1 text-danger mb-2">{{awaiting_leads}}</h3> </div>
+                                </div>
+                                <div class="col-4">
+                                <div class="icon1 bg-danger my-auto  float-end card-icon"> <i class="fas fa-user-clock"></i> </div>
+                                </div>
+                        </div>
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+<!--End::row-1 -->

@@ -764,7 +764,7 @@ class UpdateListView(mixins.HybridListView):
     model = Update
     table_class = tables.UpdateTable
     filterset_fields = {'created': ['exact'],}  
-    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor", "tele_caller")
+    permissions = ("admin_staff", "branch_staff", "teacher", "is_superuser", "student", "mentor", "tele_caller", "sales_head")
     branch_filter = False
     
     def get_context_data(self, **kwargs):
@@ -773,7 +773,7 @@ class UpdateListView(mixins.HybridListView):
         context["is_update"] = True
         context["updates"] = context["object_list"]
         user_type = self.request.user.usertype
-        context["can_add"] = user_type not in ("mentor", "student", "teacher", "tele_caller",)
+        context["can_add"] = user_type not in ("mentor", "student", "teacher", "tele_caller", "sales_head")
         context["new_link"] = reverse_lazy("masters:update_create")
         return context
     
@@ -781,7 +781,7 @@ class UpdateListView(mixins.HybridListView):
 class UpdateDetailView(mixins.HybridDetailView):
     template_name = "masters/update/detail.html"
     model = Update
-    permissions = ("admin_staff", "branch_staff", "teacher", "student", "mentor")
+    permissions = ("admin_staff", "branch_staff", "teacher", "student", "mentor", "tele_caller", "sales_head" )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

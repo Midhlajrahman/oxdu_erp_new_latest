@@ -207,6 +207,14 @@ class HomeView(mixins.HybridTemplateView):
             context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
             context["student_count"] = students_in_branch.count()
 
+        elif user.usertype == "sales_head":
+            branch = user.branch 
+            students_in_branch = Admission.objects.filter(branch=branch)
+
+            context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
+            context["assigned_lead_count"] = AdmissionEnquiry.objects.filter(tele_caller__isnull=False).count()
+            context["tele_callers_count"] = Employee.objects.filter(user__usertype="tele_caller", is_active=True).count()
+
         elif user.usertype == "tele_caller":
             branch = user.branch 
             students_in_branch = Admission.objects.filter(branch=branch)

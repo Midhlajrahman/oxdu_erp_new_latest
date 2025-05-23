@@ -89,7 +89,7 @@
     <div class="id-card-1">
         <div class="card">
             {% if instance.photo %}
-                <div class="id-card-img" style="background-image: url('{{ photo_url }}');"></div>
+                <div class="id-card-img" style="background-image: url('{{ instance.photo.url }}');"></div>
             {% endif %} 
             <p class="fullname" style="top: 50%; left: 8%; width:70%">{{instance.fullname}}</p>
             <p class="position" style="top: 54%; left: 8%;">{{instance.designation}}</p>
@@ -107,7 +107,7 @@
             {% endif %}
             <p class="id-no" style="top: 21.3%; left: 8%;">{{instance.date_of_birth|date:"d/Y/m"}}</p>
             <p class="id-no" style="top: 30.8%; left: 8%;">{{instance.mobile}}</p>
-            <p class="id-no" style="top: 41%; left: 8%;">{{instance.guardian_mobile}}</p>
+            <p class="id-no" style="top: 41%; left: 8%;">{{instance.guardian_mobile|default:""}}</p>
             <p class="id-no" style="top: 50%; left: 8%;">{{instance.get_blood_group_display}}</p>
             <p class="id-no" style="top: 59%; left: 15%; display: flex; justify-content: center; width: 70%; text-align: center; font-size: 13px; line-height: 18px;">{{instance.branch.get_address}}</p>
         </div>

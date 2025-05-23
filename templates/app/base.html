@@ -66,6 +66,8 @@
                 {% include 'app/sidebar/branch_staff.html' %}
             {% elif request.user.usertype == 'mentor' %}
                 {% include 'app/sidebar/mentor.html' %}
+            {% elif request.user.usertype == 'sales_head' %}
+                {% include 'app/sidebar/sales_head.html' %}
             {% elif request.user.usertype == 'tele_caller' %}
                 {% include 'app/sidebar/tele_caller.html' %}
             {% elif request.user.usertype == 'student' %}

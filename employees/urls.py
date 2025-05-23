@@ -19,6 +19,8 @@ urlpatterns = [
     #
     path("profile/", views.ProfileView.as_view(), name="profile"),
     path("employees/", views.EmployeeListView.as_view(), name="employee_list"),
+    path("tele-callers/", views.TeleCallerListView.as_view(), name="tele_caller_list"),
+    
     path("employees/add/", views.EmployeeCreateView.as_view(), name="employee_create"),
     path("view/<pk>/", views.EmployeeDetailView.as_view(), name="employee_detail"),
     path("employees/change/<pk>/", views.EmployeeUpdateView.as_view(), name="employee_update"),

@@ -12,7 +12,7 @@ def main_context(request):
     # Fetch academic year and branch if session keys exist
     branch_id = request.session.get('branch')
 
-    loged_branch = Branch.objects.filter(id=branch_id).first() if branch_id else None
+    loged_branch = user.employee.branch if user and hasattr(user, 'employee') and user.employee else None
     
     admission = None
     if request.user.is_authenticated and request.user.usertype == 'student':

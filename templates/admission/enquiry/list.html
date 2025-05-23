@@ -224,6 +224,51 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  function assignTeleCaller(enquiryId, teleCallerId) {
+      if (!teleCallerId) return;
+  
+      fetch(`/admission/assign-to/${enquiryId}/`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: JSON.stringify({ tele_caller_id: teleCallerId })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === "success") {
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Assigned!',
+                  text: 'Tele caller assigned successfully.',
+                  confirmButtonText: 'OK'
+              }).then(() => {
+                  location.reload();
+              });
+          } else {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: data.message || 'Assignment failed.',
+                  confirmButtonText: 'OK'
+              });
+          }
+      })
+      .catch(error => {
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error assigning tele caller.',
+              confirmButtonText: 'OK'
+          });
+          console.error(error);
+      });
+  }
+  </script>
+  
+
+<script>
   function getCookie(name) {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {

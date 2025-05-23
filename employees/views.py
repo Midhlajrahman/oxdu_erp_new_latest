@@ -126,6 +126,29 @@ class EmployeeListView(mixins.HybridListView):
         context = super().get_context_data(**kwargs)
         context["is_employee"] = True
         return context
+
+    
+class TeleCallerListView(mixins.HybridListView):
+    model = Employee
+    table_class = tables.EmployeeTable
+    permissions = ("branch_staff", "admin_staff", "sales_head")
+    filterset_fields = {'branch': ['exact'] ,'department': ['exact'], 'designation': ['exact'], 'gender': ['exact'],}
+    search_fields = ("user__email", "employee_id", "first_name", "middle_name", "last_name", "marital_status", "mobile", "whatsapp")
+    branch_filter = False
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if getattr(self.request.user, "employee", None) and self.request.user.employee.is_also_tele_caller == "Yes":
+            return queryset.filter(Q(user__usertype="tele_caller") | Q(id=self.request.user.employee.id))
+        
+        return queryset.filter(user__usertype="tele_caller")
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_tele_caller"] = True
+        context["title"] = "Tele Callers"
+        return context
     
 
 
@@ -171,30 +194,28 @@ class EmployeeCreateView(mixins.HybridCreateView):
         return build_url("employees:employee_detail", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
-        user = form.save(commit=False)  # Create user instance but don't save yet
+        user = form.save(commit=False)
 
-        # Ensure password is hashed before saving
         if form.cleaned_data.get("password"):
             user.set_password(form.cleaned_data["password"])
 
-        # Assign branch from logged-in user or fallback to a default
+        branch = None
         if self.request.user.is_authenticated and hasattr(self.request.user, "branch") and self.request.user.branch:
-            user.branch = self.request.user.branch
+            branch = self.request.user.branch
         else:
-            default_branch = Branch.objects.first()  # Get first available branch
-            if default_branch:
-                user.branch = default_branch
-            else:
-                form.add_error(None, "No branch is assigned, and no default branch is available.")
-                return self.form_invalid(form)
+            branch = Branch.objects.first()
 
-        # Check if we are linking to an existing employee
+        if not branch:
+            form.add_error(None, "No branch assigned and no default branch available.")
+            return self.form_invalid(form)
+
+        user.branch = branch
+
         pk = self.kwargs.get("pk")
         if pk:
             employee = get_object_or_404(Employee, pk=pk)
             user.first_name = employee.first_name
             user.last_name = employee.last_name or ""
-
             user.save()
 
             employee.user = user

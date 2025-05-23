@@ -1,9 +1,10 @@
 import datetime
 import openpyxl
 import csv
+import json
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 
 from django.shortcuts import get_object_or_404
@@ -90,7 +91,6 @@ def get_batches_for_course(request):
     return JsonResponse({'batches': data})
 
 
-
 class ImportEnquiryView(View):
     def post(self, request):
         file = request.FILES.get('file')
@@ -158,6 +158,25 @@ def add_to_me(request, pk):
         messages.warning(request, "This enquiry already has a tele-caller.")
         
     return redirect('admission:public_lead_list')
+
+
+@csrf_exempt
+def assign_to(request, pk):
+    if request.method == "POST" and request.user.usertype == "sales_head":
+        enquiry = get_object_or_404(AdmissionEnquiry, pk=pk)
+        try:
+            data = json.loads(request.body)
+            tele_caller_id = data.get("tele_caller_id")
+            employee = Employee.objects.get(id=tele_caller_id)
+            enquiry.tele_caller = employee
+            enquiry.save()
+            return JsonResponse({"status": "success"})
+        except Employee.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Invalid tele caller selected."})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)})
+
+    return JsonResponse({"status": "error", "message": "Invalid request."})
 
 
 def student_check_data(request):
@@ -360,7 +379,7 @@ class PublicLeadListView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.PublicEnquiryListTable
     filterset_fields = {'city': ['exact'], 'branch': ['exact'], 'date': ['exact']}
-    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller")
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "sales_head")
     branch_filter = False
 
     def get_table(self, **kwargs):
@@ -379,6 +398,7 @@ class PublicLeadListView(mixins.HybridListView):
         context["title"] = "Public Leads"
         context["is_lead"] = True
         context["is_public_lead"] = True  
+        context["tele_callers"] = Employee.objects.filter(user__usertype="tele_caller")
         user_type = self.request.user.usertype
         context["can_add"] = user_type in ("tele_caller",)
         context["new_link"] = reverse_lazy("admission:admission_enquiry_create")    
@@ -389,13 +409,16 @@ class MyleadListView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
     filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
-    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor")
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor", "sales_head")
     branch_filter = False
 
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        queryset = queryset.filter(tele_caller=user.employee)
+        if user.usertype == "sales_head":
+            queryset = queryset.filter(tele_caller__isnull=False, is_active=True)
+        else:
+            queryset = queryset.filter(tele_caller=user.employee)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -403,7 +426,7 @@ class MyleadListView(mixins.HybridListView):
         user_type = self.request.user.usertype
 
         context.update({
-            "title": "My Leads",
+            "title": "Leads List",
             "is_my_lead": True,
             "can_add": user_type in ("tele_caller",),
             "new_link": reverse_lazy("admission:admission_enquiry_create"),

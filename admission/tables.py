@@ -3,7 +3,7 @@ import django_tables2 as tables
 from django_tables2 import columns
 from django.utils.html import format_html
 
-from .models import Admission, AttendanceRegister, FeeReceipt
+from .models import Admission, AttendanceRegister, FeeReceipt, AdmissionEnquiry
 
 class AdmissionTable(BaseTable):
     created = None
@@ -59,19 +59,43 @@ class AdmissionEnquiryTable(BaseTable):
     status = columns.Column(verbose_name="Enquiry Status")
 
     class Meta:
-        model = Admission
-        fields = ("date", "full_name", "course", "contact_number", "personal_email", "status", "action")
+        model = AdmissionEnquiry
+        fields = ("date", "full_name", "course", "contact_number", "personal_email", "tele_caller", "status", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
 
     
 class PublicEnquiryListTable(BaseTable):
     full_name = columns.Column(verbose_name="Full Name")
 
+    tele_caller_column = tables.TemplateColumn(
+        template_code='''
+            {% if record.tele_caller %}
+                <strong>{{ record.tele_caller.user.get_full_name }}</strong>
+            {% elif not table.request.user.usertype == "sales_head" %}
+                <span class="text-danger">Not Assigned</span>
+            {% endif %}
+
+            {% if table.request.user.usertype == "sales_head" %}
+                <select name="tele_caller" class="form-select form-select-sm mt-2"
+                    onchange="assignTeleCaller({{ record.id }}, this.value)">
+                    <option value="">-- Assign Tele Caller --</option>
+                    {% for caller in tele_callers %}
+                        <option value="{{ caller.id }}">{{ caller.user.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        ''',
+        verbose_name='Tele Caller',
+        orderable=False,
+    )
+
+    contact_number = columns.Column(verbose_name="Contact Number")
+
     action = tables.TemplateColumn(
         template_code='''
             {% if record.tele_caller %}
                 <span class="badge bg-success">Assigned</span>
-            {% elif table.request.user.usertype == "tele_caller" or table.request.user.employee.is_also_tele_caller %}
+            {% elif table.request.user.usertype == "tele_caller" or table.request.user.employee.is_also_tele_caller == "Yes" %}
                 <a href="{% url 'admission:add_to_me' record.id %}" class="btn btn-sm btn-danger fw-bold">ADD TO ME</a>
             {% else %}
                 <span class="badge bg-danger text-white">Not Assigned</span>
@@ -80,14 +104,13 @@ class PublicEnquiryListTable(BaseTable):
         verbose_name='Action',
         orderable=False,
     )
-    contact_number = columns.Column(verbose_name="Contact Number")
-    
+
     def render_contact_number(self, value):
         return f"**** **** {value[-4:]}" if value else ""
 
     class Meta:
-        model = Admission
-        fields = ("full_name", "contact_number", "city", "created", "action")
+        model = AdmissionEnquiry
+        fields = ("full_name", "contact_number", "city", "created", "tele_caller_column",)
         attrs = {"class": "table star-student table-hover table-bordered"}
     
 
@@ -110,7 +133,16 @@ class AttendanceRegisterTable(BaseTable):
         
     
 class FeeReceiptTable(BaseTable):
-       
+    action = columns.TemplateColumn(
+        """
+        <div class="btn-group">
+            <a class="btn btn-default mx-1 btn-sm" title='View' href="{{record.get_absolute_url}}"><i class="fa fa-eye"></i></a>
+            <a class="btn btn-default mx-1 btn-sm" title='Edit' href="{{record.get_update_url}}"><i class="fa fa-edit"></i></a>
+            <a class="btn btn-default mx-1 btn-sm" title='Delete' href="{{record.get_delete_url}}"><i class="fa fa-trash"></i></a>
+        </div>
+        """,
+        orderable=False,
+    )   
     created = None
     class Meta:
         model = FeeReceipt

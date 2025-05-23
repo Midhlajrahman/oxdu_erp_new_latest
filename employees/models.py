@@ -72,7 +72,7 @@ class Department(BaseModel):
 
 
 class Employee(BaseModel):
-    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE)
+    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, null=True)
     user = models.OneToOneField("accounts.User", on_delete=models.PROTECT, limit_choices_to={"is_active": True}, related_name="employee", null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100, null=True, blank=True)
