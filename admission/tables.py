@@ -28,7 +28,6 @@ class AdmissionTable(BaseTable):
 
     id_card = tables.TemplateColumn(
         template_code="""
-        {% if request.user.is_superuser or request.user.usertype == 'admin_staff' %}
             <a href="{{ record.get_id_card_absolute_url }}" 
             class="btn btn-sm px-3 py-1 d-flex align-items-center gap-2 shadow-sm rounded-1"
             style="background-color: #157347; color: #fff; border: 1px solid #146c43;"
@@ -36,7 +35,6 @@ class AdmissionTable(BaseTable):
                 <i class="bi bi-person-badge-fill"></i> 
                 <span>ID Card</span>
             </a>
-        {% endif %}
         """,
         verbose_name="ID Card",
         orderable=False

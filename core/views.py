@@ -290,12 +290,22 @@ class IDCardView(PDFView):
     def dispatch(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
 
-        try:
-            self.instance = Admission.objects.get(pk=pk)
-            self.template_name = "core/student_id_card.html"
-        except Admission.DoesNotExist:
-            self.instance = get_object_or_404(Employee, pk=pk)
-            self.template_name = "core/id_card.html"
+        if pk:
+            # If a specific PK is provided, fetch based on Admission or Employee
+            try:
+                self.instance = Admission.objects.get(pk=pk)
+                self.template_name = "core/student_id_card.html"
+            except Admission.DoesNotExist:
+                self.instance = get_object_or_404(Employee, pk=pk)
+                self.template_name = "core/id_card.html"
+        else:
+            # For logged-in user
+            if request.user.usertype == "student":
+                self.instance = get_object_or_404(Admission, user=request.user)
+                self.template_name = "core/student_id_card.html"
+            else:
+                self.instance = get_object_or_404(Employee, user=request.user)
+                self.template_name = "core/id_card.html"
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -319,4 +329,3 @@ class IDCardView(PDFView):
 
     def get_filename(self):
         return "id_card.pdf"
-
