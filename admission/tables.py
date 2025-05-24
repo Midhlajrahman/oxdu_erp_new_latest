@@ -30,9 +30,11 @@ class AdmissionTable(BaseTable):
         template_code="""
         {% if request.user.is_superuser or request.user.usertype == 'admin_staff' %}
             <a href="{{ record.get_id_card_absolute_url }}" 
-            class="btn btn-sm btn-outline-success px-3 shadow-sm d-inline-flex align-items-center"
+            class="btn btn-sm px-3 py-1 d-flex align-items-center gap-2 shadow-sm rounded-1"
+            style="background-color: #157347; color: #fff; border: 1px solid #146c43;"
             title="Download ID Card">
-            <i class="bi bi-person-badge-fill me-1"></i> ID Card
+                <i class="bi bi-person-badge-fill"></i> 
+                <span>ID Card</span>
             </a>
         {% endif %}
         """,

@@ -287,8 +287,26 @@ class IDCardView(PDFView):
         "margin-right": "0",
     }
 
+    def dispatch(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
+
+        try:
+            self.instance = Admission.objects.get(pk=pk)
+            self.template_name = "core/student_id_card.html"
+        except Admission.DoesNotExist:
+            self.instance = get_object_or_404(Employee, pk=pk)
+            self.template_name = "core/id_card.html"
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_template_names(self):
-        return "core/student_id_card.html" if self.request.user.usertype == "student" else "core/id_card.html"
+        return self.template_name
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "ID Card"
+        context["instance"] = self.instance
+        return context
 
     def render_html(self, *args, **kwargs):
         static_url = f"{self.request.scheme}://{self.request.get_host()}{settings.STATIC_URL}"
@@ -298,20 +316,6 @@ class IDCardView(PDFView):
             template = loader.get_template(self.get_template_names())
             context = self.get_context_data(*args, **kwargs)
             return template.render(context)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        pk = self.kwargs.get("pk")
-
-        if self.request.user.usertype == "student":
-            instance = get_object_or_404(Admission, pk=pk) if pk else get_object_or_404(Admission, user=self.request.user)
-        else:
-            instance = get_object_or_404(Employee, pk=pk) if pk else get_object_or_404(Employee, user=self.request.user)
-
-        context["title"] = "Id Card"
-        context["instance"] = instance
-
-        return context
 
     def get_filename(self):
         return "id_card.pdf"
