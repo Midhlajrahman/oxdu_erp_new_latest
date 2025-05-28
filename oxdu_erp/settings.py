@@ -30,6 +30,7 @@ INSTALLED_PLUGINS = [
     "easy_thumbnails",
     'simple_history',
     'mptt',
+    'django_extensions',
 ]
 
 DJANGO_APPS = [
