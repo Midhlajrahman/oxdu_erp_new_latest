@@ -557,3 +557,38 @@ headerbtn1.forEach((button) => {
     });
 });
 /* for notifications dropdown */
+
+
+// Toggle checkbox when clicking anywhere in the table cell
+$('#selectable-table').on('click', '.checkbox-column', function(e) {
+    // Don't trigger if clicking directly on the checkbox
+    if ($(e.target).is('input[type="checkbox"]')) {
+        return;
+    }
+    
+    const checkbox = $(this).find('.select-checkbox');
+    checkbox.prop('checked', !checkbox.prop('checked'));
+    const allChecked = $('.select-checkbox:checked').length === $('.select-checkbox').length;
+    $('.select-all-checkbox').prop('checked', allChecked);
+    
+    // Update delete button visibility
+    toggleDeleteButton();
+});
+
+// Select all/deselect all functionality
+$('.select-all-checkbox').on('change', function() {
+    const isChecked = $(this).prop('checked');
+    $('.select-checkbox').prop('checked', isChecked);
+    
+    // Update delete button visibility
+    toggleDeleteButton();
+});
+
+// If any checkbox is unchecked, uncheck the "select all" checkbox
+$('#selectable-table').on('change', '.select-checkbox', function() {
+    const allChecked = $('.select-checkbox:checked').length === $('.select-checkbox').length;
+    $('.select-all-checkbox').prop('checked', allChecked);
+    
+    // Update delete button visibility
+    toggleDeleteButton();
+});

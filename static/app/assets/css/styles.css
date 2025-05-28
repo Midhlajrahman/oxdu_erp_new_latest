@@ -26750,3 +26750,7 @@ h6, .h6 {
 }
 
 /* End:: height */
+
+.selected-row {
+    background-color: #f0f8ff !important; 
+}

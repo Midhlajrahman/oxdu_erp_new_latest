@@ -11,7 +11,7 @@ from core.choices import GENDER_CHOICES
 from core.choices import RELIGION_CHOICES
 from core.choices import PAYMENT_PERIOD_CHOICES
 from core.choices import ATTENDANCE_STATUS
-from core.choices import MONTH_CHOICES, YEAR_CHOICES, ENQUIRY_STATUS
+from core.choices import MONTH_CHOICES, ENQUIRY_TYPE_CHOICES, ENQUIRY_STATUS
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
@@ -355,11 +355,14 @@ class FeeReceipt(BaseModel):
 
 
 class AdmissionEnquiry(BaseModel):
+    enquiry_type = models.CharField(max_length=80, choices=ENQUIRY_TYPE_CHOICES, default="public_lead")
     tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, null=True)
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True)
     course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
     date = models.DateField(null=True)
     status = models.CharField(max_length=30, choices=ENQUIRY_STATUS, default="new_enquiry")
+    next_enquiry_date = models.DateField(null=True) 
+    remark = models.TextField(blank=True, null=True)
 
     # Student Info
     full_name = models.CharField(max_length=200, null=True)

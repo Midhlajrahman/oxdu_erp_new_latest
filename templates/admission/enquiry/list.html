@@ -16,7 +16,7 @@
       </div>
       <div class="page-rightheader">
         <div class="btn-list">
-            {% if request.user.usertype == "admin_staff" or request.user.is_superuser %}
+            {% if request.user.usertype == "admin_staff" or request.user.is_superuser or request.user.usertype == "sales_head" %}
 
             <!-- Button to trigger file input -->
             <form id="importForm" method="post" action="{% url 'admission:import_enquiry' %}" enctype="multipart/form-data">
@@ -44,8 +44,8 @@
 
             {% endif %}
           {% if can_add and new_link %}
-          <button type="button" class="btn btn-light3" data-bs-placement="top"  data-bs-toggle="modal" data-bs-target="#addnewmodal"
-                    title="New"> <i class="fe fe-plus"></i> New</button>
+          <a href="{{ new_link }}" class="btn btn-light3" data-bs-placement="top" data-bs-toggle="tooltip" title="Add New"> <i
+              class="fe fe-plus"></i>New </a>
           {% endif %}
           {% if table.paginated_rows %}
           <a href="{% export_url 'xlsx' %}" class="btn btn-light3" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -155,38 +155,6 @@
 
 
 </div>
-
-<div class="modal fade" id="addnewmodal" tabindex="-1" role="dialog" aria-labelledby="addnewmodalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" >
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addnewmodalLabel">ADD New</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </button>
-        </div>
-        <form  method="post" id="addnewform">
-            {% csrf_token %}
-            <div class="modal-body">
-                <div class="row">
-                <div class="col-sm-12">
-                    <select name="branch" id="is_branch" class="form-control" required>
-                        <option value="">Choose Batch </option>
-                        {% for branch in branches %}
-                            <option value="{{ branch.pk }}">{{ branch.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-success submit_btn">Submit </button>
-            </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
@@ -359,7 +327,7 @@
       let html = '<table class="table table-bordered table-sm"><thead>';
       html += '<tr>' + headers.map(h => `<th>${h.trim()}</th>`).join('') + '</tr></thead><tbody>';
   
-      const rowsToShow = showAll ? lines.slice(1) : lines.slice(1, 6); // First 5 or all
+      const rowsToShow = showAll ? lines.slice(1) : lines.slice(1, 6);
       rowsToShow.forEach(line => {
           const row = line.split(',');
           html += '<tr>' + row.map(col => `<td>${col.trim()}</td>`).join('') + '</tr>';
@@ -381,12 +349,74 @@
   }
   </script>
 
-<script>
-    $('.submit_btn').click(function(){
-       var form = $('#addnewform');
-       var val = form.find('#is_branch').val();
-       window.location.href = "/admission/new/admission-enquiry/" + val + "/";
-    })
-</script>
+
+  <script>
+    $(document).on('change', '.bulk-assign-tele-caller', function () {
+        const selectedTeleCallerId = $(this).val();
+        const selectedEnquiryIds = $('.select-checkbox:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (!selectedTeleCallerId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Please select a tele caller.'
+            });
+            return;
+        }
+
+        if (selectedEnquiryIds.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Please select at least one enquiry.'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Assign selected enquiries to this tele caller?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, assign',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{% url 'admission:bulk_assign_to' %}",
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        tele_caller_id: selectedTeleCallerId,
+                        enquiry_ids: selectedEnquiryIds
+                    }),
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Assigned!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // Refresh after success
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Error assigning tele caller.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+    </script>
 
 {% endblock javascript %}

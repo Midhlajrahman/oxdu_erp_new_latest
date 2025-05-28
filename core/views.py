@@ -1,6 +1,7 @@
 import os
 from core import mixins
 from django.db.models import Q
+from django_tables2 import RequestConfig
 from django.db.models import Count
 from django.core.files.storage import default_storage
 from core.pdfview import PDFView
@@ -14,6 +15,7 @@ from branches.models import Branch
 from core.models import Setting
 from branches.tables import BranchTable
 from admission.models import Admission, Attendance, FeeReceipt, AdmissionEnquiry
+from admission.tables import AdmissionEnquiryTable
 from employees.models import Employee
 from masters.models import Batch, Course
 
@@ -214,15 +216,32 @@ class HomeView(mixins.HybridTemplateView):
             context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
             context["assigned_lead_count"] = AdmissionEnquiry.objects.filter(tele_caller__isnull=False).count()
             context["tele_callers_count"] = Employee.objects.filter(user__usertype="tele_caller", is_active=True).count()
+            context['total_enquiries'] = AdmissionEnquiry.objects.count()
+            context['enquiry_type_counts'] = AdmissionEnquiry.objects.values('enquiry_type').annotate(count=Count('id'))
+            context['branch_counts'] = AdmissionEnquiry.objects.values('branch__name').annotate(count=Count('id'))
+            context['course_counts'] = AdmissionEnquiry.objects.values('course__name').annotate(count=Count('id'))
+            context['status_counts'] = AdmissionEnquiry.objects.values('status').annotate(count=Count('id'))
 
         elif user.usertype == "tele_caller":
             branch = user.branch 
             students_in_branch = Admission.objects.filter(branch=branch)
 
+            today = datetime.now().date()
+            today_enquiries_qs = AdmissionEnquiry.objects.filter(
+                tele_caller=self.request.user.employee,
+                next_enquiry_date=today
+            )
+
+            table = AdmissionEnquiryTable(today_enquiries_qs)
+            RequestConfig(self.request, paginate={"per_page": 10}).configure(table)
+
             context['total_my_leads'] = AdmissionEnquiry.objects.filter(tele_caller=self.request.user.employee).count()
             context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
             context["student_count"] = students_in_branch.count()
             context["employee_count"] = Employee.objects.filter(branch=branch, is_active=True).count()
+            context["today_enquiries"] = today_enquiries_qs
+            context["table"] = table
+            context["today_date"] = datetime.now().date()
 
         return context
 

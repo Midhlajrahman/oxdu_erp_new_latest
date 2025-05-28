@@ -161,16 +161,28 @@ def add_to_me(request, pk):
 
 
 @csrf_exempt
-def assign_to(request, pk):
+def assign_to(request, pk=None):
     if request.method == "POST" and request.user.usertype == "sales_head":
-        enquiry = get_object_or_404(AdmissionEnquiry, pk=pk)
         try:
             data = json.loads(request.body)
             tele_caller_id = data.get("tele_caller_id")
             employee = Employee.objects.get(id=tele_caller_id)
-            enquiry.tele_caller = employee
-            enquiry.save()
-            return JsonResponse({"status": "success"})
+
+            # Bulk assignment if enquiry_ids are provided
+            enquiry_ids = data.get("enquiry_ids")
+            if enquiry_ids:
+                AdmissionEnquiry.objects.filter(id__in=enquiry_ids).update(tele_caller=employee)
+                return JsonResponse({"status": "success", "message": "Bulk assigned successfully"})
+
+            # Single assignment if pk is provided
+            if pk:
+                enquiry = get_object_or_404(AdmissionEnquiry, pk=pk)
+                enquiry.tele_caller = employee
+                enquiry.save()
+                return JsonResponse({"status": "success", "message": "Assigned successfully"})
+
+            return JsonResponse({"status": "error", "message": "No enquiries provided."})
+
         except Employee.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Invalid tele caller selected."})
         except Exception as e:
@@ -400,7 +412,7 @@ class PublicLeadListView(mixins.HybridListView):
         context["is_public_lead"] = True  
         context["tele_callers"] = Employee.objects.filter(user__usertype="tele_caller")
         user_type = self.request.user.usertype
-        context["can_add"] = user_type in ("tele_caller",)
+        context["can_add"] = user_type in ("sales_head", "admin_staff", "branch_staff")
         context["new_link"] = reverse_lazy("admission:admission_enquiry_create")    
         return context
 
@@ -438,7 +450,7 @@ class AdmissionEnquiryView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
     filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
-    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor")
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor", "sales_head")
     branch_filter = False
 
     def get_queryset(self):
@@ -470,7 +482,7 @@ class AdmissionEnquiryView(mixins.HybridListView):
 
 class AdmissionEnquiryDetailView(mixins.HybridDetailView):
     model = AdmissionEnquiry
-    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser", "sales_head")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -480,7 +492,7 @@ class AdmissionEnquiryDetailView(mixins.HybridDetailView):
 
 class AdmissionEnquiryCreateView(mixins.HybridCreateView):
     model = AdmissionEnquiry
-    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser", "sales_head")
     exclude = ('tele_caller',)
 
     def get_context_data(self, **kwargs):
@@ -498,12 +510,12 @@ class AdmissionEnquiryCreateView(mixins.HybridCreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return self.object.get_list_url()
+        return redirect("admission:public_lead_list")
 
 
 class AdmissionEnquiryUpdateView(mixins.HybridUpdateView):
     model = AdmissionEnquiry
-    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser", "sales_head")
     exclude = ('tele_caller',)
 
     def get_context_data(self, **kwargs):
@@ -526,7 +538,7 @@ class AdmissionEnquiryUpdateView(mixins.HybridUpdateView):
 
 class AdmissionEnquiryDeleteView(mixins.HybridDeleteView):
     model = AdmissionEnquiry
-    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser")
+    permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser", "sales_head")
 
 
 class DeleteUnassignedLeadsView(View):

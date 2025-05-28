@@ -9,6 +9,7 @@ urlpatterns = [
     path("student_check_data/", views.student_check_data, name="student_check_data"),
     path('add-to-me/<int:pk>/', views.add_to_me, name='add_to_me'),
     path('assign-to/<int:pk>/', views.assign_to, name='assign_to'),
+    path('bulk-assign-to/', views.assign_to, name='bulk_assign_to'),
     path('admission/<int:pk>/change-status/', views.change_status, name='change_status'),
     path('ajax/get-batches/', views.get_batches_for_course, name='get_batches_for_course'),
     

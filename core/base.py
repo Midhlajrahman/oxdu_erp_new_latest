@@ -13,6 +13,7 @@ from django.urls import NoReverseMatch
 from django.urls import reverse_lazy
 from django_tables2 import Table
 from django_tables2 import columns
+from django_tables2 import CheckBoxColumn
 from import_export.admin import ImportExportModelAdmin
 from simple_history.models import HistoricalRecords
 
@@ -102,6 +103,43 @@ class BaseTable(Table):
 
     class Meta:
         attrs = {"class": "table  table-vcenter text-nowrap table-bordered border-bottom table-striped"}
+
+
+class CustomBaseTable(Table):
+    selection = CheckBoxColumn(
+        accessor="pk",
+        attrs={
+            "th__input": {
+                "class": "form-check-input select-all-checkbox",
+            },
+            "td__input": {
+                "class": "form-check-input select-checkbox",
+            },
+            "th": {
+                "class": "checkbox-column table-primary w-5",
+                "style":""
+            },
+            "td": {
+                "class": "checkbox-column table-primary",
+            }
+        },
+        orderable=False,
+        empty_values=()
+    )
+    pk = columns.Column(visible=False)
+    action = columns.TemplateColumn(
+        template_name="app/partials/table_actions.html",
+        orderable=False,
+        attrs={"th": {"class": "w-5"}}
+    )
+
+    class Meta:
+        attrs = {
+            "class": "table table-vcenter text-nowrap table-bordered border-bottom table-striped",
+            "id": "selectable-table"  # Added ID for easier jQuery targeting
+        }
+        sequence = ("selection", "...", "action")    # The "..." will be replaced with remaining fields
+        template_name = "django_tables2/basic.html"
 
 
 class BaseForm(forms.ModelForm):

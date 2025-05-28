@@ -1,5 +1,6 @@
-from core.base import BaseTable
+from core.base import BaseTable, CustomBaseTable
 import django_tables2 as tables
+from django.utils.safestring import mark_safe 
 from django_tables2 import columns
 from django.utils.html import format_html
 
@@ -60,12 +61,13 @@ class AdmissionEnquiryTable(BaseTable):
 
     class Meta:
         model = AdmissionEnquiry
-        fields = ("date", "full_name", "course", "contact_number", "personal_email", "tele_caller", "status", "action")
+        fields = ("date", "full_name", "course", "contact_number", "personal_email", "tele_caller", "enquiry_type", "status", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
 
     
-class PublicEnquiryListTable(BaseTable):
+class PublicEnquiryListTable(CustomBaseTable):
     full_name = columns.Column(verbose_name="Full Name")
+    contact_number = columns.Column(verbose_name="Contact Number")
 
     tele_caller_column = tables.TemplateColumn(
         template_code='''
@@ -76,8 +78,9 @@ class PublicEnquiryListTable(BaseTable):
             {% endif %}
 
             {% if table.request.user.usertype == "sales_head" %}
-                <select name="tele_caller" class="form-select form-select-sm mt-2"
-                    onchange="assignTeleCaller({{ record.id }}, this.value)">
+                <select name="tele_caller"
+                        class="form-select form-select-sm mt-2 bulk-assign-tele-caller"
+                        data-record-id="{{ record.id }}">
                     <option value="">-- Assign Tele Caller --</option>
                     {% for caller in tele_callers %}
                         <option value="{{ caller.id }}">{{ caller.user.get_full_name }}</option>
@@ -88,8 +91,6 @@ class PublicEnquiryListTable(BaseTable):
         verbose_name='Tele Caller',
         orderable=False,
     )
-
-    contact_number = columns.Column(verbose_name="Contact Number")
 
     action = tables.TemplateColumn(
         template_code='''
@@ -111,6 +112,7 @@ class PublicEnquiryListTable(BaseTable):
     class Meta:
         model = AdmissionEnquiry
         fields = ("full_name", "contact_number", "city", "created", "tele_caller_column",)
+        sequence = ("selection", "...", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
     
 
