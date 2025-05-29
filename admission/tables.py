@@ -58,6 +58,7 @@ class AdmissionEnquiryTable(BaseTable):
     date = columns.Column(verbose_name="Enquiry Date")
     personal_email = columns.Column(verbose_name="Email")
     status = columns.Column(verbose_name="Enquiry Status")
+    created = None
 
     class Meta:
         model = AdmissionEnquiry

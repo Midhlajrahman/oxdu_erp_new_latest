@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render
 from core import mixins
 from core.utils import build_url
@@ -138,17 +139,17 @@ class TeleCallerListView(mixins.HybridListView):
     
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = Employee.objects.filter(user__usertype="tele_caller", is_active=True)
 
-        if getattr(self.request.user, "employee", None) and self.request.user.employee.is_also_tele_caller == "Yes":
-            return queryset.filter(Q(user__usertype="tele_caller") | Q(id=self.request.user.employee.id))
-        
-        return queryset.filter(user__usertype="tele_caller")
+        return queryset
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["is_tele_caller"] = True
-        context["title"] = "Tele Callers"
-        return context
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = Employee.objects.filter(
+            Q(user__usertype="tele_caller") | Q(is_also_tele_caller="Yes"),
+            is_active=True
+        )
+        return queryset
     
 
 

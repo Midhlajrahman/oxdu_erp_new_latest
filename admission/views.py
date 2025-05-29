@@ -417,6 +417,30 @@ class PublicLeadListView(mixins.HybridListView):
         return context
 
 
+class AssignedLeadListView(mixins.HybridListView):
+    model = AdmissionEnquiry
+    table_class = tables.AdmissionEnquiryTable
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
+    permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor", "sales_head")
+    branch_filter = False
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(tele_caller__isnull=False, is_active=True)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            "title": "Assigned Leads List",
+            "is_assigned_lead": True,
+            "can_add": False
+        })
+
+        return context
+
+
 class MyleadListView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
@@ -427,10 +451,7 @@ class MyleadListView(mixins.HybridListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
-        if user.usertype == "sales_head":
-            queryset = queryset.filter(tele_caller__isnull=False, is_active=True)
-        else:
-            queryset = queryset.filter(tele_caller=user.employee)
+        queryset = queryset.filter(tele_caller=user.employee)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -438,7 +459,7 @@ class MyleadListView(mixins.HybridListView):
         user_type = self.request.user.usertype
 
         context.update({
-            "title": "Leads List",
+            "title": "My Leads List",
             "is_my_lead": True,
             "can_add": user_type in ("tele_caller",),
             "new_link": reverse_lazy("admission:admission_enquiry_create"),

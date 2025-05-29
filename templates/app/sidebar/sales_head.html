@@ -48,16 +48,27 @@
 
                 <!-- Start::slide -->
                 <li class="slide ">
-                    <a href="{% url 'employees:tele_caller_list' %}" class="side-menu__item {% if is_my_lead %}active{% endif %}">
+                    <a href="{% url 'employees:tele_caller_list' %}" class="side-menu__item {% if is_tele_callers %}active{% endif %}">
                         <i class="la la-phone side-menu__icon"></i>
                         <span class="side-menu__label">Tele Callers</span>
                     </a>
                 </li>
                 <!-- End::slide -->
 
-                <!-- Start::slide -->
+                {% if request.user.employee.is_also_tele_caller == "Yes" %}
+                    <!-- Start::slide -->
+                    <li class="slide ">
+                        <a href="{% url 'admission:my_lead_list' %}" class="side-menu__item {% if is_my_lead %}active{% endif %}">
+                            <i class="la la-question-circle side-menu__icon"></i>
+                            <span class="side-menu__label">My Leads</span>
+                        </a>
+                    </li>
+                    <!-- End::slide -->
+                 {% endif %}
+
+                 <!-- Start::slide -->
                 <li class="slide ">
-                    <a href="{% url 'admission:my_lead_list' %}" class="side-menu__item {% if is_my_lead %}active{% endif %}">
+                    <a href="{% url 'admission:assigned_lead_list' %}" class="side-menu__item {% if is_assigned_lead %}active{% endif %}">
                         <i class="la la-question-circle side-menu__icon"></i>
                         <span class="side-menu__label">Assigned Leads</span>
                     </a>

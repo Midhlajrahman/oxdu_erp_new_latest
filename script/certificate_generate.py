@@ -1,10 +1,12 @@
+from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import openpyxl
 import os
 
+
 # Paths (adjust as needed)
 CERTIFICATE_IMAGE = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/images/certificate_template.jpg"
-EXCEL_FILE = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/excel/certificate_data_gd.xlsx"
+EXCEL_FILE = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/excel/certificate_data_web_mern.xlsx"
 OUTPUT_FOLDER = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/certificates"
 FONT_PATH_BOLD = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/font/Poppins/Poppins-Bold.ttf"
 FONT_PATH_REGULAR = "/home/gedexo/gedexo projects/oxdu_erp/oxdu_erp/static/app/assets/font/Poppins/Poppins-Regular.ttf"
@@ -15,12 +17,36 @@ TEXT_COLOR = (0, 0, 0)
 
 # Coordinates for individual fields
 FIELD_POSITIONS = {
-    "Issue Date": (600, 1533),
-    "ID Number": (2060, 1530),
+    "Issue Date": (600, 1503),
+    "ID Number": (2060, 1500),
 }
 
 # Ensure output folder exists
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+def format_date_long(date_value):
+    if isinstance(date_value, datetime):
+        return date_value.strftime("%B %-d %Y")
+    try:
+        parsed = datetime.strptime(str(date_value), "%Y-%m-%d")
+    except ValueError:
+        try:
+            parsed = datetime.strptime(str(date_value), "%d/%m/%Y")
+        except ValueError:
+            return str(date_value)
+    return parsed.strftime("%B %-d %Y")
+
+def format_date_dmy(date_value):
+    if isinstance(date_value, datetime):
+        return date_value.strftime("%-d/%-m/%Y")
+    try:
+        parsed = datetime.strptime(str(date_value), "%Y-%m-%d")
+    except ValueError:
+        try:
+            parsed = datetime.strptime(str(date_value), "%d/%m/%Y")
+        except ValueError:
+            return str(date_value)
+    return parsed.strftime("%-d/%-m/%Y")
 
 
 def draw_text_with_letter_spacing(draw_obj, position, text, font, fill, letter_spacing):
@@ -30,8 +56,7 @@ def draw_text_with_letter_spacing(draw_obj, position, text, font, fill, letter_s
         draw_obj.text((x, y), char, font=font, fill=fill)
         char_width = font.getbbox(char)[2] - font.getbbox(char)[0]
         x += char_width + letter_spacing
-    return x  # Return the new x position after drawing the text
-
+    return x
 
 def draw_multiline_text_with_bold(draw_obj, full_text, bold_parts, position, font_regular, font_bold, fill, max_width=1500, line_spacing=0, first_line_indent=0):
     """
@@ -139,6 +164,8 @@ def create_certificate(data):
         for field, position in FIELD_POSITIONS.items():
             text = data.get(field)
             if text:
+                if field == "Issue Date":
+                    text = format_date_long(text)
                 draw.text(position, str(text), fill=TEXT_COLOR, font=font_bold_large)
 
         # Prepare body text template with placeholders
@@ -153,8 +180,8 @@ def create_certificate(data):
         # Extract values
         full_name = str(data.get("Full Name", ""))
         course = str(data.get("Course", ""))
-        joined_date = str(data.get("Joined Date", ""))
-        end_date = str(data.get("End Date", ""))
+        joined_date = format_date_dmy(data.get("Joined Date", ""))
+        end_date = format_date_dmy(data.get("End Date", ""))
 
         # Fill template with placeholders for bold replacement
         filled_text = body_text_template.format(

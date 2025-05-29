@@ -213,6 +213,7 @@ class HomeView(mixins.HybridTemplateView):
             branch = user.branch 
             students_in_branch = Admission.objects.filter(branch=branch)
 
+            context['my_leads'] = AdmissionEnquiry.objects.filter(tele_caller=self.request.user.employee).count()
             context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
             context["assigned_lead_count"] = AdmissionEnquiry.objects.filter(tele_caller__isnull=False).count()
             context["tele_callers_count"] = Employee.objects.filter(user__usertype="tele_caller", is_active=True).count()
