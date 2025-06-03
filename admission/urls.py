@@ -22,6 +22,7 @@ urlpatterns = [
     path("admission/<str:pk>/delete/", views.AdmissionDeleteView.as_view(), name="admission_delete"),
 
     # enquiry
+    path("leads/", views.LeadList.as_view(), name="lead_list"),
     path("public-leads/", views.PublicLeadListView.as_view(), name="public_lead_list"),
     path("assigned-leads/", views.AssignedLeadListView.as_view(), name="assigned_lead_list"),
     path("my-leads/", views.MyleadListView.as_view(), name="my_lead_list"),

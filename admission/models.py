@@ -357,33 +357,22 @@ class FeeReceipt(BaseModel):
 class AdmissionEnquiry(BaseModel):
     enquiry_type = models.CharField(max_length=80, choices=ENQUIRY_TYPE_CHOICES, default="public_lead")
     tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, null=True)
-    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True)
-    course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True,)
+    branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True, blank=True)
+    course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True, blank=True)
     date = models.DateField(null=True)
     status = models.CharField(max_length=30, choices=ENQUIRY_STATUS, default="new_enquiry")
-    next_enquiry_date = models.DateField(null=True) 
+    next_enquiry_date = models.DateField(null=True, blank=True) 
     remark = models.TextField(blank=True, null=True)
 
     # Student Info
     full_name = models.CharField(max_length=200, null=True)
-    date_of_birth = models.DateField(null=True)
-    religion = models.CharField(max_length=20, choices=RELIGION_CHOICES, blank=True, null=True)
+    contact_number = models.CharField(max_length=100, null=True)
     city = models.CharField(max_length=180, blank=True, null=True)
     district = models.CharField(max_length=180, blank=True, null=True)
     state = models.CharField(max_length=180, blank=True, null=True)
-    pin_code = models.CharField(max_length=180, blank=True, null=True)
-    personal_email = models.EmailField(null=True, unique=True)
-    contact_number = models.CharField(max_length=30,null=True,)
-    whatsapp_number = models.CharField(max_length=30,null=True,)
-
-    # Parent Info
-    parent_full_name = models.CharField(max_length=200,null=True,)
-    parent_contact_number = models.CharField(max_length=30, null=True, )
-    parent_whatsapp_number = models.CharField(max_length=30, null=True, )
-    parent_mail_id = models.EmailField(verbose_name="Mail Id", null=True, blank=True)
 
     def str(self):
-        return f"{self.full_name} - {self.course.name}"
+        return f"{self.full_name}"
 
     class Meta:
         ordering = ['-id']  

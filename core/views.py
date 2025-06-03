@@ -219,8 +219,8 @@ class HomeView(mixins.HybridTemplateView):
             context["tele_callers_count"] = Employee.objects.filter(user__usertype="tele_caller", is_active=True).count()
             context['total_enquiries'] = AdmissionEnquiry.objects.count()
             context['enquiry_type_counts'] = AdmissionEnquiry.objects.values('enquiry_type').annotate(count=Count('id'))
-            context['branch_counts'] = AdmissionEnquiry.objects.values('branch__name').annotate(count=Count('id'))
-            context['course_counts'] = AdmissionEnquiry.objects.values('course__name').annotate(count=Count('id'))
+            context['branch_counts'] = AdmissionEnquiry.objects.values('branch__id', 'branch__name').annotate(count=Count('id'))
+            context['course_counts'] = AdmissionEnquiry.objects.values('course__id', 'course__name').annotate(count=Count('id'))
             context['status_counts'] = AdmissionEnquiry.objects.values('status').annotate(count=Count('id'))
 
         elif user.usertype == "tele_caller":
@@ -243,6 +243,10 @@ class HomeView(mixins.HybridTemplateView):
             context["today_enquiries"] = today_enquiries_qs
             context["table"] = table
             context["today_date"] = datetime.now().date()
+            context['branch_counts'] = AdmissionEnquiry.objects.values('branch__id', 'branch__name').annotate(count=Count('id'))
+            context['course_counts'] = AdmissionEnquiry.objects.values('course__id', 'course__name').annotate(count=Count('id'))
+            context['status_counts'] = AdmissionEnquiry.objects.values('status').annotate(count=Count('id'))
+            context['enquiry_type_counts'] = AdmissionEnquiry.objects.values('enquiry_type').annotate(count=Count('id'))
 
         return context
 

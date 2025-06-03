@@ -386,6 +386,42 @@ class AdmissionDeleteView(mixins.HybridDeleteView):
     permissions = ("is_superuser", "teacher", "branch_staff", )
 
 
+class LeadList(mixins.HybridListView):
+    model = AdmissionEnquiry
+    context_object_name = 'leads'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        status = self.request.GET.get('status')
+        branch = self.request.GET.get('branch')
+        course = self.request.GET.get('course')
+        enquiry_type = self.request.GET.get('enquiry_type')
+
+        if status:
+            queryset = queryset.filter(status=status)
+        if branch:
+            queryset = queryset.filter(branch_id=branch)
+        if course:
+            queryset = queryset.filter(course_id=course)
+        if enquiry_type:
+            queryset = queryset.filter(enquiry_type=enquiry_type)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = "Leads"
+        context['filter_status'] = self.request.GET.get('status', '')
+        context['filter_branch'] = self.request.GET.get('branch', '')
+        context['filter_course'] = self.request.GET.get('course', '')
+        context['filter_enquiry_type'] = self.request.GET.get('enquiry_type', '')
+        context['can_add'] = False
+
+        return context
+
+
 class PublicLeadListView(mixins.HybridListView):
     template_name = "admission/enquiry/list.html"
     model = AdmissionEnquiry
@@ -420,7 +456,7 @@ class PublicLeadListView(mixins.HybridListView):
 class AssignedLeadListView(mixins.HybridListView):
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
-    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'], 'status': ['exact'], 'enquiry_type': ['exact'], 'date': ['exact']}
     permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor", "sales_head")
     branch_filter = False
 

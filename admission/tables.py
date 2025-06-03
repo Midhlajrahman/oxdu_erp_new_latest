@@ -56,13 +56,20 @@ class AdmissionEnquiryTable(BaseTable):
         orderable=False
     )
     date = columns.Column(verbose_name="Enquiry Date")
-    personal_email = columns.Column(verbose_name="Email")
     status = columns.Column(verbose_name="Enquiry Status")
+    action = tables.TemplateColumn(
+        verbose_name='Action',
+        template_code='''
+            <a href="{{ record.get_absolute_url }}" class="btn btn-sm btn-primary">View</a>
+            <a href="{{ record.get_update_url }}" class="btn btn-sm btn-warning">Edit</a>
+        ''',
+        orderable=False
+    )
     created = None
 
     class Meta:
         model = AdmissionEnquiry
-        fields = ("date", "full_name", "course", "contact_number", "personal_email", "tele_caller", "enquiry_type", "status", "action")
+        fields = ("date", "full_name", "course", "contact_number", "tele_caller", "enquiry_type", "status", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
 
     

@@ -183,3 +183,78 @@ input[readonly] {
     gap: 50px !important;
     padding: 30px !important;
 }
+
+.report-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+  }
+
+  .report-card .mini-card {
+    border: 1px solid #eaeaea;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .report-card .mini-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.07);
+    transform: translateY(-4px);
+  }
+
+  .report-card .icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .bg-primary-light { background-color: #0d6efd; }
+  .bg-success-light { background-color: #198754; }
+  .bg-warning-light { background-color: #ffc107; color: #000; }
+  .bg-info-light { background-color: #0dcaf0; }
+  .bg-danger-light { background-color: #dc3545; }
+
+  .count-badge {
+    background-color: rgba(0,0,0,0.05);
+    padding: 4px 12px;
+    margin: 4px 0;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .total-enquiry-small .icon-circle {
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.total-enquiry-small h2 {
+  font-size: 2rem;
+  margin-bottom: 0;
+}
+
+.total-enquiry-small small {
+  color: #6c757d;
+}
+
+.card {
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+  }
+  .badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+  }
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }

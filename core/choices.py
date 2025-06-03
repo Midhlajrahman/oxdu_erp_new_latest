@@ -107,6 +107,7 @@ ENQUIRY_STATUS_TYPE_CHOICES = (("OPEN", "OPEN"), ("CLOSED", "CLOSED"), ("REJECTE
 
 ENQUIRY_STATUS = (
     ('new_enquiry', 'New Enquiry'),
+    ('no_response', 'No Response'),
     ('follow_up', 'Follow Up'),
     ('demo', 'Ready for Demo'),
     ('interested', 'Interested'),

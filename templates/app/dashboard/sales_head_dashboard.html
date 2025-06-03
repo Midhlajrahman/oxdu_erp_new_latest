@@ -81,164 +81,133 @@
             
         </div>
     </div>
+  
+</div>
+<!--End::row-1 -->
 
-  <div class="container my-5">
-    <div class="card report-card">
-      <div class="card-header bg-white text-center py-4">
-        <h3 class="mb-0">
-          <i class="bi bi-bar-chart-fill me-2"></i>
+<div class="row">
+ <div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <h4 class="fw-bold text-dark text-center">
+          <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
           Leads Report
-        </h3>
+        </h4>
       </div>
-      <div class="card-body px-4 py-5">
+    </div>
 
-        <!-- TOTAL ENQUIRIES -->
-        <div class="text-center mb-4">
-          <div class="icon-circle bg-primary-light mx-auto mb-2" style="width: 40px; height: 40px; font-size: 1.25rem;">
-            <i class="bi bi-clipboard-data"></i>
-          </div>
-          <h2 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_enquiries }}</h2>
-          <small class="text-muted">Total Enquiries</small>
+  <!-- Lead Breakdown -->
+  <div class="row g-3">
+    <!-- Enquiry Types -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card custom-card border-0  h-100">
+        <div class="card-header bg-white border-0">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-list-check text-primary me-2"></i>
+            Enquiry Types
+          </h6>
         </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            {% for item in enquiry_type_counts %}
+            <li class="py-2 border-bottom">
+              <a href="{% url 'admission:lead_list' %}?enquiry_type={{ item.enquiry_type }}" 
+                 class="d-flex justify-content-between text-decoration-none text-dark">
+                <span>{{ item.enquiry_type|capfirst }}</span>
+                <span class="badge bg-primary bg-opacity-10 text-primary">{{ item.count }}</span>
+              </a>
+            </li>
+            {% empty %}
+            <li class="py-2 text-muted">No data</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
 
-        <!-- MINI-CARDS GRID -->
-        <div class="row g-4">
+    <!-- Branch Wise -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card custom-card border-0  h-100">
+        <div class="card-header bg-white border-0">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-building text-info me-2"></i>
+            Branch Wise
+          </h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            {% for item in branch_counts %}
+            <li class="py-2 border-bottom">
+              <a href="{% url 'admission:lead_list' %}?branch={{ item.branch__id }}" 
+                 class="d-flex justify-content-between text-decoration-none text-dark">
+                <span>{{ item.branch__name|default:"N/A" }}</span>
+                <span class="badge bg-info bg-opacity-10 text-info">{{ item.count }}</span>
+              </a>
+            </li>
+            {% empty %}
+            <li class="py-2 text-muted">No data</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
 
-          <!-- Enquiry Types -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="mini-card">
-              <div class="icon-circle bg-success-light">
-                <i class="bi bi-list-check"></i>
-              </div>
-              <h6 class="fw-semibold mt-2 mb-3">Enquiry Types</h6>
-              {% for item in enquiry_type_counts %}
-                <div class="count-badge">
-                  {{ item.enquiry_type|capfirst }}: <strong>{{ item.count }}</strong>
-                </div>
-              {% empty %}
-                <p class="text-muted">No data</p>
-              {% endfor %}
-            </div>
-          </div>
+    <!-- Course Wise -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card custom-card border-0  h-100">
+        <div class="card-header bg-white border-0">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-book text-warning me-2"></i>
+            Course Wise
+          </h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            {% for item in course_counts %}
+            <li class="py-2 border-bottom">
+              <a href="{% url 'admission:lead_list' %}?course={{ item.course__id }}" 
+                 class="d-flex justify-content-between text-decoration-none text-dark">
+                <span>{{ item.course__name|default:"N/A" }}</span>
+                <span class="badge bg-warning bg-opacity-10 text-warning">{{ item.count }}</span>
+              </a>
+            </li>
+            {% empty %}
+            <li class="py-2 text-muted">No data</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
 
-          <!-- Branch Wise -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="mini-card">
-              <div class="icon-circle bg-info-light">
-                <i class="bi bi-building"></i>
-              </div>
-              <h6 class="fw-semibold mt-2 mb-3">Branch Wise</h6>
-              {% for item in branch_counts %}
-                <div class="count-badge">
-                  {{ item.branch__name|default:"N/A" }}: <strong>{{ item.count }}</strong>
-                </div>
-              {% empty %}
-                <p class="text-muted">No data</p>
-              {% endfor %}
-            </div>
-          </div>
-
-          <!-- Course Wise -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="mini-card">
-              <div class="icon-circle bg-warning-light">
-                <i class="bi bi-journal-bookmark"></i>
-              </div>
-              <h6 class="fw-semibold mt-2 mb-3">Course Wise</h6>
-              {% for item in course_counts %}
-                <div class="count-badge">
-                  {{ item.course__name|default:"N/A" }}: <strong>{{ item.count }}</strong>
-                </div>
-              {% empty %}
-                <p class="text-muted">No data</p>
-              {% endfor %}
-            </div>
-          </div>
-
-          <!-- Status Wise -->
-          <div class="col-sm-6 col-lg-3">
-            <div class="mini-card">
-              <div class="icon-circle bg-danger-light">
-                <i class="bi bi-flag-fill"></i>
-              </div>
-              <h6 class="fw-semibold mt-2 mb-3">Status Wise</h6>
-              {% for item in status_counts %}
-                <div class="count-badge">
-                  {{ item.status|capfirst }}: <strong>{{ item.count }}</strong>
-                </div>
-              {% empty %}
-                <p class="text-muted">No data</p>
-              {% endfor %}
-            </div>
-          </div>
-
+    <!-- Status Wise -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card custom-card border-0  h-100">
+        <div class="card-header bg-white border-0">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-flag text-danger me-2"></i>
+            Status Wise
+          </h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            {% for item in status_counts %}
+            <li class="py-2 border-bottom">
+              <a href="{% url 'admission:lead_list' %}?status={{ item.status }}" 
+                 class="d-flex justify-content-between text-decoration-none text-dark">
+                <span>{{ item.status|capfirst }}</span>
+                <span class="badge bg-danger bg-opacity-10 text-danger">{{ item.count }}</span>
+              </a>
+            </li>
+            {% empty %}
+            <li class="py-2 text-muted">No data</li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
     </div>
   </div>
-   
+
 </div>
-<!--End::row-1 -->
-
-<style>
-  .report-card {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
-  }
-
-  .report-card .mini-card {
-    border: 1px solid #eaeaea;
-    border-radius: 0.75rem;
-    padding: 1rem;
-    text-align: center;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .report-card .mini-card:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.07);
-    transform: translateY(-4px);
-  }
-
-  .report-card .icon-circle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #fff;
-  }
-
-  .bg-primary-light { background-color: #0d6efd; }
-  .bg-success-light { background-color: #198754; }
-  .bg-warning-light { background-color: #ffc107; color: #000; }
-  .bg-info-light { background-color: #0dcaf0; }
-  .bg-danger-light { background-color: #dc3545; }
-
-  .count-badge {
-    background-color: rgba(0,0,0,0.05);
-    padding: 4px 12px;
-    margin: 4px 0;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-  }
-
-  .total-enquiry-small .icon-circle {
-  width: 40px;
-  height: 40px;
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-}
-
-.total-enquiry-small h2 {
-  font-size: 2rem;
-  margin-bottom: 0;
-}
-
-.total-enquiry-small small {
-  color: #6c757d;
-}
-</style>
+</div>  
