@@ -2,6 +2,7 @@ import datetime
 import openpyxl
 import csv
 import json
+from django.db.models import Count
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -389,9 +390,11 @@ class AdmissionDeleteView(mixins.HybridDeleteView):
 class LeadList(mixins.HybridListView):
     model = AdmissionEnquiry
     context_object_name = 'leads'
+    table_class = tables.AdmissionEnquiryTable
+    branch_filter = None
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = AdmissionEnquiry.objects.filter(is_active=True)
 
         status = self.request.GET.get('status')
         branch = self.request.GET.get('branch')
@@ -399,13 +402,16 @@ class LeadList(mixins.HybridListView):
         enquiry_type = self.request.GET.get('enquiry_type')
 
         if status:
-            queryset = queryset.filter(status=status)
+            queryset = AdmissionEnquiry.objects.filter(status=status)
+
         if branch:
-            queryset = queryset.filter(branch_id=branch)
+            queryset = AdmissionEnquiry.objects.filter(branch=branch)
+
         if course:
-            queryset = queryset.filter(course_id=course)
+            queryset = AdmissionEnquiry.objects.filter(course=course)
+
         if enquiry_type:
-            queryset = queryset.filter(enquiry_type=enquiry_type)
+            queryset = AdmissionEnquiry.objects.filter(enquiry_type=enquiry_type)
 
         return queryset
 
@@ -426,7 +432,7 @@ class PublicLeadListView(mixins.HybridListView):
     template_name = "admission/enquiry/list.html"
     model = AdmissionEnquiry
     table_class = tables.PublicEnquiryListTable
-    filterset_fields = {'city': ['exact'], 'branch': ['exact'], 'date': ['exact']}
+    filterset_fields = {'city': ['exact'], 'branch': ['exact'], 'date': ['exact'], 'enquiry_type': ['exact'],}
     permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "sales_head")
     branch_filter = False
 
@@ -478,9 +484,10 @@ class AssignedLeadListView(mixins.HybridListView):
 
 
 class MyleadListView(mixins.HybridListView):
+    template_name = "admission/enquiry/my_lead_list.html"
     model = AdmissionEnquiry
     table_class = tables.AdmissionEnquiryTable
-    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact']}
+    filterset_fields = {'course': ['exact'], 'branch': ['exact'],'status': ['exact'],'date': ['exact'], 'next_enquiry_date' : ['exact'],}
     permissions = ("branch_staff", "admin_staff", "is_superuser", "tele_caller", "mentor", "sales_head")
     branch_filter = False
 
@@ -488,17 +495,41 @@ class MyleadListView(mixins.HybridListView):
         queryset = super().get_queryset()
         user = self.request.user
         queryset = queryset.filter(tele_caller=user.employee)
+
+        status = self.request.GET.get('status')
+        branch = self.request.GET.get('branch')
+        course = self.request.GET.get('course')
+        enquiry_type = self.request.GET.get('enquiry_type')
+
+        if status:
+            queryset = queryset.filter(status=status)
+
+        if branch:
+            queryset = queryset.filter(branch=branch)
+
+        if course:
+            queryset = queryset.filter(course=course)
+
+        if enquiry_type:
+            queryset = queryset.filter(enquiry_type=enquiry_type)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_type = self.request.user.usertype
+        user = self.request.user
+        queryset = self.get_queryset()
 
         context.update({
             "title": "My Leads List",
             "is_my_lead": True,
-            "can_add": user_type in ("tele_caller",),
+            "can_add": user.usertype == "tele_caller",
             "new_link": reverse_lazy("admission:admission_enquiry_create"),
+            "enquiry_type_counts": queryset.values('enquiry_type').annotate(count=Count('id')),
+            "branch_counts": queryset.values('branch__id', 'branch__name').annotate(count=Count('id')),
+            "course_counts": queryset.values('course__id', 'course__name').annotate(count=Count('id')),
+            "status_counts": queryset.values('status').annotate(count=Count('id')),
+            'total_called_leads' : queryset.exclude(status="new_enquiry").count()
         })
 
         return context
@@ -567,7 +598,7 @@ class AdmissionEnquiryCreateView(mixins.HybridCreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return redirect("admission:public_lead_list")
+        return reverse("admission:my_lead_list")
 
 
 class AdmissionEnquiryUpdateView(mixins.HybridUpdateView):

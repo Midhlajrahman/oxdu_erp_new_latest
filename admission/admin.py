@@ -34,5 +34,5 @@ class AdmissionAdmin(BaseAdmin):
 
 @admin.register(AdmissionEnquiry)
 class AdmissionEnquiryAdmin(BaseAdmin):
-    list_display = ("full_name", "branch", "course", 'enquiry_type', 'tele_caller', "is_active",)
+    list_display = ("full_name", "branch", "course", 'enquiry_type', 'status', 'tele_caller', "is_active",)
     list_filter = ("branch", "course", "is_active")

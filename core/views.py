@@ -210,18 +210,19 @@ class HomeView(mixins.HybridTemplateView):
             context["student_count"] = students_in_branch.count()
 
         elif user.usertype == "sales_head":
+            active_enquiries = AdmissionEnquiry.objects.filter(is_active=True)
             branch = user.branch 
             students_in_branch = Admission.objects.filter(branch=branch)
 
-            context['my_leads'] = AdmissionEnquiry.objects.filter(tele_caller=self.request.user.employee).count()
-            context['awaiting_leads'] = AdmissionEnquiry.objects.filter(tele_caller__isnull=True).count()
-            context["assigned_lead_count"] = AdmissionEnquiry.objects.filter(tele_caller__isnull=False).count()
+            context['my_leads'] = active_enquiries.filter(tele_caller=self.request.user.employee).count()
+            context['awaiting_leads'] = active_enquiries.filter(tele_caller__isnull=True).count()
+            context["assigned_lead_count"] = active_enquiries.filter(tele_caller__isnull=False).count()
             context["tele_callers_count"] = Employee.objects.filter(user__usertype="tele_caller", is_active=True).count()
-            context['total_enquiries'] = AdmissionEnquiry.objects.count()
-            context['enquiry_type_counts'] = AdmissionEnquiry.objects.values('enquiry_type').annotate(count=Count('id'))
-            context['branch_counts'] = AdmissionEnquiry.objects.values('branch__id', 'branch__name').annotate(count=Count('id'))
-            context['course_counts'] = AdmissionEnquiry.objects.values('course__id', 'course__name').annotate(count=Count('id'))
-            context['status_counts'] = AdmissionEnquiry.objects.values('status').annotate(count=Count('id'))
+            context['total_enquiries'] = active_enquiries.count()
+            context['enquiry_type_counts'] = active_enquiries.values('enquiry_type').annotate(count=Count('id'))
+            context['branch_counts'] = active_enquiries.values('branch__id', 'branch__name').annotate(count=Count('id'))
+            context['course_counts'] = active_enquiries.values('course__id', 'course__name').annotate(count=Count('id'))
+            context['status_counts'] = active_enquiries.values('status').annotate(count=Count('id'))
 
         elif user.usertype == "tele_caller":
             branch = user.branch 

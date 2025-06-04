@@ -357,6 +357,9 @@ class FeeReceipt(BaseModel):
 class AdmissionEnquiry(BaseModel):
     enquiry_type = models.CharField(max_length=80, choices=ENQUIRY_TYPE_CHOICES, default="public_lead")
     tele_caller = models.ForeignKey("employees.Employee", on_delete=models.CASCADE, null=True)
+    full_name = models.CharField(max_length=200, null=True)
+    contact_number = models.CharField(max_length=100, null=True)
+    city = models.CharField(max_length=180, blank=True, null=True)
     branch = models.ForeignKey("branches.Branch", on_delete=models.CASCADE, limit_choices_to=active_objects, null=True, blank=True)
     course = models.ForeignKey('masters.Course', on_delete=models.CASCADE, limit_choices_to={"is_active": True}, null=True, blank=True)
     date = models.DateField(null=True)
@@ -365,9 +368,7 @@ class AdmissionEnquiry(BaseModel):
     remark = models.TextField(blank=True, null=True)
 
     # Student Info
-    full_name = models.CharField(max_length=200, null=True)
-    contact_number = models.CharField(max_length=100, null=True)
-    city = models.CharField(max_length=180, blank=True, null=True)
+   
     district = models.CharField(max_length=180, blank=True, null=True)
     state = models.CharField(max_length=180, blank=True, null=True)
 

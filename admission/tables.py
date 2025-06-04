@@ -119,7 +119,7 @@ class PublicEnquiryListTable(CustomBaseTable):
 
     class Meta:
         model = AdmissionEnquiry
-        fields = ("full_name", "contact_number", "city", "created", "tele_caller_column",)
+        fields = ("full_name", "contact_number", "city", "enquiry_type", "tele_caller_column", "created",)
         sequence = ("selection", "...", "action")
         attrs = {"class": "table star-student table-hover table-bordered"}
     

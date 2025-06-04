@@ -116,11 +116,11 @@ ENQUIRY_STATUS = (
 )
 
 ENQUIRY_TYPE_CHOICES = (
-        ('public_lead', 'Public Lead'),
-        ('meta_lead', 'Meta Lead'),
-        ('campaign_lead', 'Campaign Lead'),
-        ('event_lead', 'Event Lead'),
-        ('referral_lead', 'Referral Lead'),
+    ('public_lead', 'Public Lead'),
+    ('meta_lead', 'Meta Lead'),
+    ('campaign_lead', 'Campaign Lead'),
+    ('event_lead', 'Event Lead'),
+    ('referral_lead', 'Referral Lead'),
 )
 
 MARITAL_CHOICES = (("SINGLE", "Single"), ("MARRIED", "Married"), ("IN_A_RELATIONSHIP", "In a Relationship"), ("DIVORCED", "Divorced"), ("WIDOWED", "Widowed"), ("OTHER", "Other"))
