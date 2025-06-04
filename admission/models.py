@@ -376,7 +376,7 @@ class AdmissionEnquiry(BaseModel):
         return f"{self.full_name}"
 
     class Meta:
-        ordering = ['-id']  
+        ordering = ['id']  
         verbose_name = 'Admission Enquiry'
         verbose_name_plural = 'Admission Enquiries'
     

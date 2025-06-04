@@ -213,7 +213,7 @@ class RegistrationForm(forms.ModelForm):
 class AdmissionEnquiryForm(forms.ModelForm):
     class Meta:
         model = AdmissionEnquiry
-        exclude = ('tele_caller',)
+        fields = '__all__'
         
 
 class AttendanceRegisterForm(forms.ModelForm):

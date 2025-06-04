@@ -103,16 +103,18 @@ class ImportEnquiryView(View):
             if file.name.endswith('.xlsx'):
                 wb = openpyxl.load_workbook(file)
                 sheet = wb.active
-                for row in sheet.iter_rows(min_row=2, values_only=True):
+                for row in sheet.iter_rows(min_row=3, values_only=True):
                     phone = row[0] if len(row) > 0 else None
                     full_name = row[1] if len(row) > 1 else None
                     city = row[2] if len(row) > 2 else None
+                    enquiry_type = row[3] if len(row) > 3 else None
 
                     if phone:
                         AdmissionEnquiry.objects.create(
                             contact_number=phone,
                             full_name=full_name,
                             city=city,
+                            enquiry_type=enquiry_type
                         )
 
             elif file.name.endswith('.csv'):
@@ -123,12 +125,14 @@ class ImportEnquiryView(View):
                     full_name = row[0] if len(row) > 0 else None
                     city = row[1] if len(row) > 1 else None
                     phone = row[2] if len(row) > 2 else None
+                    enquiry_type = row[3] if len(row) > 3 else None
 
                     if phone:
                         AdmissionEnquiry.objects.create(
                             contact_number=phone,
                             full_name=full_name,
                             city=city,
+                            enquiry_type=enquiry_type
                         )
 
             else:
@@ -603,15 +607,25 @@ class AdmissionEnquiryCreateView(mixins.HybridCreateView):
 
 class AdmissionEnquiryUpdateView(mixins.HybridUpdateView):
     model = AdmissionEnquiry
+    form_class = AdmissionEnquiryForm
     permissions = ("branch_staff", "tele_caller", "admin_staff", "is_superuser", "sales_head")
-    exclude = ('tele_caller',)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["is_admission"] = True
-        context["is_enquiry"] = True  
+        context["is_enquiry"] = True
         context["title"] = "Edit Lead"
         return context
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        user = self.request.user
+        if not (user.is_superuser or user.usertype in ["admin_staff", "sales_head"]):
+            if 'tele_caller' in form.fields:
+                del form.fields['tele_caller']
+
+        return form
 
     def form_valid(self, form):
         user = self.request.user
