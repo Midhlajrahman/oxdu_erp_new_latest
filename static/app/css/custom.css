@@ -1,9 +1,8 @@
-.table>thead>tr>th,
-.table>thead>tr>th a {
+.table > thead > tr > th,
+.table > thead > tr > th a {
     text-transform: uppercase;
     font-size: 12px;
 }
-
 
 #div_id_is_active {
     display: none;
@@ -28,18 +27,17 @@ input[type="number"] {
     /* Remove spinners for Firefox */
 }
 
-.custom .table tbody td{
+.custom .table tbody td {
     padding: 10px;
 }
 
-.custom-input{
+.custom-input {
     border: none !important;
     background: none !important;
     width: 100% !important;
     font-size: 1rem !important;
     font-weight: bold !important;
 }
-
 
 .bordered-container {
     border: 1px solid #ccc;
@@ -61,12 +59,13 @@ input[readonly] {
     color: #333; /* Optional: Adjust text color for better contrast */
     cursor: not-allowed; /* Optional: Indicate the field is not editable */
 }
-.app-sidebar{
-    background: linear-gradient(90deg, #EE4C24, #EB135E) !important;
-
+.app-sidebar {
+    background: linear-gradient(90deg, #ee4c24, #eb135e) !important;
 }
 
-.app-sidebar .side-menu__icon, .app-sidebar .side-menu__angle, .app-sidebar .side-menu__label{
+.app-sidebar .side-menu__icon,
+.app-sidebar .side-menu__angle,
+.app-sidebar .side-menu__label {
     color: white !important;
     fill: white !important;
 }
@@ -75,20 +74,20 @@ input[readonly] {
     padding: 10px;
     font-weight: 600;
     font-size: 11px;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
 }
-.invoice-header img{
+.invoice-header img {
     height: 40px !important;
 }
-.customlogin-content .header-brand{
+.customlogin-content .header-brand {
     justify-content: center;
     display: flex;
 }
-.customlogin-content .header-brand img{
+.customlogin-content .header-brand img {
     height: 50px !important;
 }
 
-.customlogin-content{
+.customlogin-content {
     width: 380px !important;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
     height: auto !important;
@@ -96,30 +95,30 @@ input[readonly] {
     border-radius: 10px !important;
 }
 
-.custom-btn{
-    background: linear-gradient(90deg, #EE4C24, #EB135E) !important;
+.custom-btn {
+    background: linear-gradient(90deg, #ee4c24, #eb135e) !important;
     color: white;
     /* border-radius: 30px !important; */
 }
-.custom-btn:hover{
-    border-color: #EE4C24;
+.custom-btn:hover {
+    border-color: #ee4c24;
     color: rgb(0, 0, 0) !important;
     background: white !important;
 }
-.card.custom-card .card-icon{
-    border-radius: 40px ;
+.card.custom-card .card-icon {
+    border-radius: 40px;
 }
-.custom-btn-2{
-    border-color: #EE4C24;
+.custom-btn-2 {
+    border-color: #ee4c24;
     color: rgb(0, 0, 0) !important;
     background: white !important;
 }
-.custom-btn-2:hover{
-    border-color: #EE4C24;
+.custom-btn-2:hover {
+    border-color: #ee4c24;
 }
 @media (max-width: 991px) {
     .app-sidebar .slide {
-        padding: 5px .75rem !important;
+        padding: 5px 0.75rem !important;
     }
     .app-sidebar .side-menu__item.active {
         background-color: rgb(0 0 0) !important;
@@ -130,40 +129,43 @@ input[readonly] {
         color: black !important;
     }
 
-    .app-sidebar .side-menu__item{
+    .app-sidebar .side-menu__item {
         color: white !important;
     }
-    .app-sidebar .slide-menu.child1 .side-menu__item.active{
+    .app-sidebar .slide-menu.child1 .side-menu__item.active {
         color: rgb(255, 255, 255) !important;
     }
-    .app-sidebar .slide-menu.child1 .side-menu__item.active:hover{
+    .app-sidebar .slide-menu.child1 .side-menu__item.active:hover {
         color: rgb(255, 255, 255) !important;
     }
 
-    .header-logo{
+    .header-logo {
         display: none;
     }
 }
-.registration-form-section .registration-form-card .registration-form-content h1{
+.registration-form-section
+    .registration-form-card
+    .registration-form-content
+    h1 {
     font-weight: 600 !important;
 }
-.registration-form-section .registration-form-card-sec{
+.registration-form-section .registration-form-card-sec {
     padding: 20px !important;
     border-bottom: 1px solid gray !important;
-    gap: 50px !important
+    gap: 50px !important;
 }
 
-.registration-form-section .registration-form-card-sec img{
+.registration-form-section .registration-form-card-sec img {
     height: 60px !important;
 }
 
-.registration-form-section .image-input{
-    cursor: pointer; 
-    position: relative; 
+.registration-form-section .image-input {
+    cursor: pointer;
+    position: relative;
     display: inline-block;
 }
 
-.registration-form-section #overlayText{
+.registration-form-section #overlayText {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -175,11 +177,11 @@ input[readonly] {
     font-size: 14px;
 }
 
-.registration-form-section .image-input img{
+.registration-form-section .image-input img {
     width: 100%;
     height: 213px;
 }
-.terms-condition-section .registration-form-card-sec{
+.terms-condition-section .registration-form-card-sec {
     gap: 50px !important;
     padding: 30px !important;
 }
@@ -188,22 +190,22 @@ input[readonly] {
     border: none;
     border-radius: 1rem;
     box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .report-card .mini-card {
+.report-card .mini-card {
     border: 1px solid #eaeaea;
     border-radius: 0.75rem;
     padding: 1rem;
     text-align: center;
     transition: all 0.2s ease-in-out;
-  }
+}
 
-  .report-card .mini-card:hover {
+.report-card .mini-card:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.07);
     transform: translateY(-4px);
-  }
+}
 
-  .report-card .icon-circle {
+.report-card .icon-circle {
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -213,50 +215,59 @@ input[readonly] {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
     color: #fff;
-  }
+}
 
-  .bg-primary-light { background-color: #0d6efd; }
-  .bg-success-light { background-color: #198754; }
-  .bg-warning-light { background-color: #ffc107; color: #000; }
-  .bg-info-light { background-color: #0dcaf0; }
-  .bg-danger-light { background-color: #dc3545; }
+.bg-primary-light {
+    background-color: #0d6efd;
+}
+.bg-success-light {
+    background-color: #198754;
+}
+.bg-warning-light {
+    background-color: #ffc107;
+    color: #000;
+}
+.bg-info-light {
+    background-color: #0dcaf0;
+}
+.bg-danger-light {
+    background-color: #dc3545;
+}
 
-  .count-badge {
-    background-color: rgba(0,0,0,0.05);
+.count-badge {
+    background-color: rgba(0, 0, 0, 0.05);
     padding: 4px 12px;
     margin: 4px 0;
     border-radius: 1rem;
     font-size: 0.875rem;
-  }
+}
 
-  .total-enquiry-small .icon-circle {
-  width: 40px;
-  height: 40px;
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+.total-enquiry-small .icon-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
 }
 
 .total-enquiry-small h2 {
-  font-size: 2rem;
-  margin-bottom: 0;
+    font-size: 2rem;
+    margin-bottom: 0;
 }
 
 .total-enquiry-small small {
-  color: #6c757d;
+    color: #6c757d;
 }
 
 .card {
     transition: transform 0.2s;
-  }
-  .card:hover {
+}
+.card:hover {
     transform: translateY(-2px);
-  }
-  .badge {
+}
+.badge {
     font-weight: 500;
     padding: 0.35em 0.65em;
-  }
-  .table-hover tbody tr:hover {
+}
+.table-hover tbody tr:hover {
     background-color: rgba(0, 0, 0, 0.02);
-  }
-
-  
+}

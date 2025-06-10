@@ -38,9 +38,17 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <form class="form-horizontal" method="post" autocomplete="off" enctype="multipart/form-data" action=""
-                                enctype="multipart/form-data">
+                            <form class="form-horizontal" method="post" autocomplete="off" enctype="multipart/form-data" action="">
                                 {% csrf_token %}
+                                <div class="col-lg-4 col-sm-12 col-md-4" id="div_id_branch" {% if not user.usertype == 'admin_staff' and not user.is_superuser %}style="display:none;"{% endif %}>
+                                    <label for="branch" class="form-label">Branches<span class="asteriskField">*</span></label>
+                                    <select class="form-control" name="branch" id="branch">
+                                        <option value="">Select Branch</option>
+                                        {% for branch in branches %}
+                                            <option value="{{ branch.id }}" {% if user.branch.id == branch.id %}selected{% endif %}>{{ branch.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                                 {{form|crispy}}
 
                                 {% if formset %}
@@ -55,7 +63,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                             </form>
                             </div>
                         </div>
@@ -71,4 +78,70 @@
     </div>
 </div>
 
+<style>
+    #div_id_student {
+        display: none;
+    }
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+</style>
+<script>
+$(document).ready(function() {
+    const userIsAdmin = {% if user.usertype == 'admin_staff' or user.is_superuser %}true{% else %}false{% endif %};
+    const userBranchId = {% if user.branch.id %}{{ user.branch.id }}{% else %}null{% endif %};
+
+    // Initialize Select2
+    $('#id_student').select2({
+        placeholder: "Search students...",
+        allowClear: true
+    });
+
+    if (!userIsAdmin) {
+        // Auto-load branch students if not admin
+        $('#branch').val(userBranchId);
+        loadStudents(userBranchId);
+        $('#div_id_student').show();
+    }
+
+    $('#branch').on('change', function() {
+        const branchId = $(this).val();
+        if (branchId) {
+            $('#div_id_student').show();
+            loadStudents(branchId);
+        } else {
+            $('#div_id_student').hide();
+            $('#id_student').empty().append('<option value="">---------</option>').trigger('change');
+        }
+    });
+
+    function loadStudents(branchId) {
+        const studentSelect = $('#id_student');
+        studentSelect.empty().append('<option value="">Loading students...</option>');
+
+        $.ajax({
+            url: "{% url 'admission:get_students_by_branch' %}",
+            method: 'GET',
+            data: { 'branch_id': branchId },
+            success: function(response) {
+                studentSelect.empty();
+                studentSelect.append('<option value="">---------</option>');
+                if (response.success && response.students.length > 0) {
+                    response.students.forEach(function(student) {
+                        const option = new Option(student.display, student.id);
+                        studentSelect.append(option);
+                    });
+                } else {
+                    studentSelect.append('<option value="">No students found in this branch</option>');
+                }
+                studentSelect.trigger('change');
+            },
+            error: function() {
+                studentSelect.empty().append('<option value="">Error loading students</option>').trigger('change');
+            }
+        });
+    }
+});
+</script>
 {% endblock content %}

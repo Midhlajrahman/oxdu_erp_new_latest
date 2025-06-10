@@ -28,7 +28,7 @@ from django.forms import formset_factory, inlineformset_factory
 from core.utils import build_url
 from core import mixins
 
-from admission .models import Admission, Attendance, AttendanceRegister, FeeReceipt, AdmissionEnquiry
+from admission .models import Admission, Attendance, AttendanceRegister, FeeReceipt, AdmissionEnquiry, generate_receipt_no
 from masters.models import Batch, Course
 from masters.forms import BatchForm
 from employees.models import Employee
@@ -38,7 +38,7 @@ from core.pdfview import PDFView
 from . import tables
 from . import forms
 
-from admission.forms import AttendanceForm, AttendanceUpdateForm, FeeReceiptFormSet, AdmissionEnquiryForm
+from admission.forms import AttendanceForm, AttendanceUpdateForm, FeeReceiptForm, FeeReceiptFormSet, AdmissionEnquiryForm
 # from .forms import AdmissionForm
 
 
@@ -90,6 +90,30 @@ def get_batches_for_course(request):
     data = [{'id': batch.id, 'name': batch.batch_name} for batch in batches]
 
     return JsonResponse({'batches': data})
+
+
+def get_students_by_branch(request):
+    if request.method == 'GET' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        branch_id = request.GET.get('branch_id')
+
+        if not (request.user.usertype == 'admin_staff' or request.user.is_superuser):
+            branch_id = request.user.branch.id if hasattr(request.user, 'branch') else None
+
+        if branch_id:
+            students = Admission.objects.filter(branch_id=branch_id).values(
+                'id', 
+                'first_name', 
+                'last_name', 
+                'admission_number'
+            )
+            students_list = [{
+                'id': student['id'],
+                'display': f"{student['first_name']} {student['last_name']} - {student['admission_number']}"
+            } for student in students]
+
+            return JsonResponse({'success': True, 'students': students_list})
+
+    return JsonResponse({'success': False, 'students': []})
 
 
 class ImportEnquiryView(View):
@@ -899,9 +923,6 @@ class FeeReceiptListView(mixins.HybridListView):
         elif user.usertype == "branch_staff":
             queryset = queryset.filter(student__branch=user.branch)
 
-        else :
-            queryset = queryset.filter(student__branch=get_branch)
-
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -909,7 +930,7 @@ class FeeReceiptListView(mixins.HybridListView):
         context["is_admission"] = True
         context["fee_reciept"] = True
         user = self.request.user
-        context["can_add"] = user.usertype in ["teacher", "branch_staff", "admin_staff"]
+        context["can_add"] = user.usertype in ["teacher", "branch_staff", "admin_staff", ] or user.is_superuser
         if context["can_add"]:
             context["new_link"] = reverse_lazy("admission:feereceipt_create")
         return context
@@ -923,13 +944,15 @@ class FeeReceiptDetailView(mixins.HybridDetailView):
 
 class FeeReceiptCreateView(mixins.HybridCreateView):
     model = FeeReceipt
-    fields = ["student", "receipt_no", "date", "note", "payment_type", "amount"]
-    permissions = ("is_superuser", "teacher", "branch_staff")
+    form_class = FeeReceiptForm
+    exclude = ['receipt_no',]
+    permissions = ("is_superuser", "teacher", "branch_staff", "admin_staff")
     template_name = "admission/fee_receipt/object_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "New Fee Receipt"
+        context["branches"] = Branch.objects.all()
         return context
 
     def get_form(self, form_class=None):
@@ -951,6 +974,12 @@ class FeeReceiptCreateView(mixins.HybridCreateView):
 
     def form_valid(self, form):
         fee_receipt = form.save(commit=False)
+
+        user = self.request.user
+        if user.usertype in ["teacher", "branch_staff"]:
+            fee_receipt.branch = user.branch 
+
+        fee_receipt.receipt_no = generate_receipt_no(fee_receipt.student)  
         fee_receipt.save()
         return super().form_valid(form)
 

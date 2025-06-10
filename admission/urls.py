@@ -5,6 +5,8 @@ from django.urls import path
 app_name = "admission"
 
 urlpatterns = [
+    #ajax
+    path('ajax/students-by-branch/', views.get_students_by_branch, name='get_students_by_branch'),
     path('enquiry/import/', views.ImportEnquiryView.as_view(), name='import_enquiry'),
     path("student_check_data/", views.student_check_data, name="student_check_data"),
     path('add-to-me/<int:pk>/', views.add_to_me, name='add_to_me'),

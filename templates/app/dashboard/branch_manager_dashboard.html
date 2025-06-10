@@ -5,7 +5,7 @@
     <div class="col-xxl-9 col-md-12 col-lg-12">
         <div class="row">
           
-            <div class="col-6 col-md-4 col-lg-2-4">
+            <div class="col-12 col-md-4 col-lg-2-4">
                 <div class="card custom-card">
                     <div class="card-body">
                         <div class="row">
@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-2-4">
+            <div class="col-12 col-md-4 col-lg-2-4">
                 <div class="card custom-card">
                     <div class="card-body">
                         <div class="row">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-4 col-lg-2-4">
+            <div class="col-12 col-md-4 col-lg-2-4">
                 <div class="card custom-card">
                     <div class="card-body">
                         <div class="row">
@@ -53,7 +53,7 @@
                 </div>
             </div>
 
-            <div class="col-6 col-md-4 col-lg-2-4">
+            <div class="col-12 col-md-4 col-lg-2-4">
                 <div class="card custom-card">
                     <div class="card-body">
                         <div class="row">
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="col-6 col-md-4 col-lg-2-4">
+            <div class="col-12 col-md-4 col-lg-2-4">
                 <div class="card custom-card">
                     <div class="card-body">
                         <a href="{% url 'admission:admission_enquiry' %}"> 
@@ -94,9 +94,11 @@
 
 {% block extra_css %}
 <style>
-    .col-lg-2-4 {
-        flex: 0 0 20%;
-        max-width: 20%;
-      }
+    @media(min-width:991px){
+        .col-lg-2-4 {
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+    }
 </style>
 {% endblock %}

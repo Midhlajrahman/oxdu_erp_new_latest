@@ -1,6 +1,8 @@
 from django.core.validators import RegexValidator
 import os
+import re
 import uuid
+from django.db.models import Max
 from django.db.models import Sum
     
 from core.base import BaseModel
@@ -46,18 +48,30 @@ def generate_admission_no(course):
     return f"{prefix}{str(next_number).zfill(3)}"
 
 
-def generate_receipt_no():
-    max_receipt_no = FeeReceipt.objects.aggregate(models.Max('receipt_no'))['receipt_no__max']
-    
-    if max_receipt_no is None:
-        receipt_no = 1
-    else:
-        try:
-            receipt_no = int(max_receipt_no.replace("OXD00", "")) + 1  
-        except ValueError:
-            raise ValueError("Invalid receipt number format in database")
+def generate_receipt_no(student):
+    # Get the branch name from the student instance
+    branch_name = student.branch.name
 
-    return f"OXD00{receipt_no}"  
+    # Function to generate branch code dynamically
+    def get_branch_code(name):
+        code = re.sub(r'[AEIOUaeiou\s]', '', name)[:3].upper()
+        return code.ljust(3, 'X')  # pad with 'X' if less than 3 characters
+
+    branch_code = get_branch_code(branch_name)
+    
+    # Find the max receipt number for this branch
+    max_receipt_no = FeeReceipt.objects.filter(student__branch=student.branch).aggregate(Max('receipt_no'))['receipt_no__max']
+
+    if max_receipt_no is None:
+        next_no = 1
+    else:
+        # Extract numeric part from the receipt number
+        numeric_part = re.findall(r'\d+$', max_receipt_no)
+        next_no = int(numeric_part[0]) + 1 if numeric_part else 1
+
+    # Construct the new receipt number
+    receipt_no = f"OXD{branch_code}{str(next_no).zfill(3)}"
+    return receipt_no
 
 
 def active_objects():
@@ -293,8 +307,8 @@ class StudentFee(BaseModel):
     
 class FeeReceipt(BaseModel):
     student = models.ForeignKey(Admission, on_delete=models.PROTECT)
-    receipt_no = models.CharField(max_length=10,default=generate_receipt_no, null=True)
-    date = models.DateTimeField(null=True)
+    receipt_no = models.CharField(max_length=10, null=True)
+    date = models.DateField(null=True)
     note = models.CharField(max_length=128,blank=True,null=True)
     payment_type = models.CharField(max_length=30, choices=PAYMENT_METHOD_CHOICES, default='Cash')
     amount = models.DecimalField(max_digits=14, decimal_places=2, null=True, )

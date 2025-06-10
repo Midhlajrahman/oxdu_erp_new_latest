@@ -3,6 +3,8 @@ from django.db import transaction
 from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee, AdmissionEnquiry, AttendanceRegister
 from django import forms
 from decimal import Decimal
+from branches.models import Branch
+from employees.models import Employee
 
 
 class AdmissionForm(BaseForm):
@@ -230,3 +232,9 @@ class AttendanceRegisterForm(forms.ModelForm):
         if batch:
             self.fields['starting_time'].initial = batch.starting_time
             self.fields['ending_time'].initial = batch.ending_time
+
+        
+class FeeReceiptForm(forms.ModelForm):
+    class Meta:
+        model = FeeReceipt
+        fields = '__all__'
