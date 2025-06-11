@@ -336,11 +336,18 @@ class AdmissionCreateView(mixins.HybridCreateView):
         return build_url("admission:admission_detail", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
-        branch_id = self.request.session.get('branch')
-        print('branch_id=',branch_id)
-        form.instance.creator = self.request.user
-        form.instance.branch = Branch.objects.get(pk=branch_id)
-        return super().form_valid(form)
+        if hasattr(self.request.user, 'employee') and self.request.user.employee and self.request.user.employee.branch:
+            branch = self.request.user.employee.branch
+        else:
+            form.add_error(None, "Current user has no branch assigned.")
+            return self.form_invalid(form)
+
+        self.object = form.save(commit=False)
+        self.object.creator = self.request.user
+        self.object.branch = branch
+        self.object.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_message(self, cleaned_data):
         return "Admission Personal Data Created Successfully"
