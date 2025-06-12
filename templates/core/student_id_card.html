@@ -93,7 +93,7 @@
             {% endif %} 
             <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname}}</p>
             {% if instance.user.usertype == "student" %}
-                <p class="position" style="top: 74%; left: 38.5%;">{{instance.user.get_usertype_display}}</p>
+                <p class="position" style="top: 74%; left: 29%;">{{instance.user.student.course}}</p>
             {% else %}
                 <p class="position" style="top: 74%; left: 38%;">{{instance.designation}}</p>
             {% endif %}
