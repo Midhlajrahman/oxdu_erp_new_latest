@@ -63,6 +63,10 @@
             font-weight: 800;
             font-size: 20px;
             text-transform: uppercase;
+            display: flex !important;
+            justify-content: center !important;;
+            align-items: center !important;;
+            text-align: center !important;
         }
         .id-no{
             position: absolute;
@@ -91,7 +95,7 @@
             {% if instance.photo %}
                 <div class="id-card-img" style="background-image: url('{{ instance.photo.url }}');"></div>
             {% endif %} 
-            <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname|default:""}}</p>
+            <p class="fullname" style="top: 70%; width:100%">{{instance.fullname|default:""}}</p>
             {% if instance.user.usertype == "student" %}
                 <p class="position" style="top: 74%; left: 29%;">{{instance.user.student.course|default:""}}</p>
             {% else %}
