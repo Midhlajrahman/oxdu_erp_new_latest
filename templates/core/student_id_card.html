@@ -91,11 +91,11 @@
             {% if instance.photo %}
                 <div class="id-card-img" style="background-image: url('{{ instance.photo.url }}');"></div>
             {% endif %} 
-            <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname}}</p>
+            <p class="fullname" style="top: 70%; left: 30%; width:70%">{{instance.fullname|default:""}}</p>
             {% if instance.user.usertype == "student" %}
-                <p class="position" style="top: 74%; left: 29%;">{{instance.user.student.course}}</p>
+                <p class="position" style="top: 74%; left: 29%;">{{instance.user.student.course|default:""}}</p>
             {% else %}
-                <p class="position" style="top: 74%; left: 38%;">{{instance.designation}}</p>
+                <p class="position" style="top: 74%; left: 38%;">{{instance.designation|default:""}}</p>
             {% endif %}
             
         </div>
@@ -105,14 +105,14 @@
     <div class="id-card-2">
         <div class="card">
             {% if instance.user.usertype == "student" %}
-               <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.admission_number}}</p>
+               <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.admission_number|default:""}}</p>
             {% else %}
-                <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.employee_id}}</p>
+                <p class="id-no" style="top: 10.5%; left: 8%;">{{instance.employee_id|default:""}}</p>
             {% endif %}
             <p class="id-no" style="top: 21.3%; left: 8%;">{{instance.date_of_birth|date:"d/Y/m"}}</p>
-            <p class="id-no" style="top: 30.8%; left: 8%;">{{instance.contact_number}}</p>
-            <p class="id-no" style="top: 41%; left: 8%;">{{instance.parent_contact_number}}</p>
-            <p class="id-no" style="top: 50%; left: 8%;">{{instance.get_blood_group_display}}</p>
+            <p class="id-no" style="top: 30.8%; left: 8%;">{{instance.contact_number|default:""}}</p>
+            <p class="id-no" style="top: 41%; left: 8%;">{{instance.parent_contact_number|default:""}}</p>
+            <p class="id-no" style="top: 50%; left: 8%;">{{instance.get_blood_group_display|default:""}}</p>
             <p class="id-no" style="top: 59%; left: 15%; display: flex; justify-content: center; width: 70%; text-align: center; font-size: 13px; line-height: 18px;">{{instance.branch.get_address}}</p>
         </div>
         
