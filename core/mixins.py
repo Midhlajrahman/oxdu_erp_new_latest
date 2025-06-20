@@ -166,9 +166,8 @@ class HybridCreateView(CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMe
         return form
 
     def get_branch(self):
-        branch_id = self.request.session.get('branch')
-        loged_branch = Branch.objects.filter(id=branch_id).first() if branch_id else None
-        return loged_branch
+        branch = self.request.user.branch
+        return branch
 
 
 class HybridUpdateView(CustomLoginRequiredMixin, CustomModelFormMixin, SuccessMessageMixin, UpdateView):

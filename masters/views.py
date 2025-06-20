@@ -140,6 +140,7 @@ class BatchCreateView(mixins.HybridCreateView):
         return context
 
     def form_invalid(self, form):
+        
         print(form.errors)
         return super().form_invalid(form)
     

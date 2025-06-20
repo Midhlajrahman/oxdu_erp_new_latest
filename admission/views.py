@@ -363,7 +363,7 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
             "parent": forms.AdmissionParentDataForm,
             "address": forms.AdmissionAddressDataForm,
             "official": forms.AdmissionOfficialDataForm,
-            "personal": forms.AdmissionPersonalDataForm,  
+            "personal": forms.AdmissionPersonalDataForm,
             "financial": forms.AdmissionFinancialDataForm
         }
         info_type = self.request.GET.get("type", "personal")
@@ -372,7 +372,13 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         info_type = self.request.GET.get("type", "personal")
-        subtitles = {"parent": "Parent Data", "address": "Address Data", "official": "Official Data", "financial": "Financial Data",  "personal": "Personal Data"}
+        subtitles = {
+            "parent": "Parent Data",
+            "address": "Address Data",
+            "official": "Official Data",
+            "financial": "Financial Data",
+            "personal": "Personal Data"
+        }
         urls = {
             "personal": build_url("admission:admission_update", kwargs={"pk": self.object.pk}, query_params={'type': 'personal'}),
             "parent": build_url("admission:admission_update", kwargs={"pk": self.object.pk}, query_params={'type': 'parent'}),
@@ -387,12 +393,12 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
         context["is_admission"] = True
         context['batch_form'] = BatchForm(self.request.POST or None)
         return context
-
+    
     def get_success_url(self):
         if "save_and_next" in self.request.POST:
             info_type = self.request.GET.get("type", "personal")
             if info_type == "official" and self.object.user:
-                next_url = build_url("accounts:student_user_update", kwargs={"pk": self.object.user.pk})
+                return build_url("accounts:student_user_update", kwargs={"pk": self.object.user.pk})
             else:
                 urls = {
                     "personal": build_url("admission:admission_update", kwargs={"pk": self.object.pk}, query_params={'type': 'parent'}),
@@ -401,9 +407,8 @@ class AdmissionUpdateView(mixins.HybridUpdateView):
                     "official": build_url("admission:admission_update", kwargs={"pk": self.object.pk}, query_params={'type': 'financial'}),
                     "financial": build_url("accounts:student_user_create", kwargs={"pk": self.object.pk}, query_params={'type': 'parent'}),
                 }
-                next_url = urls.get(info_type, build_url("admission_detail", kwargs={"pk": self.object.pk}))
-            return next_url
-        return self.object.get_list_url()
+                return urls.get(info_type, build_url("admission_detail", kwargs={"pk": self.object.pk}))
+        return self.object.get_list_url()  
 
     def get_success_message(self, cleaned_data):
         info_type = self.request.GET.get("type", "personal")

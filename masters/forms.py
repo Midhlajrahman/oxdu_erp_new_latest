@@ -99,4 +99,4 @@ class PlacementRequestForm(forms.ModelForm):
 class BatchForm(forms.ModelForm):
     class Meta:
         model = Batch
-        fields = ["course", "batch_name", "description", "starting_time", "ending_time", "starting_date", "ending_date", "is_active",]
+        fields = [ "course", "batch_name", "description", "starting_time", "ending_time", "starting_date", "ending_date", "is_active",]

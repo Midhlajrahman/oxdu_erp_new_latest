@@ -6,7 +6,7 @@ from django.contrib import admin
 
 @admin.register(Batch)
 class BatchAdmin(BaseAdmin):
-    pass
+    list_display = ("__str__", "branch",)
 
 
 @admin.register(Course)
