@@ -120,7 +120,7 @@ class Admission(BaseModel):
     # finance
     fee_type = models.CharField(max_length=30, choices=FEE_TYPE, blank=True, null=True)
     is_discount = models.CharField(max_length=30, choices=CHOICES, blank=True, null=True)
-    discount_percentage = models.PositiveIntegerField(null=True, blank=True)
+    discount_amount = models.PositiveIntegerField(null=True, blank=True)
     
     def fullname(self):
         if self.last_name:
@@ -248,7 +248,7 @@ class Attendance(BaseModel):
             phone_number = self.student.parent_whatsapp_number
             if phone_number:
                 combined_message = (
-                    f"*Oxdu Tech School - Attendance Notification / ഹാജര്‍ അറിയിപ്പ്*\n\n"
+                    f"*Oxdu Integrated Media School - Attendance Notification / ഹാജര്‍ അറിയിപ്പ്*\n\n"
                     
                     f"*English:*\n"
                     f"Dear Parent,\n\n"
@@ -263,7 +263,7 @@ class Attendance(BaseModel):
                     f"ആയതിനാൽ യഥാർത്ഥ കാരണം ദയവായി അറിയിക്കുക.\n\n"
                     
                     f"Regards,\n"
-                    f"*Oxdu Tech School*"
+                    f"*Oxdu Integrated Media School*"
                 )
                 send_sms(phone_number, combined_message)
 

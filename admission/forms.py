@@ -1,5 +1,6 @@
 from core.base import BaseForm
 from django.db import transaction
+from django.db.models import Sum
 from .models import Admission, Attendance, FeeReceipt, FeeStructure, StudentFee, AdmissionEnquiry, AttendanceRegister
 from django import forms
 from decimal import Decimal
@@ -77,34 +78,52 @@ class AdmissionOfficialDataForm(forms.ModelForm):
 class AdmissionFinancialDataForm(forms.ModelForm):
     class Meta:
         model = Admission
-        fields = ("fee_type", "is_discount", "discount_percentage")
+        fields = ("fee_type", "is_discount", "discount_amount")
         widgets = {
             'fee_type': forms.Select(attrs={'class': 'select form-control', 'id': 'id_fee_type'}),
             'is_discount': forms.Select(attrs={'class': 'select form-control', 'id': 'id_is_discount'}),
-            'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'id': 'id_discount_percentage'}),
+            'discount_amount': forms.NumberInput(attrs={'class': 'form-control', 'id': 'discount_amount'}),
         }
 
-        
     def save(self, commit=True):
-        admission = super().save(commit=False)  
-        with transaction.atomic():  
+        admission = super().save(commit=False)
+
+        with transaction.atomic():
             fee_names = ["first_payment", "second_payment", "third_payment", "fourth_payment"]
-            total_amount = 0  
 
-            for fee_name in fee_names:
-                fee_structure = FeeStructure.objects.filter(course=admission.course, name=fee_name).first()
-                if fee_structure:  
-                    StudentFee.objects.create(student=admission, fee_structure=fee_structure)
-                    total_amount += fee_structure.amount
+            # Create StudentFee entries only if they don't exist (avoiding duplication)
+            if not StudentFee.objects.filter(student=admission).exists():
+                for fee_name in fee_names:
+                    fee_structure = FeeStructure.objects.filter(course=admission.course, name=fee_name).first()
+                    if fee_structure:
+                        StudentFee.objects.create(student=admission, fee_structure=fee_structure)
 
-            if admission.is_discount and admission.discount_percentage:
-                discount_amount = total_amount * (Decimal(admission.discount_percentage) / 100)
-                FeeReceipt.objects.create(student=admission, amount=discount_amount, note="Discount")
+            if commit:
+                admission.save()  # save the updated Admission first (important!)
 
-            if commit:  
-                admission.save()
+            # Now handle the discount logic properly:
+            if admission.is_discount and admission.discount_amount:
+
+                # Total Discount Already Applied in FeeReceipt:
+                total_discount_applied = FeeReceipt.objects.filter(
+                    student=admission,
+                    note="Discount Applied"
+                ).aggregate(total=Sum('amount'))['total'] or 0
+
+                # New discount value from form
+                current_discount = admission.discount_amount
+
+                difference = current_discount - total_discount_applied
+
+                if difference != 0:  # Means discount increased or reduced
+                    FeeReceipt.objects.create(
+                        student=admission,
+                        amount=difference,
+                        note="Discount Applied"
+                    )
 
         return admission
+
         
 
 class AttendanceForm(BaseForm):

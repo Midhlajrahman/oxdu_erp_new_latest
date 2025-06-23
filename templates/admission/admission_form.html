@@ -214,12 +214,12 @@
         function toggleFields() {
             var selectedFeeType = $("#id_fee_type").val();
     
-            if (selectedFeeType === "one_time") {
+            if (["one_time", "installment", "Finance",].includes(selectedFeeType)) {
                 $("#id_is_discount").parents(".form-group, .mb-3").show();
-                $("#id_discount_percentage").parents(".form-group, .mb-3").show();
+                $("#id_discount_amount").parents(".form-group, .mb-3").show();
             } else {
                 $("#id_is_discount").parents(".form-group, .mb-3").hide();
-                $("#id_discount_percentage").parents(".form-group, .mb-3").hide();
+                $("#id_discount_amount").parents(".form-group, .mb-3").hide();
             }
         }
     
