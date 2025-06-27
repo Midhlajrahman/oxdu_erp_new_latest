@@ -145,14 +145,10 @@ class AttendanceRegisterTable(BaseTable):
 class FeeReceiptTable(BaseTable):
     action = columns.TemplateColumn(
         """
-        <div class="btn-group">
-            <a class="btn btn-default mx-1 btn-sm" title='View' href="{{record.get_absolute_url}}"><i class="fa fa-eye"></i></a>
-            <a class="btn btn-default mx-1 btn-sm" title='Edit' href="{{record.get_update_url}}"><i class="fa fa-edit"></i></a>
-            <a class="btn btn-default mx-1 btn-sm" title='Delete' href="{{record.get_delete_url}}"><i class="fa fa-trash"></i></a>
-        </div>
+        <a href="{{ record.get_absolute_url }}" class="btn btn-sm btn-light btn-outline-info">OPEN</a>
         """,
         orderable=False,
-    )   
+    )
     created = None
     class Meta:
         model = FeeReceipt
