@@ -317,10 +317,10 @@ class FeeReceipt(BaseModel):
         return f"Receipt No: {self.receipt_no} - Student: {self.student} - Amount: {self.amount}"
     
     def get_total_amount(self):
-        return FeeReceipt.objects.filter(student=self.student).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+        return FeeReceipt.objects.filter(student=self.student, is_active=True).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
     
     def get_balance_amount(self):
-        total_paid = FeeReceipt.objects.filter(student=self.student).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+        total_paid = FeeReceipt.objects.filter(student=self.student, is_active=True).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
         return self.student.course.fees - total_paid
     
     def get_receipt_balance(self):
