@@ -148,6 +148,8 @@
         const { jsPDF } = window.jspdf;
         const card = this.closest('.card');
         const btn = this;
+        const originalWidth = card.style.width;
+        card.style.width = '900px'; // Set fixed width for PDF
         btn.style.display = 'none'; // Hide the button
         html2canvas(card, { scale: 3 }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
@@ -155,9 +157,11 @@
             const imgWidth = 190;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            pdf.save('student_fee_overview.pdf');
+            pdf.save('{{object.fullname}}_fee_overview.pdf');
+            card.style.width = originalWidth; // Restore original width
             btn.style.display = 'inline-block'; // Show the button again
         }).catch(error => {
+            card.style.width = originalWidth; // Restore original width on error
             btn.style.display = 'inline-block'; // Show the button again on error
         });
     });

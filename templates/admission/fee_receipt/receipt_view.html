@@ -47,20 +47,24 @@
                                 <p class="fw-medium mb-2">Receipt To</p>
                                 <div class="billed-to">
                                     <h6>{{object.student.fullname}}</h6>
-                                    {% if object.student.communication_address %}
-                                    <p>{{object.student.communication_address}}<br>
+                                    {% if object.student.communication_address|default:"" %}
+                                    <p>{{object.student.communication_address|default:""}}<br>
                                     {% endif %}
-                                    Phone : {{object.student.contact_number}}<br>
-                                    Email: {{object.student.personal_email}}</p>
+                                    Phone : {{object.student.contact_number|default:""}}<br>
+                                    Email: {{object.student.personal_email|default:""}}</p>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="billed-from text-md-end">
                                     <label class="fw-medium">Receipt From</label>
                                     <h6>Oxdu Integrated Media School.</h6>
-                                    <p>{{object.student.branch.get_address}}<br>
-                                    Phone : {{object.student.branch.contact_number}}<br>
-                                    Email: {{object.student.branch.email}}</p>
+                                    <p>{{object.student.branch.get_address|default:""}}<br>
+                                    {% if object.student.branch.contact_number %}
+                                    Phone : {{object.student.branch.contact_number|default:""}}<br> 
+                                    {% endif %}
+                                    {% if object.student.branch.email %}
+                                    Email: {{object.student.branch.email|default:""}}</p>
+                                    {% endif %}
                                 </div><!-- billed-from -->
                             </div>
                         </div>
@@ -131,7 +135,8 @@
         const { jsPDF } = window.jspdf;
         const invoiceCard = document.getElementById("invoice-card");
         const buttons = document.querySelector(".invoice-btns"); 
-    
+        const originalWidth = invoiceCard.style.width;
+        invoiceCard.style.width = '900px'; // Set fixed width for PDF
         buttons.style.display = "none";
     
         html2canvas(invoiceCard, { scale: 3 }).then(canvas => {
@@ -142,11 +147,13 @@
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
             pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-            pdf.save("invoice.pdf");
+            pdf.save("Receipt-{{object.student.fullname}}.pdf");
     
+            invoiceCard.style.width = originalWidth; // Restore original width
             buttons.style.display = "block";
         }).catch(error => {
             console.error("Error generating PDF:", error);
+            invoiceCard.style.width = originalWidth; // Restore original width on error
             buttons.style.display = "block"; 
         });
     }
