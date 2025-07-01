@@ -271,3 +271,22 @@ input[readonly] {
 .table-hover tbody tr:hover {
     background-color: rgba(0, 0, 0, 0.02);
 }
+.id-card-btn {
+    background: #f8f9fa;
+    color: #0d6efd;
+    border: 1px solid #0d6efd8a;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    font-weight: 500;
+    box-shadow: none;
+}
+.id-card-btn:hover, .id-card-btn:focus {
+    background: #e7f1ff;
+    color: #084298;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+}
+.id-card-btn i {
+    margin-right: 6px;
+    font-size: 1.1em;
+}

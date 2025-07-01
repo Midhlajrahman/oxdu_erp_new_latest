@@ -78,6 +78,7 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between w-100">
           <h5 class="mb-0">Receipt List</h5>
+          <button class="btn btn-info" id="download-overview-btn" type="button"><i class="ri-download-2-line align-middle"></i> Download</button>
         </div>
         <div class="card-body p-5">
           <div class="table-responsive">
@@ -110,11 +111,22 @@
                   <th colspan="4" class="text-end fw-bold">Total Receipt:</th>
                   <th class="fw-bold text-success">₹{{ object.get_total_fee_amount }}</th>
                 </tr>
-
                 <tr>
-                    <th colspan="4" class="text-end fw-bold">Balance Due:</th>
-                    <th class="fw-bold text-danger">₹{{ object.get_balance_amount }}</th>
-                  </tr>
+                  <th colspan="4" class="text-end fw-bold">Total Course Fee:</th>
+                  <th class="fw-bold">₹{{ object.course.fees }}</th>
+                </tr>
+                <tr>
+                  <th colspan="4" class="text-end fw-bold">Discount:</th>
+                  <th class="fw-bold text-warning">₹{% if object.is_discount and object.discount_amount %}{{ object.discount_amount }}{% else %}0{% endif %}</th>
+                </tr>
+                <tr>
+                  <th colspan="4" class="text-end fw-bold">Current Fee:</th>
+                  <th class="fw-bold text-info">₹{{ object.get_current_fee }}</th>
+                </tr>
+                <tr>
+                  <th colspan="4" class="text-end fw-bold">Balance Due:</th>
+                  <th class="fw-bold text-danger">₹{{ object.get_balance_amount }}</th>
+                </tr>
               </tfoot>
             </table>
           </div>
@@ -127,4 +139,27 @@
 
   </div>
 </div>
+
+<!-- Add scripts for download functionality -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    document.getElementById('download-overview-btn').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const card = this.closest('.card');
+        const btn = this;
+        btn.style.display = 'none'; // Hide the button
+        html2canvas(card, { scale: 3 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            pdf.save('student_fee_overview.pdf');
+            btn.style.display = 'inline-block'; // Show the button again
+        }).catch(error => {
+            btn.style.display = 'inline-block'; // Show the button again on error
+        });
+    });
+</script>
 {% endblock content %}

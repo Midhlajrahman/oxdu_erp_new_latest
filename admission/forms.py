@@ -91,7 +91,6 @@ class AdmissionFinancialDataForm(forms.ModelForm):
         with transaction.atomic():
             fee_names = ["first_payment", "second_payment", "third_payment", "fourth_payment"]
 
-            # Create StudentFee entries only if they don't exist (avoiding duplication)
             if not StudentFee.objects.filter(student=admission).exists():
                 for fee_name in fee_names:
                     fee_structure = FeeStructure.objects.filter(course=admission.course, name=fee_name).first()
@@ -99,28 +98,8 @@ class AdmissionFinancialDataForm(forms.ModelForm):
                         StudentFee.objects.create(student=admission, fee_structure=fee_structure)
 
             if commit:
-                admission.save()  # save the updated Admission first (important!)
+                admission.save() 
 
-            # Now handle the discount logic properly:
-            if admission.is_discount and admission.discount_amount:
-
-                # Total Discount Already Applied in FeeReceipt:
-                total_discount_applied = FeeReceipt.objects.filter(
-                    student=admission,
-                    note="Discount Applied"
-                ).aggregate(total=Sum('amount'))['total'] or 0
-
-                # New discount value from form
-                current_discount = admission.discount_amount
-
-                difference = current_discount - total_discount_applied
-
-                if difference != 0:  # Means discount increased or reduced
-                    FeeReceipt.objects.create(
-                        student=admission,
-                        amount=difference,
-                        note="Discount Applied"
-                    )
 
         return admission
 

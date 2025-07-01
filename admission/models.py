@@ -184,7 +184,16 @@ class Admission(BaseModel):
     
     def get_balance_amount(self):
         total_paid = FeeReceipt.objects.filter(student=self).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
-        return self.course.fees - total_paid
+        course_fee = self.course.fees
+        if self.is_discount and self.discount_amount:
+            course_fee -= self.discount_amount
+        return course_fee - total_paid
+
+    def get_current_fee(self):
+        course_fee = self.course.fees
+        if self.is_discount and self.discount_amount:
+            course_fee -= self.discount_amount
+        return course_fee
     
     def get_fee(self):
         return FeeStructure.objects.filter(course=self.course)
@@ -324,35 +333,35 @@ class FeeReceipt(BaseModel):
         return self.student.course.fees - total_paid
     
     def get_receipt_balance(self):
-        total_course_fees = self.student.course.fees 
-        
+        # Use discounted fee if applicable
+        course_fee = self.student.course.fees
+        if self.student.is_discount and self.student.discount_amount:
+            course_fee -= self.student.discount_amount
         previous_payments = FeeReceipt.objects.filter(
             student=self.student, 
-            id__lt=self.id  
+            id__lt=self.id ,
+            is_active = True
         ).aggregate(Sum('amount'))['amount__sum'] or 0
-        
-        remaining_balance = total_course_fees - previous_payments
-        
+        remaining_balance = course_fee - previous_payments
         receipt_balance = remaining_balance - self.amount  
-
         return max(receipt_balance, 0)
     
     def get_due_amount(self):
-        total_course_fees = self.student.course.fees 
-        
+        # Use discounted fee if applicable
+        course_fee = self.student.course.fees
+        if self.student.is_discount and self.student.discount_amount:
+            course_fee -= self.student.discount_amount
         previous_payments = FeeReceipt.objects.filter(
             student=self.student, 
-            id__lt=self.id  
+            id__lt=self.id,
+            is_active = True
         ).aggregate(Sum('amount'))['amount__sum'] or 0
-        
-        remaining_balance = total_course_fees - previous_payments
-        
+        remaining_balance = course_fee - previous_payments
         due_amount = remaining_balance - self.amount  
-
         return max(due_amount, 0)
 
     class Meta:
-        ordering = ("-date",)
+        ordering = ("-id",)
     
     @staticmethod
     def get_list_url():

@@ -69,7 +69,9 @@
                                 <thead>
                                     <tr>
                                         <th class="">Course</th>
-                                        <th class="text-center">Course Price</th>
+                                        <th class="text-center">Original Course Fee</th>
+                                        <th class="text-center">Discount</th>
+                                        <th class="text-center">Current Fee</th>
                                         <th class="text-end">Paid</th>
                                         <th class="text-end">Balance</th>
                                     </tr>
@@ -78,6 +80,14 @@
                                     <tr>
                                         <td class="fw-medium">{{object.student.course}}</td>
                                         <td class="text-center fw-bold">₹{{object.student.course.fees}}</td>
+                                        <td class="text-center fw-bold text-warning">
+                                            {% if object.student.is_discount and object.student.discount_amount %}
+                                                ₹{{object.student.discount_amount}}
+                                            {% else %}
+                                                ₹0
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center fw-bold text-info">₹{{object.student.get_current_fee}}</td>
                                         <td class="text-end fw-bold text-success">₹{{object.amount}}</td>
                                         <td class="text-end fw-bold text-danger">₹{{object.get_receipt_balance|default:"0"}}</td>
                                     </tr>
